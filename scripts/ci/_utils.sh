@@ -126,9 +126,9 @@ function convert_docker_mounts_to_docker_params() {
     while IFS= read -r LINE; do
         echo "-v"
         echo "${LINE}"
-    done < <(parse_yaml scripts/ci/docker-compose-local.yml COMPOSE_ | \
+    done < <(parse_yaml scripts/ci/docker-compose/local.yml COMPOSE_ | \
             grep "COMPOSE_services_airflow-testing_volumes_" | \
-            sed "s/..\/../${ESCAPED_AIRFLOW_SOURCES}/" | \
+            sed "s/..\/..\/../${ESCAPED_AIRFLOW_SOURCES}/" | \
             sed "s/COMPOSE_services_airflow-testing_volumes_//" | \
             sort -t "=" -k 1 -n | \
             cut -d "=" -f 2- | \
@@ -860,7 +860,7 @@ function build_image_on_ci() {
     export FORCE_BUILD="true"
     export VERBOSE="${VERBOSE:="false"}"
 
-    if [[ ${TRAVIS_JOB_NAME:=""} == "Tests"*"kubernetes"* ]]; then
+    if [[ ${TRAVIS_JOB_NAME:=""} == "Tests"*"Kubernetes"* ]]; then
         match_files_regexp 'airflow/kubernetes/.*\.py' 'tests/kubernetes/.*\.py' \
             'airflow/www/.*\.py' 'airflow/www/.*\.js' 'airflow/www/.*\.html' \
             'scripts/ci/.*'
