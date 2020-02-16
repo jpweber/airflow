@@ -15,29 +15,25 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-
 # Script to run mypy on all code. Can be started from any working directory
-set -uo pipefail
-
-MY_DIR=$(cd "$(dirname "$0")" || exit 1; pwd)
-
-# shellcheck source=scripts/ci/in_container/_in_container_utils.sh
-. "${MY_DIR}/_in_container_utils.sh"
-
-in_container_basic_sanity_check
-
-in_container_script_start
+# shellcheck source=scripts/ci/in_container/_in_container_script_init.sh
+. "$( dirname "${BASH_SOURCE[0]}" )/_in_container_script_init.sh"
 
 echo
 echo "Running mypy with parameters: $*"
 echo
 echo
 
+<<<<<<< HEAD
 mypy --cache-dir=/dev/null "$@"
+=======
+set +e
+>>>>>>> ae04980da... [AIRFLOW-6816] Simplified common functions in breeze scripts (#7430)
 
+mypy "$@"
 RES="$?"
 
-in_container_script_end
+set -e
 
 if [[ "${RES}" != 0 ]]; then
     echo >&2
