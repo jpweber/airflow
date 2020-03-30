@@ -24,11 +24,7 @@ echo "Running mypy with parameters: $*"
 echo
 echo
 
-<<<<<<< HEAD
-mypy --cache-dir=/dev/null "$@"
-=======
 set +e
->>>>>>> ae04980da... [AIRFLOW-6816] Simplified common functions in breeze scripts (#7430)
 
 mypy "$@"
 RES="$?"
