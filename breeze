@@ -2086,7 +2086,7 @@ function run_breeze_command {
             setup_autocomplete
             ;;
         manage_kind_cluster)
-            check_kind_and_kubectl_are_installed
+            make_sure_kubernetes_tools_are_installed
             perform_kind_cluster_operation "${KIND_CLUSTER_OPERATION}"
             ;;
         build_docs)

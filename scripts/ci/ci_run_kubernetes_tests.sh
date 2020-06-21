@@ -100,7 +100,7 @@ if [[ ${INTERACTIVE} == "true" ]]; then
     echo
     echo "The webserver is available at http://localhost:30809/"
     echo
-    echo "User/password: airflow/airflow"
+    echo "User/password: admin/admin"
     echo
     echo "You are entering the virtualenv now. Type exit to exit back to the original shell"
     echo

@@ -336,7 +336,6 @@ For your testing you manage Kind cluster with ``kind-cluster`` breeze command:
 
     ./breeze kind-cluster [ start | stop | recreate | status ]
 
-
 The command allows you to start/stop/recreate/status Kind Kubernetes cluster
 in your docker engine as well as deploy airflow to use it for testing (with ``deploy`` command).
 
@@ -360,7 +359,6 @@ Deploying Airflow to the Kubernetes cluster created is also done via ``kind-clus
 .. code-block:: bash
 
     ./breeze kind-cluster deploy
-
 
 The deploy commands performs tthose steps:
 
@@ -513,7 +511,7 @@ Once you enter the environment you get this information:
 
     The webserver is available at http://localhost:30809/
 
-    User/password: airflow/airflow
+    User/password: admin/admin
 
     You are entering the virtualenv now. Type exit to exit back to the original shell
 

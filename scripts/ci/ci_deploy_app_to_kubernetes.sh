@@ -31,11 +31,7 @@ HANDLERS="$( trap -p EXIT | cut -f2 -d \' )"
 trap "${HANDLERS}${HANDLERS:+;}dump_kind_logs" EXIT
 
 get_ci_environment
-check_kind_and_kubectl_are_installed
-build_kubernetes_image
+make_sure_kubernetes_tools_are_installed
+build_prod_image_for_kubernetes_tests
 load_image_to_kind_cluster
-prepare_kubernetes_app_variables
-prepare_kubernetes_resources
-apply_kubernetes_resources
-wait_for_airflow_pods_up_and_running
-wait_for_airflow_webserver_up_and_running
+deploy_airflow_with_helm

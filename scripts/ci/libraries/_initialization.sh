@@ -236,6 +236,12 @@ function initialize_common_environment {
     # Name of the KinD cluster to connect to when referred to via kubectl
     export KUBECTL_CLUSTER_NAME=kind-${KIND_CLUSTER_NAME}
 
+    # folder with DAGs to embed into production image
+    export EMBEDDED_DAGS=${EMBEDDED_DAGS:="empty"}
+
+    # Namespace where airflow is installed via helm
+    export HELM_AIRFLOW_NAMESPACE="airflow"
+
 }
 
 # Retrieves CI environment variables needed - depending on the CI system we run it in.
