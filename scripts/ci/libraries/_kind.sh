@@ -257,16 +257,20 @@ function deploy_airflow_with_helm() {
     echo
     echo "Deleting namespace ${HELM_AIRFLOW_NAMESPACE}"
     verbose_kubectl delete namespace "${HELM_AIRFLOW_NAMESPACE}" >/dev/null 2>&1 || true
+    verbose_kubectl delete namespace "test-namespace" >/dev/null 2>&1 || true
     verbose_kubectl create namespace "${HELM_AIRFLOW_NAMESPACE}"
+    verbose_kubectl create namespace "test-namespace"
     cd "${AIRFLOW_SOURCES}/chart" || exit 1
     verbose_helm repo add stable https://kubernetes-charts.storage.googleapis.com
     verbose_helm dep update
     verbose_helm install airflow . --namespace "${HELM_AIRFLOW_NAMESPACE}" \
         --set "defaultAirflowRepository=${DOCKERHUB_USER}/${DOCKERHUB_REPO}" \
+        --set "images.airflow.repository=${DOCKERHUB_USER}/${DOCKERHUB_REPO}" \
+        --set "images.airflow.tag=${AIRFLOW_PROD_BASE_TAG}" -v 1 \
         --set "defaultAirflowTag=${AIRFLOW_PROD_BASE_TAG}" -v 1
     echo
 
-    verbose_kubectl port-forward svc/airflow-webserver 30809:8080 --namespace airflow >/dev/null &
+    verbose_kubectl port-forward svc/airflow-webserver 8080:8080 --namespace airflow >/dev/null &
 }
 
 
