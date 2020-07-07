@@ -165,7 +165,7 @@ ${{ hashFiles('requirements/requirements-python${{matrix.python-version}}.txt') 
     strategy:
       matrix:
         python-version: [3.6, 3.7, 3.8]
-        postgres-version: [9.6, 10]
+        postgres-version: [10, 12.2]
         test-type: [Core, Integration]
       fail-fast: false
     env:
@@ -260,7 +260,7 @@ ${{ hashFiles('requirements/requirements-python${{matrix.python-version}}.txt') 
     strategy:
       matrix:
         python-version: [3.6]
-        postgres-version: [9.6]
+        postgres-version: [10]
         test-type: [Quarantined]
       fail-fast: false
     env:
