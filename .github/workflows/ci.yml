@@ -284,29 +284,6 @@ ${{ hashFiles('requirements/requirements-python${{matrix.python-version}}.txt') 
       - name: "Tests"
         run: ./scripts/ci/ci_run_airflow_testing.sh
 
-  requirements:
-    timeout-minutes: 80
-    name: "Requirements"
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.6, 3.7, 3.8]
-      fail-fast: false
-    env:
-      PYTHON_MAJOR_MINOR_VERSION: ${{ matrix.python-version }}
-      CHECK_REQUIREMENTS_ONLY: true
-      UPGRADE_WHILE_GENERATING_REQUIREMENTS: ${{ github.event_name == 'schedule' }}
-      CI_JOB_TYPE: "Requirements"
-    steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-python@v1
-      - name: "Free space"
-        run: ./scripts/ci/ci_free_space_on_ci.sh
-      - name: "Build CI image ${{ matrix.python-version }}"
-        run: ./scripts/ci/ci_prepare_ci_image_on_ci.sh
-      - name: "Generate requirements"
-        run: ./scripts/ci/ci_generate_requirements.sh
-
   push-ci-images-to-github-cache:
     timeout-minutes: 40
     name: "Push CI images"
@@ -315,7 +292,6 @@ ${{ hashFiles('requirements/requirements-python${{matrix.python-version}}.txt') 
       - tests-sqlite
       - tests-postgres
       - tests-mysql
-      - requirements
       - docs
     if: |
       (github.ref == 'refs/heads/master' ||
