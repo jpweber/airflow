@@ -19,9 +19,11 @@
 name: CI Build
 on:
   push:
-    branches: ['master', 'v1-10-test', 'v1-10-stable']
+    branches: ['master', 'v1-10-test', 'v1-10-11']
+    tags: ['v1.10.11+astro.*']
   pull_request:
-    branches: ['master', 'v1-10-test', 'v1-10-stable']
+    branches: ['master', 'v1-10-test', 'v1-10-11']
+
 
 env:
 
@@ -314,7 +316,6 @@ ${{ hashFiles('requirements/requirements-python${{matrix.python-version}}.txt') 
       - tests-postgres
       - tests-mysql
       - requirements
-      - build-prod-image
       - docs
     if: |
       (github.ref == 'refs/heads/master' ||
