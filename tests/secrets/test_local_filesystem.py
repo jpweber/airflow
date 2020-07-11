@@ -107,10 +107,13 @@ class TestLoadVariables(unittest.TestCase):
     @parameterized.expand(
         (
             ("KEY: AAA", {"KEY": "AAA"}),
-            ("""
+            (
+                """
             KEY_A: AAA
             KEY_B: BBB
-            """, {"KEY_A": "AAA", "KEY_B": "BBB"}),
+            """,
+                {"KEY_A": "AAA", "KEY_B": "BBB"},
+            ),
         )
     )
     def test_yaml_file_should_load_variables(self, file_content, expected_variables):
@@ -210,12 +213,16 @@ class TestLoadConnection(unittest.TestCase):
     @parameterized.expand(
         (
             ("""CONN_A: 'mysql://host_a'""", {"CONN_A": ["mysql://host_a"]}),
-            ("""
+            (
+                """
             CONN_B:
                 - 'mysql://host_a'
                 - 'mysql://host_b'
-             """, {"CONN_B": ["mysql://host_a", "mysql://host_b"]}),
-            ("""
+             """,
+                {"CONN_B": ["mysql://host_a", "mysql://host_b"]},
+            ),
+            (
+                """
             conn_a: mysql://hosta
             conn_b:
               - mysql://hostb
@@ -231,10 +238,18 @@ class TestLoadConnection(unittest.TestCase):
                  extra__google_cloud_platform__keyfile_dict:
                    a: b
                  extra__google_cloud_platform__keyfile_path: asaa""",
-                {"conn_a": ["mysql://hosta"], "conn_b": ["mysql://hostb", "mysql://hostc"],
-                    "conn_c": [''.join("""scheme://Login:None@host:1234/lschema?
+                {
+                    "conn_a": ["mysql://hosta"],
+                    "conn_b": ["mysql://hostb", "mysql://hostc"],
+                    "conn_c": [
+                        ''.join(
+                            """scheme://Login:None@host:1234/lschema?
                         extra__google_cloud_platform__keyfile_dict=%7B%27a%27%3A+%27b%27%7D
-                        &extra__google_cloud_platform__keyfile_path=asaa""".split())]}),
+                        &extra__google_cloud_platform__keyfile_path=asaa""".split()
+                        )
+                    ],
+                },
+            ),
         )
     )
     def test_yaml_file_should_load_connection(self, file_content, expected_connection_uris):
@@ -249,7 +264,8 @@ class TestLoadConnection(unittest.TestCase):
 
     @parameterized.expand(
         (
-            ("""conn_c:
+            (
+                """conn_c:
                conn_type: scheme
                host: host
                schema: lschema
@@ -259,8 +275,11 @@ class TestLoadConnection(unittest.TestCase):
                extra_dejson:
                  aws_conn_id: bbb
                  region_name: ccc
-                 """, {"conn_c": [{"aws_conn_id": "bbb", "region_name": "ccc"}]}),
-            ("""conn_d:
+                 """,
+                {"conn_c": [{"aws_conn_id": "bbb", "region_name": "ccc"}]},
+            ),
+            (
+                """conn_d:
                conn_type: scheme
                host: host
                schema: lschema
@@ -271,18 +290,27 @@ class TestLoadConnection(unittest.TestCase):
                  extra__google_cloud_platform__keyfile_dict:
                    a: b
                  extra__google_cloud_platform__key_path: xxx
-                 """, {"conn_d": [{"extra__google_cloud_platform__keyfile_dict": {"a": "b"},
-                                   "extra__google_cloud_platform__key_path": "xxx"}]}),
-            ("""conn_d:
+                 """,
+                {
+                    "conn_d": [
+                        {
+                            "extra__google_cloud_platform__keyfile_dict": {"a": "b"},
+                            "extra__google_cloud_platform__key_path": "xxx",
+                        }
+                    ]
+                },
+            ),
+            (
+                """conn_d:
                conn_type: scheme
                host: host
                schema: lschema
                login: Login
                password: None
                port: 1234
-               extra: '{\"extra__google_cloud_platform__keyfile_dict\": {\"a\": \"b\"}}'""", {"conn_d": [
-                {"extra__google_cloud_platform__keyfile_dict": {"a": "b"}}]})
-
+               extra: '{\"extra__google_cloud_platform__keyfile_dict\": {\"a\": \"b\"}}'""",
+                {"conn_d": [{"extra__google_cloud_platform__keyfile_dict": {"a": "b"}}]},
+            ),
         )
     )
     def test_yaml_file_should_load_connection_extras(self, file_content, expected_extras):
@@ -296,7 +324,8 @@ class TestLoadConnection(unittest.TestCase):
 
     @parameterized.expand(
         (
-            ("""conn_c:
+            (
+                """conn_c:
                conn_type: scheme
                host: host
                schema: lschema
@@ -308,7 +337,9 @@ class TestLoadConnection(unittest.TestCase):
                extra_dejson:
                  aws_conn_id: bbb
                  region_name: ccc
-                 """, "The extra and extra_dejson parameters are mutually exclusive."),
+                 """,
+                "The extra and extra_dejson parameters are mutually exclusive.",
+            ),
         )
     )
     def test_yaml_invalid_extra(self, file_content, expected_message):

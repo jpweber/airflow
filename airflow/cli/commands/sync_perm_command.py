@@ -30,6 +30,4 @@ def sync_perm(args):
     print('Updating permission on all DAG views')
     dags = DagBag().dags.values()
     for dag in dags:
-        appbuilder.sm.sync_perm_for_dag(
-            dag.dag_id,
-            dag.access_control)
+        appbuilder.sm.sync_perm_for_dag(dag.dag_id, dag.access_control)

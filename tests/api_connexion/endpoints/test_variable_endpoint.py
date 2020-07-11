@@ -58,7 +58,6 @@ class TestDeleteVariable(TestVariableEndpoint):
 
 
 class TestGetVariable(TestVariableEndpoint):
-
     def test_should_response_200(self):
         expected_value = '{"foo": 1}'
         Variable.set("TEST_VARIABLE_KEY", expected_value)
@@ -72,28 +71,28 @@ class TestGetVariable(TestVariableEndpoint):
 
 
 class TestGetVariables(TestVariableEndpoint):
-    @parameterized.expand([
-        ("/api/v1/variables?limit=2&offset=0", {
-            "variables": [
-                {"key": "var1", "value": "1"},
-                {"key": "var2", "value": "foo"},
-            ],
-            "total_entries": 3,
-        }),
-        ("/api/v1/variables?limit=2&offset=1", {
-            "variables": [
-                {"key": "var2", "value": "foo"},
-                {"key": "var3", "value": "[100, 101]"},
-            ],
-            "total_entries": 3,
-        }),
-        ("/api/v1/variables?limit=1&offset=2", {
-            "variables": [
-                {"key": "var3", "value": "[100, 101]"},
-            ],
-            "total_entries": 3,
-        }),
-    ])
+    @parameterized.expand(
+        [
+            (
+                "/api/v1/variables?limit=2&offset=0",
+                {
+                    "variables": [{"key": "var1", "value": "1"}, {"key": "var2", "value": "foo"},],
+                    "total_entries": 3,
+                },
+            ),
+            (
+                "/api/v1/variables?limit=2&offset=1",
+                {
+                    "variables": [{"key": "var2", "value": "foo"}, {"key": "var3", "value": "[100, 101]"},],
+                    "total_entries": 3,
+                },
+            ),
+            (
+                "/api/v1/variables?limit=1&offset=2",
+                {"variables": [{"key": "var3", "value": "[100, 101]"},], "total_entries": 3,},
+            ),
+        ]
+    )
     def test_should_get_list_variables(self, query, expected):
         Variable.set("var1", 1)
         Variable.set("var2", "foo")
@@ -122,10 +121,7 @@ class TestGetVariables(TestVariableEndpoint):
 class TestPatchVariable(TestVariableEndpoint):
     def test_should_update_variable(self):
         Variable.set("var1", "foo")
-        response = self.client.patch("/api/v1/variables/var1", json={
-            "key": "var1",
-            "value": "updated",
-        })
+        response = self.client.patch("/api/v1/variables/var1", json={"key": "var1", "value": "updated",})
         assert response.status_code == 204
         response = self.client.get("/api/v1/variables/var1")
         assert response.json == {
@@ -135,10 +131,7 @@ class TestPatchVariable(TestVariableEndpoint):
 
     def test_should_reject_invalid_update(self):
         Variable.set("var1", "foo")
-        response = self.client.patch("/api/v1/variables/var1", json={
-            "key": "var2",
-            "value": "updated",
-        })
+        response = self.client.patch("/api/v1/variables/var1", json={"key": "var2", "value": "updated",})
         assert response.status_code == 400
         assert response.json == {
             "title": "Invalid post body",
@@ -147,9 +140,7 @@ class TestPatchVariable(TestVariableEndpoint):
             "detail": "key from request body doesn't match uri parameter",
         }
 
-        response = self.client.patch("/api/v1/variables/var1", json={
-            "key": "var2",
-        })
+        response = self.client.patch("/api/v1/variables/var1", json={"key": "var2",})
         assert response.json == {
             "title": "Invalid Variable schema",
             "status": 400,
@@ -160,10 +151,7 @@ class TestPatchVariable(TestVariableEndpoint):
 
 class TestPostVariables(TestVariableEndpoint):
     def test_should_create_variable(self):
-        response = self.client.post("/api/v1/variables", json={
-            "key": "var_create",
-            "value": "{}",
-        })
+        response = self.client.post("/api/v1/variables", json={"key": "var_create", "value": "{}",})
         assert response.status_code == 200
         response = self.client.get("/api/v1/variables/var_create")
         assert response.json == {
@@ -172,10 +160,7 @@ class TestPostVariables(TestVariableEndpoint):
         }
 
     def test_should_reject_invalid_request(self):
-        response = self.client.post("/api/v1/variables", json={
-            "key": "var_create",
-            "v": "{}",
-        })
+        response = self.client.post("/api/v1/variables", json={"key": "var_create", "v": "{}",})
         assert response.status_code == 400
         assert response.json == {
             "title": "Invalid Variable schema",

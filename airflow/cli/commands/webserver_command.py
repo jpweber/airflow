@@ -78,6 +78,7 @@ class GunicornMonitor(LoggingMixin):
     :param reload_on_plugin_change: If set to True, Airflow will track files in plugins_follder directory.
         When it detects changes, then reload the gunicorn.
     """
+
     def __init__(
         self,
         gunicorn_master_pid: int,
@@ -85,7 +86,7 @@ class GunicornMonitor(LoggingMixin):
         master_timeout: int,
         worker_refresh_interval: int,
         worker_refresh_batch_size: int,
-        reload_on_plugin_change: bool
+        reload_on_plugin_change: bool,
     ):
         super().__init__()
         self.gunicorn_master_proc = psutil.Process(gunicorn_master_pid)
@@ -170,7 +171,7 @@ class GunicornMonitor(LoggingMixin):
             excess += 1
             self._wait_until_true(
                 lambda: self.num_workers_expected + excess == self._get_num_workers_running(),
-                timeout=self.master_timeout
+                timeout=self.master_timeout,
             )
 
     def _kill_old_workers(self, count: int) -> None:
@@ -185,7 +186,8 @@ class GunicornMonitor(LoggingMixin):
             self.gunicorn_master_proc.send_signal(signal.SIGTTOU)
             self._wait_until_true(
                 lambda: self.num_workers_expected + count == self._get_num_workers_running(),
-                timeout=self.master_timeout)
+                timeout=self.master_timeout,
+            )
 
     def _reload_gunicorn(self) -> None:
         """
@@ -197,8 +199,7 @@ class GunicornMonitor(LoggingMixin):
         self.gunicorn_master_proc.send_signal(signal.SIGHUP)
         sleep(1)
         self._wait_until_true(
-            lambda: self.num_workers_expected == self._get_num_workers_running(),
-            timeout=self.master_timeout
+            lambda: self.num_workers_expected == self._get_num_workers_running(), timeout=self.master_timeout
         )
 
     def start(self) -> NoReturn:
@@ -208,7 +209,7 @@ class GunicornMonitor(LoggingMixin):
         try:  # pylint: disable=too-many-nested-blocks
             self._wait_until_true(
                 lambda: self.num_workers_expected == self._get_num_workers_running(),
-                timeout=self.master_timeout
+                timeout=self.master_timeout,
             )
             while True:
                 if not self.gunicorn_master_proc.is_running():
@@ -234,7 +235,8 @@ class GunicornMonitor(LoggingMixin):
         if num_ready_workers_running < num_workers_running:
             self.log.debug(
                 '[%d / %d] Some workers are starting up, waiting...',
-                num_ready_workers_running, num_workers_running
+                num_ready_workers_running,
+                num_workers_running,
             )
             sleep(1)
             return
@@ -253,9 +255,9 @@ class GunicornMonitor(LoggingMixin):
         # to increase number of workers
         if num_workers_running < self.num_workers_expected:
             self.log.error(
-                "[%d / %d] Some workers seem to have died and gunicorn did not restart "
-                "them as expected",
-                num_ready_workers_running, num_workers_running
+                "[%d / %d] Some workers seem to have died and gunicorn did not restart " "them as expected",
+                num_ready_workers_running,
+                num_workers_running,
             )
             sleep(10)
             num_workers_running = self._get_num_workers_running()
@@ -265,7 +267,9 @@ class GunicornMonitor(LoggingMixin):
                 )
                 self.log.debug(
                     '[%d / %d] Spawning %d workers',
-                    num_ready_workers_running, num_workers_running, new_worker_count
+                    num_ready_workers_running,
+                    num_workers_running,
+                    new_worker_count,
                 )
                 self._spawn_new_workers(num_workers_running)
             return
@@ -275,12 +279,14 @@ class GunicornMonitor(LoggingMixin):
         # If workers should be restarted periodically.
         if self.worker_refresh_interval > 0 and self._last_refresh_time:
             # and we refreshed the workers a long time ago, refresh the workers
-            last_refresh_diff = (time.time() - self._last_refresh_time)
+            last_refresh_diff = time.time() - self._last_refresh_time
             if self.worker_refresh_interval < last_refresh_diff:
                 num_new_workers = self.worker_refresh_batch_size
                 self.log.debug(
                     '[%d / %d] Starting doing a refresh. Starting %d workers.',
-                    num_ready_workers_running, num_workers_running, num_new_workers
+                    num_ready_workers_running,
+                    num_workers_running,
+                    num_new_workers,
                 )
                 self._spawn_new_workers(num_new_workers)
                 self._last_refresh_time = time.time()
@@ -295,14 +301,16 @@ class GunicornMonitor(LoggingMixin):
                 self.log.debug(
                     '[%d / %d] Plugins folder changed. The gunicorn will be restarted the next time the '
                     'plugin directory is checked, if there is no change in it.',
-                    num_ready_workers_running, num_workers_running
+                    num_ready_workers_running,
+                    num_workers_running,
                 )
                 self._restart_on_next_plugin_check = True
                 self._last_plugin_state = new_state
             elif self._restart_on_next_plugin_check:
                 self.log.debug(
                     '[%d / %d] Starts reloading the gunicorn configuration.',
-                    num_ready_workers_running, num_workers_running
+                    num_ready_workers_running,
+                    num_workers_running,
                 )
                 self._restart_on_next_plugin_check = False
                 self._last_refresh_time = time.time()
@@ -317,25 +325,24 @@ def webserver(args):
     access_logfile = args.access_logfile or conf.get('webserver', 'access_logfile')
     error_logfile = args.error_logfile or conf.get('webserver', 'error_logfile')
     num_workers = args.workers or conf.get('webserver', 'workers')
-    worker_timeout = (args.worker_timeout or
-                      conf.get('webserver', 'web_server_worker_timeout'))
+    worker_timeout = args.worker_timeout or conf.get('webserver', 'web_server_worker_timeout')
     ssl_cert = args.ssl_cert or conf.get('webserver', 'web_server_ssl_cert')
     ssl_key = args.ssl_key or conf.get('webserver', 'web_server_ssl_key')
     if not ssl_cert and ssl_key:
-        raise AirflowException(
-            'An SSL certificate must also be provided for use with ' + ssl_key)
+        raise AirflowException('An SSL certificate must also be provided for use with ' + ssl_key)
     if ssl_cert and not ssl_key:
-        raise AirflowException(
-            'An SSL key must also be provided for use with ' + ssl_cert)
+        raise AirflowException('An SSL key must also be provided for use with ' + ssl_cert)
 
     if args.debug:
-        print(
-            "Starting the web server on port {0} and host {1}.".format(
-                args.port, args.hostname))
+        print("Starting the web server on port {0} and host {1}.".format(args.port, args.hostname))
         app = create_app(testing=conf.getboolean('core', 'unit_test_mode'))
-        app.run(debug=True, use_reloader=not app.config['TESTING'],
-                port=args.port, host=args.hostname,
-                ssl_context=(ssl_cert, ssl_key) if ssl_cert and ssl_key else None)
+        app.run(
+            debug=True,
+            use_reloader=not app.config['TESTING'],
+            port=args.port,
+            host=args.hostname,
+            ssl_context=(ssl_cert, ssl_key) if ssl_cert and ssl_key else None,
+        )
     else:
         # This pre-warms the cache, and makes possible errors
         # get reported earlier (i.e. before demonization)
@@ -344,33 +351,49 @@ def webserver(args):
         os.environ.pop('SKIP_DAGS_PARSING')
 
         pid_file, stdout, stderr, log_file = setup_locations(
-            "webserver", args.pid, args.stdout, args.stderr, args.log_file)
+            "webserver", args.pid, args.stdout, args.stderr, args.log_file
+        )
 
         # Check if webserver is already running if not, remove old pidfile
         check_if_pidfile_process_is_running(pid_file=pid_file, process_name="webserver")
 
         print(
-            textwrap.dedent('''\
+            textwrap.dedent(
+                '''\
                 Running the Gunicorn Server with:
                 Workers: {num_workers} {workerclass}
                 Host: {hostname}:{port}
                 Timeout: {worker_timeout}
                 Logfiles: {access_logfile} {error_logfile}
                 =================================================================\
-            '''.format(num_workers=num_workers, workerclass=args.workerclass,
-                       hostname=args.hostname, port=args.port,
-                       worker_timeout=worker_timeout, access_logfile=access_logfile,
-                       error_logfile=error_logfile)))
+            '''.format(
+                    num_workers=num_workers,
+                    workerclass=args.workerclass,
+                    hostname=args.hostname,
+                    port=args.port,
+                    worker_timeout=worker_timeout,
+                    access_logfile=access_logfile,
+                    error_logfile=error_logfile,
+                )
+            )
+        )
 
         run_args = [
             'gunicorn',
-            '--workers', str(num_workers),
-            '--worker-class', str(args.workerclass),
-            '--timeout', str(worker_timeout),
-            '--bind', args.hostname + ':' + str(args.port),
-            '--name', 'airflow-webserver',
-            '--pid', pid_file,
-            '--config', 'python:airflow.www.gunicorn_config',
+            '--workers',
+            str(num_workers),
+            '--worker-class',
+            str(args.workerclass),
+            '--timeout',
+            str(worker_timeout),
+            '--bind',
+            args.hostname + ':' + str(args.port),
+            '--name',
+            'airflow-webserver',
+            '--pid',
+            pid_file,
+            '--config',
+            'python:airflow.www.gunicorn_config',
         ]
 
         if args.access_logfile:

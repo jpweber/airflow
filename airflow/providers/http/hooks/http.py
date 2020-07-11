@@ -38,12 +38,7 @@ class HttpHook(BaseHook):
     :type auth_type: AuthBase of python requests lib
     """
 
-    def __init__(
-        self,
-        method='POST',
-        http_conn_id='http_default',
-        auth_type=HTTPBasicAuth,
-    ) -> None:
+    def __init__(self, method='POST', http_conn_id='http_default', auth_type=HTTPBasicAuth,) -> None:
         super().__init__()
         self.http_conn_id = http_conn_id
         self.method = method.upper()
@@ -107,8 +102,7 @@ class HttpHook(BaseHook):
 
         session = self.get_conn(headers)
 
-        if self.base_url and not self.base_url.endswith('/') and \
-           endpoint and not endpoint.startswith('/'):
+        if self.base_url and not self.base_url.endswith('/') and endpoint and not endpoint.startswith('/'):
             url = self.base_url + '/' + endpoint
         else:
             url = (self.base_url or '') + (endpoint or '')
@@ -116,24 +110,13 @@ class HttpHook(BaseHook):
         req = None
         if self.method == 'GET':
             # GET uses params
-            req = requests.Request(self.method,
-                                   url,
-                                   params=data,
-                                   headers=headers,
-                                   **request_kwargs)
+            req = requests.Request(self.method, url, params=data, headers=headers, **request_kwargs)
         elif self.method == 'HEAD':
             # HEAD doesn't use params
-            req = requests.Request(self.method,
-                                   url,
-                                   headers=headers,
-                                   **request_kwargs)
+            req = requests.Request(self.method, url, headers=headers, **request_kwargs)
         else:
             # Others use data
-            req = requests.Request(self.method,
-                                   url,
-                                   data=data,
-                                   headers=headers,
-                                   **request_kwargs)
+            req = requests.Request(self.method, url, data=data, headers=headers, **request_kwargs)
 
         prepped_request = session.prepare_request(req)
         self.log.info("Sending '%s' to url: %s", self.method, url)
@@ -178,7 +161,8 @@ class HttpHook(BaseHook):
                 proxies=extra_options.get("proxies", {}),
                 cert=extra_options.get("cert"),
                 timeout=extra_options.get("timeout"),
-                allow_redirects=extra_options.get("allow_redirects", True))
+                allow_redirects=extra_options.get("allow_redirects", True),
+            )
 
             if extra_options.get('check_response', True):
                 self.check_response(response)
@@ -213,8 +197,6 @@ class HttpHook(BaseHook):
                  )
 
         """
-        self._retry_obj = tenacity.Retrying(
-            **_retry_args
-        )
+        self._retry_obj = tenacity.Retrying(**_retry_args)
 
         return self._retry_obj(self.run, *args, **kwargs)

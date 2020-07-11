@@ -23,9 +23,6 @@ from tests.test_utils.system_tests_class import SystemTest
 
 @pytest.mark.system("core")
 class TestExampleDagsSystem(SystemTest):
-    @parameterized.expand([
-        "example_bash_operator",
-        "example_branch_operator"
-    ])
+    @parameterized.expand(["example_bash_operator", "example_branch_operator"])
     def test_dag_example(self, dag_id):
         self.run_dag(dag_id=dag_id)

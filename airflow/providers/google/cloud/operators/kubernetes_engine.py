@@ -70,17 +70,20 @@ class GKEDeleteClusterOperator(BaseOperator):
     :param api_version: The api version to use
     :type api_version: str
     """
+
     template_fields = ['project_id', 'gcp_conn_id', 'name', 'location', 'api_version']
 
     @apply_defaults
-    def __init__(self,
-                 name: str,
-                 location: str,
-                 project_id: Optional[str] = None,
-                 gcp_conn_id: str = 'google_cloud_default',
-                 api_version: str = 'v2',
-                 *args,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        name: str,
+        location: str,
+        project_id: Optional[str] = None,
+        gcp_conn_id: str = 'google_cloud_default',
+        api_version: str = 'v2',
+        *args,
+        **kwargs,
+    ) -> None:
         super().__init__(*args, **kwargs)
 
         self.project_id = project_id
@@ -92,8 +95,7 @@ class GKEDeleteClusterOperator(BaseOperator):
 
     def _check_input(self):
         if not all([self.project_id, self.name, self.location]):
-            self.log.error(
-                'One of (project_id, name, location) is missing or incorrect')
+            self.log.error('One of (project_id, name, location) is missing or incorrect')
             raise AirflowException('Operator has incorrect or missing input.')
 
     def execute(self, context):
@@ -149,17 +151,20 @@ class GKECreateClusterOperator(BaseOperator):
     :param api_version: The api version to use
     :type api_version: str
     """
+
     template_fields = ['project_id', 'gcp_conn_id', 'location', 'api_version', 'body']
 
     @apply_defaults
-    def __init__(self,
-                 location: str,
-                 body: Optional[Union[Dict, Cluster]],
-                 project_id: Optional[str] = None,
-                 gcp_conn_id: str = 'google_cloud_default',
-                 api_version: str = 'v2',
-                 *args,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        location: str,
+        body: Optional[Union[Dict, Cluster]],
+        project_id: Optional[str] = None,
+        gcp_conn_id: str = 'google_cloud_default',
+        api_version: str = 'v2',
+        *args,
+        **kwargs,
+    ) -> None:
         super().__init__(*args, **kwargs)
 
         self.project_id = project_id
@@ -171,8 +176,8 @@ class GKECreateClusterOperator(BaseOperator):
 
     def _check_input(self):
         if not all([self.project_id, self.location, self.body]) or not (
-            (isinstance(self.body, dict) and "name" in self.body and "initial_node_count" in self.body) or
-            (getattr(self.body, "name", None) and getattr(self.body, "initial_node_count", None))
+            (isinstance(self.body, dict) and "name" in self.body and "initial_node_count" in self.body)
+            or (getattr(self.body, "name", None) and getattr(self.body, "initial_node_count", None))
         ):
             self.log.error(
                 "One of (project_id, location, body, body['name'], "
@@ -222,18 +227,20 @@ class GKEStartPodOperator(KubernetesPodOperator):
         users to specify a service account.
     :type gcp_conn_id: str
     """
-    template_fields = ('project_id', 'location',
-                       'cluster_name') + KubernetesPodOperator.template_fields
+
+    template_fields = ('project_id', 'location', 'cluster_name') + KubernetesPodOperator.template_fields
 
     @apply_defaults
-    def __init__(self,
-                 location: str,
-                 cluster_name: str,
-                 use_internal_ip: bool = False,
-                 project_id: Optional[str] = None,
-                 gcp_conn_id: str = 'google_cloud_default',
-                 *args,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        location: str,
+        cluster_name: str,
+        use_internal_ip: bool = False,
+        project_id: Optional[str] = None,
+        gcp_conn_id: str = 'google_cloud_default',
+        *args,
+        **kwargs,
+    ) -> None:
         super().__init__(*args, **kwargs)
         self.project_id = project_id
         self.location = location
@@ -253,15 +260,17 @@ class GKEStartPodOperator(KubernetesPodOperator):
         self.project_id = self.project_id or hook.project_id
 
         if not self.project_id:
-            raise AirflowException("The project id must be passed either as "
-                                   "keyword project_id parameter or as project_id extra "
-                                   "in GCP connection definition. Both are not set!")
+            raise AirflowException(
+                "The project id must be passed either as "
+                "keyword project_id parameter or as project_id extra "
+                "in GCP connection definition. Both are not set!"
+            )
 
         # Write config to a temp file and set the environment variable to point to it.
         # This is to avoid race conditions of reading/writing a single file
-        with tempfile.NamedTemporaryFile() as conf_file,\
-                patch_environ({KUBE_CONFIG_ENV_VAR: conf_file.name}), \
-                hook.provide_authorized_gcloud():
+        with tempfile.NamedTemporaryFile() as conf_file, patch_environ(
+            {KUBE_CONFIG_ENV_VAR: conf_file.name}
+        ), hook.provide_authorized_gcloud():
             # Attempt to get/update credentials
             # We call gcloud directly instead of using google-cloud-python api
             # because there is no way to write kubernetes config to a file, which is
@@ -274,8 +283,10 @@ class GKEStartPodOperator(KubernetesPodOperator):
                 "clusters",
                 "get-credentials",
                 self.cluster_name,
-                "--zone", self.location,
-                "--project", self.project_id
+                "--zone",
+                self.location,
+                "--project",
+                self.project_id,
             ]
             if self.use_internal_ip:
                 cmd.append('--internal-ip')

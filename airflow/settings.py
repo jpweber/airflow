@@ -52,13 +52,15 @@ except Exception:  # pylint: disable=broad-except
 log.info("Configured default timezone %s", TIMEZONE)
 
 
-HEADER = '\n'.join([
-    r'  ____________       _____________',
-    r' ____    |__( )_________  __/__  /________      __',
-    r'____  /| |_  /__  ___/_  /_ __  /_  __ \_ | /| / /',
-    r'___  ___ |  / _  /   _  __/ _  / / /_/ /_ |/ |/ /',
-    r' _/_/  |_/_/  /_/    /_/    /_/  \____/____/|__/',
-])
+HEADER = '\n'.join(
+    [
+        r'  ____________       _____________',
+        r' ____    |__( )_________  __/__  /________      __',
+        r'____  /| |_  /__  ___/_  /_ __  /_  __ \_ | /| / /',
+        r'___  ___ |  / _  /   _  __/ _  / / /_/ /_ |/ |/ /',
+        r' _/_/  |_/_/  /_/    /_/    /_/  \____/____/|__/',
+    ]
+)
 
 LOGGING_LEVEL = logging.INFO
 
@@ -149,11 +151,7 @@ def configure_vars():
     SQL_ALCHEMY_CONN = conf.get('core', 'SQL_ALCHEMY_CONN')
     DAGS_FOLDER = os.path.expanduser(conf.get('core', 'DAGS_FOLDER'))
 
-    PLUGINS_FOLDER = conf.get(
-        'core',
-        'plugins_folder',
-        fallback=os.path.join(AIRFLOW_HOME, 'plugins')
-    )
+    PLUGINS_FOLDER = conf.get('core', 'plugins_folder', fallback=os.path.join(AIRFLOW_HOME, 'plugins'))
 
 
 def configure_orm(disable_connection_pool=False):
@@ -198,8 +196,14 @@ def configure_orm(disable_connection_pool=False):
         # https://docs.sqlalchemy.org/en/13/core/pooling.html#disconnect-handling-pessimistic
         pool_pre_ping = conf.getboolean('core', 'SQL_ALCHEMY_POOL_PRE_PING', fallback=True)
 
-        log.debug("settings.configure_orm(): Using pool settings. pool_size=%d, max_overflow=%d, "
-                  "pool_recycle=%d, pid=%d", pool_size, max_overflow, pool_recycle, os.getpid())
+        log.debug(
+            "settings.configure_orm(): Using pool settings. pool_size=%d, max_overflow=%d, "
+            "pool_recycle=%d, pid=%d",
+            pool_size,
+            max_overflow,
+            pool_recycle,
+            os.getpid(),
+        )
         engine_args['pool_size'] = pool_size
         engine_args['pool_recycle'] = pool_recycle
         engine_args['pool_pre_ping'] = pool_pre_ping
@@ -218,10 +222,8 @@ def configure_orm(disable_connection_pool=False):
     setup_event_handlers(engine)
 
     Session = scoped_session(
-        sessionmaker(autocommit=False,
-                     autoflush=False,
-                     bind=engine,
-                     expire_on_commit=False))
+        sessionmaker(autocommit=False, autoflush=False, bind=engine, expire_on_commit=False)
+    )
 
 
 def dispose_orm():
@@ -241,18 +243,22 @@ def dispose_orm():
 def configure_adapters():
     """ Register Adapters and DB Converters """
     from pendulum import DateTime as Pendulum
+
     try:
         from sqlite3 import register_adapter
+
         register_adapter(Pendulum, lambda val: val.isoformat(' '))
     except ImportError:
         pass
     try:
         import MySQLdb.converters
+
         MySQLdb.converters.conversions[Pendulum] = MySQLdb.converters.DateTime2literal
     except ImportError:
         pass
     try:
         import pymysql.converters
+
         pymysql.converters.conversions[Pendulum] = pymysql.converters.escape_datetime
     except ImportError:
         pass
@@ -335,6 +341,8 @@ def initialize():
 
     # Ensure we close DB connections at scheduler and gunicon worker terminations
     atexit.register(dispose_orm)
+
+
 # pylint: enable=global-statement
 
 
@@ -342,8 +350,7 @@ def initialize():
 
 KILOBYTE = 1024
 MEGABYTE = KILOBYTE * KILOBYTE
-WEB_COLORS = {'LIGHTBLUE': '#4d9de0',
-              'LIGHTORANGE': '#FF9933'}
+WEB_COLORS = {'LIGHTBLUE': '#4d9de0', 'LIGHTORANGE': '#FF9933'}
 
 # If store_serialized_dags is True, scheduler writes serialized DAGs to DB, and webserver
 # reads DAGs from DB instead of importing from files.
@@ -351,8 +358,7 @@ STORE_SERIALIZED_DAGS = conf.getboolean('core', 'store_serialized_dags', fallbac
 
 # Updating serialized DAG can not be faster than a minimum interval to reduce database
 # write rate.
-MIN_SERIALIZED_DAG_UPDATE_INTERVAL = conf.getint(
-    'core', 'min_serialized_dag_update_interval', fallback=30)
+MIN_SERIALIZED_DAG_UPDATE_INTERVAL = conf.getint('core', 'min_serialized_dag_update_interval', fallback=30)
 
 # Whether to persist DAG files code in DB. If set to True, Webserver reads file contents
 # from DB instead of trying to access files in a DAG folder.

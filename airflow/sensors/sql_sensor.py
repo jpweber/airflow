@@ -52,12 +52,16 @@ class SqlSensor(BaseSensorOperator):
     """
 
     template_fields = ('sql',)  # type: Iterable[str]
-    template_ext = ('.hql', '.sql',)  # type: Iterable[str]
+    template_ext = (
+        '.hql',
+        '.sql',
+    )  # type: Iterable[str]
     ui_color = '#7c7287'
 
     @apply_defaults
-    def __init__(self, conn_id, sql, parameters=None, success=None, failure=None, fail_on_empty=False,
-                 *args, **kwargs):
+    def __init__(
+        self, conn_id, sql, parameters=None, success=None, failure=None, fail_on_empty=False, *args, **kwargs
+    ):
         self.conn_id = conn_id
         self.sql = sql
         self.parameters = parameters
@@ -69,12 +73,23 @@ class SqlSensor(BaseSensorOperator):
     def _get_hook(self):
         conn = BaseHook.get_connection(self.conn_id)
 
-        allowed_conn_type = {'google_cloud_platform', 'jdbc', 'mssql',
-                             'mysql', 'odbc', 'oracle', 'postgres',
-                             'presto', 'sqlite', 'vertica'}
+        allowed_conn_type = {
+            'google_cloud_platform',
+            'jdbc',
+            'mssql',
+            'mysql',
+            'odbc',
+            'oracle',
+            'postgres',
+            'presto',
+            'sqlite',
+            'vertica',
+        }
         if conn.conn_type not in allowed_conn_type:
-            raise AirflowException("The connection type is not supported by SqlSensor. " +
-                                   "Supported connection types: {}".format(list(allowed_conn_type)))
+            raise AirflowException(
+                "The connection type is not supported by SqlSensor. "
+                + "Supported connection types: {}".format(list(allowed_conn_type))
+            )
         return conn.get_hook()
 
     def poke(self, context):
@@ -92,7 +107,8 @@ class SqlSensor(BaseSensorOperator):
             if callable(self.failure):
                 if self.failure(first_cell):
                     raise AirflowException(
-                        "Failure criteria met. self.failure({}) returned True".format(first_cell))
+                        "Failure criteria met. self.failure({}) returned True".format(first_cell)
+                    )
             else:
                 raise AirflowException("self.failure is present, but not callable -> {}".format(self.success))
         if self.success is not None:

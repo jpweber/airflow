@@ -24,7 +24,6 @@ from airflow.models import KubeResourceVersion, KubeWorkerIdentifier
 
 
 class TestKubeResourceVersion(unittest.TestCase):
-
     def test_checkpoint_resource_version(self):
         session = settings.Session()
         KubeResourceVersion.checkpoint_resource_version('7', session)
@@ -38,13 +37,10 @@ class TestKubeResourceVersion(unittest.TestCase):
 
 
 class TestKubeWorkerIdentifier(unittest.TestCase):
-
     @patch('airflow.models.kubernetes.uuid.uuid4')
     def test_get_or_create_not_exist(self, mock_uuid):
         session = settings.Session()
-        session.query(KubeWorkerIdentifier).update({
-            KubeWorkerIdentifier.worker_uuid: ''
-        })
+        session.query(KubeWorkerIdentifier).update({KubeWorkerIdentifier.worker_uuid: ''})
         mock_uuid.return_value = 'abcde'
         worker_uuid = KubeWorkerIdentifier.get_or_create_current_kube_worker_uuid(session)
         self.assertEqual(worker_uuid, 'abcde')

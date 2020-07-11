@@ -52,13 +52,8 @@ class SegmentHook(BaseHook):
         So we define it in the `Extras` field as:
         `{"write_key":"YOUR_SECURITY_TOKEN"}`
     """
-    def __init__(
-            self,
-            segment_conn_id='segment_default',
-            segment_debug_mode=False,
-            *args,
-            **kwargs
-    ):
+
+    def __init__(self, segment_conn_id='segment_default', segment_debug_mode=False, *args, **kwargs):
         super().__init__()
         self.segment_conn_id = segment_conn_id
         self.segment_debug_mode = segment_debug_mode
@@ -85,6 +80,5 @@ class SegmentHook(BaseHook):
         """
         Handles error callbacks when using Segment with segment_debug_mode set to True
         """
-        self.log.error('Encountered Segment error: %s with '
-                       'items: %s', error, items)
+        self.log.error('Encountered Segment error: %s with ' 'items: %s', error, items)
         raise AirflowException('Segment error: {}'.format(error))

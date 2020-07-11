@@ -36,6 +36,7 @@ XCOM_SKIPMIXIN_FOLLOWED = "followed"
 
 class SkipMixin(LoggingMixin):
     """ A Mixin to skip Tasks Instances """
+
     def _set_state_to_skipped(self, dag_run, execution_date, tasks, session):
         """
         Used internally to set state of task instances to skipped from the same dag run.
@@ -106,12 +107,10 @@ class SkipMixin(LoggingMixin):
                 task_id=task_id,
                 dag_id=dag_run.dag_id,
                 execution_date=dag_run.execution_date,
-                session=session
+                session=session,
             )
 
-    def skip_all_except(
-        self, ti: TaskInstance, branch_task_ids: Union[str, Iterable[str]]
-    ):
+    def skip_all_except(self, ti: TaskInstance, branch_task_ids: Union[str, Iterable[str]]):
         """
         This method implements the logic for a branching operator; given a single
         task ID or list of task IDs to follow, this skips all other tasks
@@ -142,15 +141,10 @@ class SkipMixin(LoggingMixin):
             skip_tasks = [
                 t
                 for t in downstream_tasks
-                if t.task_id not in branch_task_ids
-                and t.task_id not in branch_downstream_task_ids
+                if t.task_id not in branch_task_ids and t.task_id not in branch_downstream_task_ids
             ]
 
             self.log.info("Skipping tasks %s", [t.task_id for t in skip_tasks])
             with create_session() as session:
-                self._set_state_to_skipped(
-                    dag_run, ti.execution_date, skip_tasks, session=session
-                )
-                ti.xcom_push(
-                    key=XCOM_SKIPMIXIN_KEY, value={XCOM_SKIPMIXIN_FOLLOWED: branch_task_ids}
-                )
+                self._set_state_to_skipped(dag_run, ti.execution_date, skip_tasks, session=session)
+                ti.xcom_push(key=XCOM_SKIPMIXIN_KEY, value={XCOM_SKIPMIXIN_FOLLOWED: branch_task_ids})

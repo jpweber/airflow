@@ -44,7 +44,8 @@ from airflow import version
 from airflow.exceptions import AirflowException
 from airflow.hooks.base_hook import BaseHook
 from airflow.providers.google.cloud.utils.credentials_provider import (
-    _get_scopes, get_credentials_and_project_id,
+    _get_scopes,
+    get_credentials_and_project_id,
 )
 from airflow.utils.process_utils import patch_environ
 
@@ -76,18 +77,10 @@ def is_soft_quota_exception(exception: Exception):
     * Google Video Intelligence
     """
     if isinstance(exception, Forbidden):
-        return any(
-            reason in error.details()
-            for reason in INVALID_REASONS
-            for error in exception.errors
-        )
+        return any(reason in error.details() for reason in INVALID_REASONS for error in exception.errors)
 
     if isinstance(exception, (ResourceExhausted, TooManyRequests)):
-        return any(
-            key in error.details()
-            for key in INVALID_KEYS
-            for error in exception.errors
-        )
+        return any(key in error.details() for key in INVALID_KEYS for error in exception.errors)
 
     return False
 
@@ -181,7 +174,7 @@ class GoogleBaseHook(BaseHook):
             key_path=key_path,
             keyfile_dict=keyfile_dict_json,
             scopes=self.scopes,
-            delegate_to=self.delegate_to
+            delegate_to=self.delegate_to,
         )
 
         overridden_project_id = self._get_field('project')
@@ -295,6 +288,7 @@ class GoogleBaseHook(BaseHook):
         A decorator that provides a mechanism to repeat requests in response to exceeding a temporary quote
         limit.
         """
+
         def decorator(fun: Callable):
             default_kwargs = {
                 'wait': tenacity.wait_exponential(multiplier=1, max=100),
@@ -303,9 +297,8 @@ class GoogleBaseHook(BaseHook):
                 'after': tenacity.after_log(log, logging.DEBUG),
             }
             default_kwargs.update(**kwargs)
-            return tenacity.retry(
-                *args, **default_kwargs
-            )(fun)
+            return tenacity.retry(*args, **default_kwargs)(fun)
+
         return decorator
 
     @staticmethod
@@ -315,6 +308,7 @@ class GoogleBaseHook(BaseHook):
         operation in progress (HTTP 409)
         limit.
         """
+
         def decorator(fun: Callable):
             default_kwargs = {
                 'wait': tenacity.wait_exponential(multiplier=1, max=300),
@@ -323,9 +317,8 @@ class GoogleBaseHook(BaseHook):
                 'after': tenacity.after_log(log, logging.DEBUG),
             }
             default_kwargs.update(**kwargs)
-            return tenacity.retry(
-                *args, **default_kwargs
-            )(fun)
+            return tenacity.retry(*args, **default_kwargs)(fun)
+
         return decorator
 
     @staticmethod
@@ -339,21 +332,25 @@ class GoogleBaseHook(BaseHook):
         :param func: function to wrap
         :return: result of the function call
         """
+
         @functools.wraps(func)
         def inner_wrapper(self: GoogleBaseHook, *args, **kwargs) -> RT:
             if args:
                 raise AirflowException(
-                    "You must use keyword arguments in this methods rather than"
-                    " positional")
+                    "You must use keyword arguments in this methods rather than" " positional"
+                )
             if 'project_id' in kwargs:
                 kwargs['project_id'] = kwargs['project_id'] or self.project_id
             else:
                 kwargs['project_id'] = self.project_id
             if not kwargs['project_id']:
-                raise AirflowException("The project id must be passed either as "
-                                       "keyword project_id parameter or as project_id extra "
-                                       "in GCP connection definition. Both are not set!")
+                raise AirflowException(
+                    "The project id must be passed either as "
+                    "keyword project_id parameter or as project_id extra "
+                    "in GCP connection definition. Both are not set!"
+                )
             return func(self, *args, **kwargs)
+
         return inner_wrapper
 
     @staticmethod
@@ -366,10 +363,12 @@ class GoogleBaseHook(BaseHook):
         scope when authorization data is available. Using context manager also
         makes it easier to use multiple connection in one function.
         """
+
         @functools.wraps(func)
         def wrapper(self: GoogleBaseHook, *args, **kwargs) -> RT:
             with self.provide_gcp_credential_file_as_context():
                 return func(self, *args, **kwargs)
+
         return wrapper
 
     @contextmanager
@@ -381,8 +380,12 @@ class GoogleBaseHook(BaseHook):
         It can be used to provide credentials for external programs (e.g. gcloud) that expect authorization
         file in ``GOOGLE_APPLICATION_CREDENTIALS`` environment variable.
         """
-        key_path = self._get_field('key_path', None)  # type: Optional[str]  # noqa: E501  #  pylint: disable=protected-access
-        keyfile_dict = self._get_field('keyfile_dict', None)  # type: Optional[Dict]  # noqa: E501  # pylint: disable=protected-access
+        key_path = self._get_field(
+            'key_path', None
+        )  # type: Optional[str]  # noqa: E501  #  pylint: disable=protected-access
+        keyfile_dict = self._get_field(
+            'keyfile_dict', None
+        )  # type: Optional[Dict]  # noqa: E501  # pylint: disable=protected-access
         if key_path and keyfile_dict:
             raise AirflowException(
                 "The `keyfile_dict` and `key_path` fields are mutually exclusive. "
@@ -390,9 +393,7 @@ class GoogleBaseHook(BaseHook):
             )
         elif key_path:
             if key_path.endswith('.p12'):
-                raise AirflowException(
-                    'Legacy P12 key file are not supported, use a JSON key file.'
-                )
+                raise AirflowException('Legacy P12 key file are not supported, use a JSON key file.')
             with patch_environ({CREDENTIALS: key_path}):
                 yield key_path
         elif keyfile_dict:
@@ -418,42 +419,40 @@ class GoogleBaseHook(BaseHook):
         credentials_path = _cloud_sdk.get_application_default_credentials_path()
         project_id = self.project_id
 
-        with self.provide_gcp_credential_file_as_context(), \
-                tempfile.TemporaryDirectory() as gcloud_config_tmp, \
-                patch_environ({'CLOUDSDK_CONFIG': gcloud_config_tmp}):
+        with self.provide_gcp_credential_file_as_context(), tempfile.TemporaryDirectory() as gcloud_config_tmp, patch_environ(
+            {'CLOUDSDK_CONFIG': gcloud_config_tmp}
+        ):
 
             if project_id:
                 # Don't display stdout/stderr for security reason
-                check_output([
-                    "gcloud", "config", "set", "core/project", project_id
-                ])
+                check_output(["gcloud", "config", "set", "core/project", project_id])
             if CREDENTIALS in os.environ:
                 # This solves most cases when we are logged in using the service key in Airflow.
                 # Don't display stdout/stderr for security reason
-                check_output([
-                    "gcloud", "auth", "activate-service-account", f"--key-file={os.environ[CREDENTIALS]}",
-                ])
+                check_output(
+                    ["gcloud", "auth", "activate-service-account", f"--key-file={os.environ[CREDENTIALS]}",]
+                )
             elif os.path.exists(credentials_path):
                 # If we are logged in by `gcloud auth application-default` then we need to log in manually.
                 # This will make the `gcloud auth application-default` and `gcloud auth` credentials equals.
                 with open(credentials_path) as creds_file:
                     creds_content = json.loads(creds_file.read())
                     # Don't display stdout/stderr for security reason
-                    check_output([
-                        "gcloud", "config", "set", "auth/client_id", creds_content["client_id"]
-                    ])
+                    check_output(["gcloud", "config", "set", "auth/client_id", creds_content["client_id"]])
                     # Don't display stdout/stderr for security reason
-                    check_output([
-                        "gcloud", "config", "set", "auth/client_secret", creds_content["client_secret"]
-                    ])
+                    check_output(
+                        ["gcloud", "config", "set", "auth/client_secret", creds_content["client_secret"]]
+                    )
                     # Don't display stdout/stderr for security reason
-                    check_output([
-                        "gcloud",
-                        "auth",
-                        "activate-refresh-token",
-                        creds_content["client_id"],
-                        creds_content["refresh_token"],
-                    ])
+                    check_output(
+                        [
+                            "gcloud",
+                            "auth",
+                            "activate-refresh-token",
+                            creds_content["client_id"],
+                            creds_content["refresh_token"],
+                        ]
+                    )
             yield
 
     @staticmethod

@@ -40,17 +40,14 @@ class MetastorePartitionSensor(SqlSensor):
     :param mysql_conn_id: a reference to the MySQL conn_id for the metastore
     :type mysql_conn_id: str
     """
+
     template_fields = ('partition_name', 'table', 'schema')
     ui_color = '#8da7be'
 
     @apply_defaults
-    def __init__(self,
-                 table,
-                 partition_name,
-                 schema="default",
-                 mysql_conn_id="metastore_mysql",
-                 *args,
-                 **kwargs):
+    def __init__(
+        self, table, partition_name, schema="default", mysql_conn_id="metastore_mysql", *args, **kwargs
+    ):
 
         self.partition_name = partition_name
         self.table = table
@@ -78,5 +75,7 @@ class MetastorePartitionSensor(SqlSensor):
                 B0.TBL_NAME = '{self.table}' AND
                 C0.NAME = '{self.schema}' AND
                 A0.PART_NAME = '{self.partition_name}';
-            """.format(self=self)
+            """.format(
+                self=self
+            )
         return super().poke(context)

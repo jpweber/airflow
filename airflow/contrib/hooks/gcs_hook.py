@@ -24,7 +24,8 @@ from airflow.providers.google.cloud.hooks.gcs import GCSHook
 
 warnings.warn(
     "This module is deprecated. Please use `airflow.providers.google.cloud.hooks.gcs`.",
-    DeprecationWarning, stacklevel=2
+    DeprecationWarning,
+    stacklevel=2,
 )
 
 
@@ -32,9 +33,11 @@ class GoogleCloudStorageHook(GCSHook):
     """
     This class is deprecated. Please use `airflow.providers.google.cloud.hooks.gcs.GCSHook`.
     """
+
     def __init__(self, *args, **kwargs):
         warnings.warn(
             "This class is deprecated. Please use `airflow.providers.google.cloud.hooks.gcs.GCSHook`.",
-            DeprecationWarning, stacklevel=2
+            DeprecationWarning,
+            stacklevel=2,
         )
         super().__init__(*args, **kwargs)

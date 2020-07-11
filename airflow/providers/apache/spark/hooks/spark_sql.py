@@ -56,21 +56,22 @@ class SparkSqlHook(BaseHook):
     """
 
     # pylint: disable=too-many-arguments
-    def __init__(self,
-                 sql,
-                 conf=None,
-                 conn_id='spark_sql_default',
-                 total_executor_cores=None,
-                 executor_cores=None,
-                 executor_memory=None,
-                 keytab=None,
-                 principal=None,
-                 master='yarn',
-                 name='default-name',
-                 num_executors=None,
-                 verbose=True,
-                 yarn_queue='default'
-                 ):
+    def __init__(
+        self,
+        sql,
+        conf=None,
+        conn_id='spark_sql_default',
+        total_executor_cores=None,
+        executor_cores=None,
+        executor_memory=None,
+        keytab=None,
+        principal=None,
+        master='yarn',
+        name='default-name',
+        num_executors=None,
+        verbose=True,
+        yarn_queue='default',
+    ):
         super().__init__()
         self._sql = sql
         self._conf = conf
@@ -151,10 +152,7 @@ class SparkSqlHook(BaseHook):
         :type kwargs: dict
         """
         spark_sql_cmd = self._prepare_command(cmd)
-        self._sp = subprocess.Popen(spark_sql_cmd,
-                                    stdout=subprocess.PIPE,
-                                    stderr=subprocess.STDOUT,
-                                    **kwargs)
+        self._sp = subprocess.Popen(spark_sql_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **kwargs)
 
         for line in iter(self._sp.stdout):
             self.log.info(line)

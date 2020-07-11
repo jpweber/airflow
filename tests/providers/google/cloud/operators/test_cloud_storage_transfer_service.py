@@ -29,17 +29,37 @@ from parameterized import parameterized
 from airflow.exceptions import AirflowException
 from airflow.models import DAG, TaskInstance
 from airflow.providers.google.cloud.hooks.cloud_storage_transfer_service import (
-    ACCESS_KEY_ID, AWS_ACCESS_KEY, AWS_S3_DATA_SOURCE, BUCKET_NAME, FILTER_JOB_NAMES, GCS_DATA_SINK,
-    GCS_DATA_SOURCE, HTTP_DATA_SOURCE, LIST_URL, NAME, SCHEDULE, SCHEDULE_END_DATE, SCHEDULE_START_DATE,
-    SECRET_ACCESS_KEY, START_TIME_OF_DAY, STATUS, TRANSFER_SPEC,
+    ACCESS_KEY_ID,
+    AWS_ACCESS_KEY,
+    AWS_S3_DATA_SOURCE,
+    BUCKET_NAME,
+    FILTER_JOB_NAMES,
+    GCS_DATA_SINK,
+    GCS_DATA_SOURCE,
+    HTTP_DATA_SOURCE,
+    LIST_URL,
+    NAME,
+    SCHEDULE,
+    SCHEDULE_END_DATE,
+    SCHEDULE_START_DATE,
+    SECRET_ACCESS_KEY,
+    START_TIME_OF_DAY,
+    STATUS,
+    TRANSFER_SPEC,
 )
 from airflow.providers.google.cloud.operators.cloud_storage_transfer_service import (
-    CloudDataTransferServiceCancelOperationOperator, CloudDataTransferServiceCreateJobOperator,
-    CloudDataTransferServiceDeleteJobOperator, CloudDataTransferServiceGCSToGCSOperator,
-    CloudDataTransferServiceGetOperationOperator, CloudDataTransferServiceListOperationsOperator,
-    CloudDataTransferServicePauseOperationOperator, CloudDataTransferServiceResumeOperationOperator,
-    CloudDataTransferServiceS3ToGCSOperator, CloudDataTransferServiceUpdateJobOperator,
-    TransferJobPreprocessor, TransferJobValidator,
+    CloudDataTransferServiceCancelOperationOperator,
+    CloudDataTransferServiceCreateJobOperator,
+    CloudDataTransferServiceDeleteJobOperator,
+    CloudDataTransferServiceGCSToGCSOperator,
+    CloudDataTransferServiceGetOperationOperator,
+    CloudDataTransferServiceListOperationsOperator,
+    CloudDataTransferServicePauseOperationOperator,
+    CloudDataTransferServiceResumeOperationOperator,
+    CloudDataTransferServiceS3ToGCSOperator,
+    CloudDataTransferServiceUpdateJobOperator,
+    TransferJobPreprocessor,
+    TransferJobValidator,
 )
 from airflow.utils import timezone
 
@@ -168,12 +188,15 @@ class TestTransferJobPreprocessor(unittest.TestCase):
     def test_should_set_default_schedule(self):
         body = {}
         TransferJobPreprocessor(body=body, default_schedule=True).process_body()
-        self.assertEqual(body, {
-            SCHEDULE: {
-                SCHEDULE_END_DATE: {'day': 15, 'month': 10, 'year': 2018},
-                SCHEDULE_START_DATE: {'day': 15, 'month': 10, 'year': 2018}
-            }
-        })
+        self.assertEqual(
+            body,
+            {
+                SCHEDULE: {
+                    SCHEDULE_END_DATE: {'day': 15, 'month': 10, 'year': 2018},
+                    SCHEDULE_START_DATE: {'day': 15, 'month': 10, 'year': 2018},
+                }
+            },
+        )
 
 
 class TestTransferJobValidator(unittest.TestCase):

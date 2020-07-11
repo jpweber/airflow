@@ -27,6 +27,7 @@ from airflow.utils.session import provide_session
 
 class KubeResourceVersion(Base):
     """Table containing Kubernetes Resource versions"""
+
     __tablename__ = "kube_resource_version"
     one_row_id = Column(Boolean, server_default=sqltrue(), primary_key=True)
     resource_version = Column(String(255))
@@ -43,24 +44,23 @@ class KubeResourceVersion(Base):
     def checkpoint_resource_version(resource_version, session: Session = None) -> None:
         """Update Kubernetes Resource Version in Airflow Metadata DB"""
         if resource_version:
-            session.query(KubeResourceVersion).update({
-                KubeResourceVersion.resource_version: resource_version
-            })
+            session.query(KubeResourceVersion).update(
+                {KubeResourceVersion.resource_version: resource_version}
+            )
             session.commit()
 
     @staticmethod
     @provide_session
     def reset_resource_version(session: Session = None) -> str:
         """Reset Kubernetes Resource Version to 0 in Airflow Metadata DB"""
-        session.query(KubeResourceVersion).update({
-            KubeResourceVersion.resource_version: '0'
-        })
+        session.query(KubeResourceVersion).update({KubeResourceVersion.resource_version: '0'})
         session.commit()
         return '0'
 
 
 class KubeWorkerIdentifier(Base):
     """Table containing Kubernetes Worker Identified"""
+
     __tablename__ = "kube_worker_uuid"
     one_row_id = Column(Boolean, server_default=sqltrue(), primary_key=True)
     worker_uuid = Column(String(255))
@@ -80,7 +80,5 @@ class KubeWorkerIdentifier(Base):
     def checkpoint_kube_worker_uuid(worker_uuid: str, session: Session = None) -> None:
         """Update the Kubernetes Worker UUID in the DB"""
         if worker_uuid:
-            session.query(KubeWorkerIdentifier).update({
-                KubeWorkerIdentifier.worker_uuid: worker_uuid
-            })
+            session.query(KubeWorkerIdentifier).update({KubeWorkerIdentifier.worker_uuid: worker_uuid})
             session.commit()

@@ -34,10 +34,7 @@ class SageMakerEndpointSensor(SageMakerBaseSensor):
     template_ext = ()
 
     @apply_defaults
-    def __init__(self,
-                 endpoint_name,
-                 *args,
-                 **kwargs):
+    def __init__(self, endpoint_name, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.endpoint_name = endpoint_name
 

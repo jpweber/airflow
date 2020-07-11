@@ -38,6 +38,7 @@ class MongoSensor(BaseSensorOperator):
         when connecting to MongoDB.
     :type mongo_conn_id: str
     """
+
     template_fields = ('collection', 'query')
 
     @apply_defaults
@@ -48,7 +49,8 @@ class MongoSensor(BaseSensorOperator):
         self.query = query
 
     def poke(self, context):
-        self.log.info("Sensor check existence of the document "
-                      "that matches the following query: %s", self.query)
+        self.log.info(
+            "Sensor check existence of the document " "that matches the following query: %s", self.query
+        )
         hook = MongoHook(self.mongo_conn_id)
         return hook.find(self.collection, self.query, find_one=True) is not None

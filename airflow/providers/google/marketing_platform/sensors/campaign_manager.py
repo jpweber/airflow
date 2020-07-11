@@ -56,13 +56,9 @@ class GoogleCampaignManagerReportSensor(BaseSensorOperator):
 
     def poke(self, context: Dict) -> bool:
         hook = GoogleCampaignManagerHook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            api_version=self.api_version,
+            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, api_version=self.api_version,
         )
-        response = hook.get_report(
-            profile_id=self.profile_id, report_id=self.report_id, file_id=self.file_id
-        )
+        response = hook.get_report(profile_id=self.profile_id, report_id=self.report_id, file_id=self.file_id)
         self.log.info("Report status: %s", response["status"])
         return response["status"] != "PROCESSING"
 
@@ -78,7 +74,7 @@ class GoogleCampaignManagerReportSensor(BaseSensorOperator):
         mode: str = "reschedule",
         poke_interval: int = 60 * 5,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.mode = mode

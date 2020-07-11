@@ -39,11 +39,8 @@ class SecretsManagerHook(GoogleBaseHook):
         domain-wide delegation enabled.
     :type delegate_to: str
     """
-    def __init__(
-        self,
-        gcp_conn_id: str = "google_cloud_default",
-        delegate_to: Optional[str] = None
-    ) -> None:
+
+    def __init__(self, gcp_conn_id: str = "google_cloud_default", delegate_to: Optional[str] = None) -> None:
         super().__init__(gcp_conn_id, delegate_to)
         self.client = _SecretManagerClient(credentials=self._get_credentials())
 
@@ -57,9 +54,9 @@ class SecretsManagerHook(GoogleBaseHook):
         return self.client
 
     @GoogleBaseHook.fallback_to_default_project_id
-    def get_secret(self, secret_id: str,
-                   secret_version: str = 'latest',
-                   project_id: Optional[str] = None) -> Optional[str]:
+    def get_secret(
+        self, secret_id: str, secret_version: str = 'latest', project_id: Optional[str] = None
+    ) -> Optional[str]:
         """
         Get secret value from the Secret Manager.
 
@@ -70,5 +67,6 @@ class SecretsManagerHook(GoogleBaseHook):
         :param project_id: Project id (if you want to override the project_id from credentials)
         :type project_id: str
         """
-        return self.get_conn().get_secret(secret_id=secret_id, secret_version=secret_version,
-                                          project_id=project_id)  # type: ignore
+        return self.get_conn().get_secret(
+            secret_id=secret_id, secret_version=secret_version, project_id=project_id
+        )  # type: ignore

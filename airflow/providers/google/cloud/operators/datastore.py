@@ -59,22 +59,25 @@ class CloudDatastoreExportEntitiesOperator(BaseOperator):
         emptied prior to exports. This enables overwriting existing backups.
     :type overwrite_existing: bool
     """
+
     template_fields = ['bucket', 'namespace', 'entity_filter', 'labels']
 
     @apply_defaults
-    def __init__(self,  # pylint: disable=too-many-arguments
-                 bucket: str,
-                 namespace: Optional[str] = None,
-                 datastore_conn_id: str = 'google_cloud_default',
-                 cloud_storage_conn_id: str = 'google_cloud_default',
-                 delegate_to: Optional[str] = None,
-                 entity_filter: Optional[dict] = None,
-                 labels: Optional[dict] = None,
-                 polling_interval_in_seconds: int = 10,
-                 overwrite_existing: bool = False,
-                 project_id: Optional[str] = None,
-                 *args,
-                 **kwargs) -> None:
+    def __init__(
+        self,  # pylint: disable=too-many-arguments
+        bucket: str,
+        namespace: Optional[str] = None,
+        datastore_conn_id: str = 'google_cloud_default',
+        cloud_storage_conn_id: str = 'google_cloud_default',
+        delegate_to: Optional[str] = None,
+        entity_filter: Optional[dict] = None,
+        labels: Optional[dict] = None,
+        polling_interval_in_seconds: int = 10,
+        overwrite_existing: bool = False,
+        project_id: Optional[str] = None,
+        *args,
+        **kwargs,
+    ) -> None:
         super().__init__(*args, **kwargs)
         self.datastore_conn_id = datastore_conn_id
         self.cloud_storage_conn_id = cloud_storage_conn_id
@@ -99,15 +102,15 @@ class CloudDatastoreExportEntitiesOperator(BaseOperator):
                 gcs_hook.delete(self.bucket, obj)
 
         ds_hook = DatastoreHook(self.datastore_conn_id, self.delegate_to)
-        result = ds_hook.export_to_storage_bucket(bucket=self.bucket,
-                                                  namespace=self.namespace,
-                                                  entity_filter=self.entity_filter,
-                                                  labels=self.labels,
-                                                  project_id=self.project_id
-                                                  )
+        result = ds_hook.export_to_storage_bucket(
+            bucket=self.bucket,
+            namespace=self.namespace,
+            entity_filter=self.entity_filter,
+            labels=self.labels,
+            project_id=self.project_id,
+        )
         operation_name = result['name']
-        result = ds_hook.poll_operation_until_done(operation_name,
-                                                   self.polling_interval_in_seconds)
+        result = ds_hook.poll_operation_until_done(operation_name, self.polling_interval_in_seconds)
 
         state = result['metadata']['common']['state']
         if state != 'SUCCESSFUL':
@@ -147,18 +150,20 @@ class CloudDatastoreImportEntitiesOperator(BaseOperator):
     template_fields = ['bucket', 'file', 'namespace', 'entity_filter', 'labels']
 
     @apply_defaults
-    def __init__(self,
-                 bucket: str,
-                 file: str,
-                 namespace: Optional[str] = None,
-                 entity_filter: Optional[dict] = None,
-                 labels: Optional[dict] = None,
-                 datastore_conn_id: str = 'google_cloud_default',
-                 delegate_to: Optional[str] = None,
-                 polling_interval_in_seconds: float = 10,
-                 project_id: Optional[str] = None,
-                 *args,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        bucket: str,
+        file: str,
+        namespace: Optional[str] = None,
+        entity_filter: Optional[dict] = None,
+        labels: Optional[dict] = None,
+        datastore_conn_id: str = 'google_cloud_default',
+        delegate_to: Optional[str] = None,
+        polling_interval_in_seconds: float = 10,
+        project_id: Optional[str] = None,
+        *args,
+        **kwargs,
+    ) -> None:
         super().__init__(*args, **kwargs)
         self.datastore_conn_id = datastore_conn_id
         self.delegate_to = delegate_to
@@ -175,16 +180,16 @@ class CloudDatastoreImportEntitiesOperator(BaseOperator):
     def execute(self, context):
         self.log.info('Importing data from Cloud Storage bucket %s', self.bucket)
         ds_hook = DatastoreHook(self.datastore_conn_id, self.delegate_to)
-        result = ds_hook.import_from_storage_bucket(bucket=self.bucket,
-                                                    file=self.file,
-                                                    namespace=self.namespace,
-                                                    entity_filter=self.entity_filter,
-                                                    labels=self.labels,
-                                                    project_id=self.project_id
-                                                    )
+        result = ds_hook.import_from_storage_bucket(
+            bucket=self.bucket,
+            file=self.file,
+            namespace=self.namespace,
+            entity_filter=self.entity_filter,
+            labels=self.labels,
+            project_id=self.project_id,
+        )
         operation_name = result['name']
-        result = ds_hook.poll_operation_until_done(operation_name,
-                                                   self.polling_interval_in_seconds)
+        result = ds_hook.poll_operation_until_done(operation_name, self.polling_interval_in_seconds)
 
         state = result['metadata']['common']['state']
         if state != 'SUCCESSFUL':

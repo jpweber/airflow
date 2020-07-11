@@ -25,8 +25,10 @@ from google.cloud.language_v1.proto.language_service_pb2 import Document
 from airflow import models
 from airflow.operators.bash import BashOperator
 from airflow.providers.google.cloud.operators.natural_language import (
-    CloudNaturalLanguageAnalyzeEntitiesOperator, CloudNaturalLanguageAnalyzeEntitySentimentOperator,
-    CloudNaturalLanguageAnalyzeSentimentOperator, CloudNaturalLanguageClassifyTextOperator,
+    CloudNaturalLanguageAnalyzeEntitiesOperator,
+    CloudNaturalLanguageAnalyzeEntitySentimentOperator,
+    CloudNaturalLanguageAnalyzeSentimentOperator,
+    CloudNaturalLanguageClassifyTextOperator,
 )
 from airflow.utils.dates import days_ago
 
@@ -56,8 +58,9 @@ with models.DAG(
 ) as dag:
 
     # [START howto_operator_gcp_natural_language_analyze_entities]
-    analyze_entities = \
-        CloudNaturalLanguageAnalyzeEntitiesOperator(document=document, task_id="analyze_entities")
+    analyze_entities = CloudNaturalLanguageAnalyzeEntitiesOperator(
+        document=document, task_id="analyze_entities"
+    )
     # [END howto_operator_gcp_natural_language_analyze_entities]
 
     # [START howto_operator_gcp_natural_language_analyze_entities_result]
@@ -81,8 +84,9 @@ with models.DAG(
     # [END howto_operator_gcp_natural_language_analyze_entity_sentiment_result]
 
     # [START howto_operator_gcp_natural_language_analyze_sentiment]
-    analyze_sentiment = \
-        CloudNaturalLanguageAnalyzeSentimentOperator(document=document, task_id="analyze_sentiment")
+    analyze_sentiment = CloudNaturalLanguageAnalyzeSentimentOperator(
+        document=document, task_id="analyze_sentiment"
+    )
     # [END howto_operator_gcp_natural_language_analyze_sentiment]
 
     # [START howto_operator_gcp_natural_language_analyze_sentiment_result]

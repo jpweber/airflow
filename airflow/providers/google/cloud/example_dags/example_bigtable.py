@@ -50,8 +50,11 @@ from os import getenv
 
 from airflow import models
 from airflow.providers.google.cloud.operators.bigtable import (
-    BigtableCreateInstanceOperator, BigtableCreateTableOperator, BigtableDeleteInstanceOperator,
-    BigtableDeleteTableOperator, BigtableUpdateClusterOperator,
+    BigtableCreateInstanceOperator,
+    BigtableCreateTableOperator,
+    BigtableDeleteInstanceOperator,
+    BigtableDeleteTableOperator,
+    BigtableUpdateClusterOperator,
 )
 from airflow.providers.google.cloud.sensors.bigtable import BigtableTableReplicationCompletedSensor
 from airflow.utils.dates import days_ago
@@ -69,9 +72,7 @@ CBT_CLUSTER_STORAGE_TYPE = getenv('CBT_CLUSTER_STORAGE_TYPE', '2')
 CBT_TABLE_ID = getenv('CBT_TABLE_ID', 'some-table-id')
 CBT_POKE_INTERVAL = getenv('CBT_POKE_INTERVAL', '60')
 
-default_args = {
-    'start_date': days_ago(1)
-}
+default_args = {'start_date': days_ago(1)}
 
 with models.DAG(
     'example_gcp_bigtable_operators',
@@ -125,27 +126,19 @@ with models.DAG(
 
     # [START howto_operator_gcp_bigtable_instance_delete]
     delete_instance_task = BigtableDeleteInstanceOperator(
-        project_id=GCP_PROJECT_ID,
-        instance_id=CBT_INSTANCE_ID,
-        task_id='delete_instance_task',
+        project_id=GCP_PROJECT_ID, instance_id=CBT_INSTANCE_ID, task_id='delete_instance_task',
     )
     delete_instance_task2 = BigtableDeleteInstanceOperator(
-        instance_id=CBT_INSTANCE_ID,
-        task_id='delete_instance_task2',
+        instance_id=CBT_INSTANCE_ID, task_id='delete_instance_task2',
     )
     # [END howto_operator_gcp_bigtable_instance_delete]
 
     # [START howto_operator_gcp_bigtable_table_create]
     create_table_task = BigtableCreateTableOperator(
-        project_id=GCP_PROJECT_ID,
-        instance_id=CBT_INSTANCE_ID,
-        table_id=CBT_TABLE_ID,
-        task_id='create_table',
+        project_id=GCP_PROJECT_ID, instance_id=CBT_INSTANCE_ID, table_id=CBT_TABLE_ID, task_id='create_table',
     )
     create_table_task2 = BigtableCreateTableOperator(
-        instance_id=CBT_INSTANCE_ID,
-        table_id=CBT_TABLE_ID,
-        task_id='create_table_task2',
+        instance_id=CBT_INSTANCE_ID, table_id=CBT_TABLE_ID, task_id='create_table_task2',
     )
     create_table_task >> create_table_task2
     # [END howto_operator_gcp_bigtable_table_create]
@@ -176,9 +169,7 @@ with models.DAG(
         task_id='delete_table_task',
     )
     delete_table_task2 = BigtableDeleteTableOperator(
-        instance_id=CBT_INSTANCE_ID,
-        table_id=CBT_TABLE_ID,
-        task_id='delete_table_task2',
+        instance_id=CBT_INSTANCE_ID, table_id=CBT_TABLE_ID, task_id='delete_table_task2',
     )
     # [END howto_operator_gcp_bigtable_table_delete]
 
@@ -186,15 +177,8 @@ with models.DAG(
     wait_for_table_replication_task2 >> delete_table_task
     wait_for_table_replication_task >> delete_table_task2
     wait_for_table_replication_task2 >> delete_table_task2
-    create_instance_task \
-        >> create_table_task \
-        >> cluster_update_task \
-        >> delete_table_task
-    create_instance_task2 \
-        >> create_table_task2 \
-        >> cluster_update_task2 \
-        >> delete_table_task2
+    create_instance_task >> create_table_task >> cluster_update_task >> delete_table_task
+    create_instance_task2 >> create_table_task2 >> cluster_update_task2 >> delete_table_task2
 
     # Only delete instances after all tables are deleted
-    [delete_table_task, delete_table_task2] >> \
-        delete_instance_task >> delete_instance_task2
+    [delete_table_task, delete_table_task2] >> delete_instance_task >> delete_instance_task2

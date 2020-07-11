@@ -122,5 +122,5 @@ class State:
             cls.RUNNING,
             cls.SHUTDOWN,
             cls.UP_FOR_RETRY,
-            cls.UP_FOR_RESCHEDULE
+            cls.UP_FOR_RESCHEDULE,
         ]

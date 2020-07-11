@@ -37,18 +37,21 @@ class SegmentTrackEventOperator(BaseOperator):
         Defaults to False
     :type segment_debug_mode: bool
     """
+
     template_fields = ('user_id', 'event', 'properties')
     ui_color = '#ffd700'
 
     @apply_defaults
-    def __init__(self,
-                 user_id,
-                 event,
-                 properties=None,
-                 segment_conn_id='segment_default',
-                 segment_debug_mode=False,
-                 *args,
-                 **kwargs):
+    def __init__(
+        self,
+        user_id,
+        event,
+        properties=None,
+        segment_conn_id='segment_default',
+        segment_debug_mode=False,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.user_id = user_id
         self.event = event
@@ -58,15 +61,14 @@ class SegmentTrackEventOperator(BaseOperator):
         self.segment_conn_id = segment_conn_id
 
     def execute(self, context):
-        hook = SegmentHook(segment_conn_id=self.segment_conn_id,
-                           segment_debug_mode=self.segment_debug_mode)
+        hook = SegmentHook(segment_conn_id=self.segment_conn_id, segment_debug_mode=self.segment_debug_mode)
 
         self.log.info(
             'Sending track event (%s) for user id: %s with properties: %s',
-            self.event, self.user_id, self.properties)
+            self.event,
+            self.user_id,
+            self.properties,
+        )
 
         # pylint: disable=no-member
-        hook.track(
-            user_id=self.user_id,
-            event=self.event,
-            properties=self.properties)
+        hook.track(user_id=self.user_id, event=self.event, properties=self.properties)

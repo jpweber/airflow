@@ -48,10 +48,7 @@ def generate_parallel_tasks(name_prefix, num_of_tasks, deps):
     """
     tasks = []
     for t_id in range(num_of_tasks):
-        run_this = PythonOperator(
-            task_id=f"{name_prefix}_{t_id}",
-            python_callable=print_context,
-        )
+        run_this = PythonOperator(task_id=f"{name_prefix}_{t_id}", python_callable=print_context,)
         run_this << deps
         tasks.append(run_this)
     return tasks

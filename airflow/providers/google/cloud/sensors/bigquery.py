@@ -46,17 +46,25 @@ class BigQueryTableExistenceSensor(BaseSensorOperator):
         have domain-wide delegation enabled.
     :type delegate_to: str
     """
-    template_fields = ('project_id', 'dataset_id', 'table_id',)
+
+    template_fields = (
+        'project_id',
+        'dataset_id',
+        'table_id',
+    )
     ui_color = '#f0eee4'
 
     @apply_defaults
-    def __init__(self,
-                 project_id: str,
-                 dataset_id: str,
-                 table_id: str,
-                 bigquery_conn_id: str = 'google_cloud_default',
-                 delegate_to: Optional[str] = None,
-                 *args, **kwargs) -> None:
+    def __init__(
+        self,
+        project_id: str,
+        dataset_id: str,
+        table_id: str,
+        bigquery_conn_id: str = 'google_cloud_default',
+        delegate_to: Optional[str] = None,
+        *args,
+        **kwargs,
+    ) -> None:
 
         super().__init__(*args, **kwargs)
         self.project_id = project_id
@@ -68,7 +76,5 @@ class BigQueryTableExistenceSensor(BaseSensorOperator):
     def poke(self, context):
         table_uri = '{0}:{1}.{2}'.format(self.project_id, self.dataset_id, self.table_id)
         self.log.info('Sensor checks existence of table: %s', table_uri)
-        hook = BigQueryHook(
-            bigquery_conn_id=self.bigquery_conn_id,
-            delegate_to=self.delegate_to)
+        hook = BigQueryHook(bigquery_conn_id=self.bigquery_conn_id, delegate_to=self.delegate_to)
         return hook.table_exists(self.project_id, self.dataset_id, self.table_id)

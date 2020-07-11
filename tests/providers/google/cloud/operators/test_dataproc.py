@@ -25,11 +25,20 @@ from google.api_core.exceptions import AlreadyExists
 from google.api_core.retry import Retry
 
 from airflow.providers.google.cloud.operators.dataproc import (
-    ClusterGenerator, DataprocCreateClusterOperator, DataprocDeleteClusterOperator,
-    DataprocInstantiateInlineWorkflowTemplateOperator, DataprocInstantiateWorkflowTemplateOperator,
-    DataprocScaleClusterOperator, DataprocSubmitHadoopJobOperator, DataprocSubmitHiveJobOperator,
-    DataprocSubmitJobOperator, DataprocSubmitPigJobOperator, DataprocSubmitPySparkJobOperator,
-    DataprocSubmitSparkJobOperator, DataprocSubmitSparkSqlJobOperator, DataprocUpdateClusterOperator,
+    ClusterGenerator,
+    DataprocCreateClusterOperator,
+    DataprocDeleteClusterOperator,
+    DataprocInstantiateInlineWorkflowTemplateOperator,
+    DataprocInstantiateWorkflowTemplateOperator,
+    DataprocScaleClusterOperator,
+    DataprocSubmitHadoopJobOperator,
+    DataprocSubmitHiveJobOperator,
+    DataprocSubmitJobOperator,
+    DataprocSubmitPigJobOperator,
+    DataprocSubmitPySparkJobOperator,
+    DataprocSubmitSparkJobOperator,
+    DataprocSubmitSparkSqlJobOperator,
+    DataprocUpdateClusterOperator,
 )
 from airflow.version import version as airflow_version
 
@@ -50,8 +59,7 @@ CLUSTER = {
     "cluster_name": CLUSTER_NAME,
     "config": {
         "gce_cluster_config": {
-            "zone_uri": "https://www.googleapis.com/compute/v1/projects/"
-                        "project_id/zones/zone",
+            "zone_uri": "https://www.googleapis.com/compute/v1/projects/" "project_id/zones/zone",
             "metadata": {"metadata": "data"},
             "network_uri": "network_uri",
             "subnetwork_uri": "subnetwork_uri",
@@ -63,58 +71,41 @@ CLUSTER = {
         "master_config": {
             "num_instances": 2,
             "machine_type_uri": "https://www.googleapis.com/compute/v1/projects/"
-                                "project_id/zones/zone/machineTypes/master_machine_type",
-            "disk_config": {
-                "boot_disk_type": "master_disk_type",
-                "boot_disk_size_gb": 128,
-            },
+            "project_id/zones/zone/machineTypes/master_machine_type",
+            "disk_config": {"boot_disk_type": "master_disk_type", "boot_disk_size_gb": 128,},
             "image_uri": "https://www.googleapis.com/compute/beta/projects/"
-                         "custom_image_project_id/global/images/custom_image",
+            "custom_image_project_id/global/images/custom_image",
         },
         "worker_config": {
             "num_instances": 2,
             "machine_type_uri": "https://www.googleapis.com/compute/v1/projects/"
-                                "project_id/zones/zone/machineTypes/worker_machine_type",
-            "disk_config": {
-                "boot_disk_type": "worker_disk_type",
-                "boot_disk_size_gb": 256,
-            },
+            "project_id/zones/zone/machineTypes/worker_machine_type",
+            "disk_config": {"boot_disk_type": "worker_disk_type", "boot_disk_size_gb": 256,},
             "image_uri": "https://www.googleapis.com/compute/beta/projects/"
-                         "custom_image_project_id/global/images/custom_image",
+            "custom_image_project_id/global/images/custom_image",
         },
         "secondary_worker_config": {
             "num_instances": 4,
             "machine_type_uri": "https://www.googleapis.com/compute/v1/projects/"
-                                "project_id/zones/zone/machineTypes/worker_machine_type",
-            "disk_config": {
-                "boot_disk_type": "worker_disk_type",
-                "boot_disk_size_gb": 256,
-            },
+            "project_id/zones/zone/machineTypes/worker_machine_type",
+            "disk_config": {"boot_disk_type": "worker_disk_type", "boot_disk_size_gb": 256,},
             "is_preemptible": True,
         },
         "software_config": {
             "properties": {"properties": "data"},
             "optional_components": ["optional_components"],
         },
-        "lifecycle_config": {
-            "idle_delete_ttl": "60s",
-            "auto_delete_time": "2019-09-12T00:00:00.000000Z",
-        },
+        "lifecycle_config": {"idle_delete_ttl": "60s", "auto_delete_time": "2019-09-12T00:00:00.000000Z",},
         "encryption_config": {"gce_pd_kms_key_name": "customer_managed_key"},
         "autoscaling_config": {"policy_uri": "autoscaling_policy"},
         "config_bucket": "storage_bucket",
-        "initialization_actions": [
-            {"executable_file": "init_actions_uris", "execution_timeout": "600s"}
-        ],
+        "initialization_actions": [{"executable_file": "init_actions_uris", "execution_timeout": "600s"}],
     },
     "labels": {"labels": "data", "airflow-version": AIRFLOW_VERSION},
 }
 
 UPDATE_MASK = {
-    "paths": [
-        "config.worker_config.num_instances",
-        "config.secondary_worker_config.num_instances",
-    ]
+    "paths": ["config.worker_config.num_instances", "config.secondary_worker_config.num_instances",]
 }
 
 TIMEOUT = 120
@@ -260,9 +251,7 @@ class TestDataprocClusterCreateOperator(unittest.TestCase):
 class TestDataprocClusterScaleOperator(unittest.TestCase):
     def test_deprecation_warning(self):
         with self.assertWarns(DeprecationWarning) as warning:
-            DataprocScaleClusterOperator(
-                task_id=TASK_ID, cluster_name=CLUSTER_NAME, project_id=GCP_PROJECT
-            )
+            DataprocScaleClusterOperator(task_id=TASK_ID, cluster_name=CLUSTER_NAME, project_id=GCP_PROJECT)
         assert_warning("DataprocUpdateClusterOperator", warning)
 
     @mock.patch(DATAPROC_PATH.format("DataprocHook"))
@@ -463,10 +452,7 @@ class TestDataProcHiveOperator(unittest.TestCase):
     variables = {"key": "value"}
     job_id = "uuid_id"
     job = {
-        "reference": {
-            "project_id": GCP_PROJECT,
-            "job_id": "{{task.task_id}}_{{ds_nodash}}_" + job_id,
-        },
+        "reference": {"project_id": GCP_PROJECT, "job_id": "{{task.task_id}}_{{ds_nodash}}_" + job_id,},
         "placement": {"cluster_name": "cluster-1"},
         "labels": {"airflow-version": AIRFLOW_VERSION},
         "hive_job": {"query_list": {"queries": [query]}, "script_variables": variables},
@@ -476,9 +462,7 @@ class TestDataProcHiveOperator(unittest.TestCase):
     def test_deprecation_warning(self, mock_hook):
         with self.assertWarns(DeprecationWarning) as warning:
             DataprocSubmitHiveJobOperator(
-                task_id=TASK_ID,
-                region=GCP_LOCATION,
-                query="query",
+                task_id=TASK_ID, region=GCP_LOCATION, query="query",
             )
         assert_warning("DataprocSubmitJobOperator", warning)
 
@@ -528,10 +512,7 @@ class TestDataProcPigOperator(unittest.TestCase):
     variables = {"key": "value"}
     job_id = "uuid_id"
     job = {
-        "reference": {
-            "project_id": GCP_PROJECT,
-            "job_id": "{{task.task_id}}_{{ds_nodash}}_" + job_id,
-        },
+        "reference": {"project_id": GCP_PROJECT, "job_id": "{{task.task_id}}_{{ds_nodash}}_" + job_id,},
         "placement": {"cluster_name": "cluster-1"},
         "labels": {"airflow-version": AIRFLOW_VERSION},
         "pig_job": {"query_list": {"queries": [query]}, "script_variables": variables},
@@ -541,9 +522,7 @@ class TestDataProcPigOperator(unittest.TestCase):
     def test_deprecation_warning(self, mock_hook):
         with self.assertWarns(DeprecationWarning) as warning:
             DataprocSubmitPigJobOperator(
-                task_id=TASK_ID,
-                region=GCP_LOCATION,
-                query="query",
+                task_id=TASK_ID, region=GCP_LOCATION, query="query",
             )
         assert_warning("DataprocSubmitJobOperator", warning)
 
@@ -593,25 +572,17 @@ class TestDataProcSparkSqlOperator(unittest.TestCase):
     variables = {"key": "value"}
     job_id = "uuid_id"
     job = {
-        "reference": {
-            "project_id": GCP_PROJECT,
-            "job_id": "{{task.task_id}}_{{ds_nodash}}_" + job_id,
-        },
+        "reference": {"project_id": GCP_PROJECT, "job_id": "{{task.task_id}}_{{ds_nodash}}_" + job_id,},
         "placement": {"cluster_name": "cluster-1"},
         "labels": {"airflow-version": AIRFLOW_VERSION},
-        "spark_sql_job": {
-            "query_list": {"queries": [query]},
-            "script_variables": variables,
-        },
+        "spark_sql_job": {"query_list": {"queries": [query]}, "script_variables": variables,},
     }
 
     @mock.patch(DATAPROC_PATH.format("DataprocHook"))
     def test_deprecation_warning(self, mock_hook):
         with self.assertWarns(DeprecationWarning) as warning:
             DataprocSubmitSparkSqlJobOperator(
-                task_id=TASK_ID,
-                region=GCP_LOCATION,
-                query="query",
+                task_id=TASK_ID, region=GCP_LOCATION, query="query",
             )
         assert_warning("DataprocSubmitJobOperator", warning)
 
@@ -661,10 +632,7 @@ class TestDataProcSparkOperator(unittest.TestCase):
     jars = ["file:///usr/lib/spark/examples/jars/spark-examples.jar"]
     job_id = "uuid_id"
     job = {
-        "reference": {
-            "project_id": GCP_PROJECT,
-            "job_id": "{{task.task_id}}_{{ds_nodash}}_" + job_id,
-        },
+        "reference": {"project_id": GCP_PROJECT, "job_id": "{{task.task_id}}_{{ds_nodash}}_" + job_id,},
         "placement": {"cluster_name": "cluster-1"},
         "labels": {"airflow-version": AIRFLOW_VERSION},
         "spark_job": {"jar_file_uris": jars, "main_class": main_class},
@@ -674,10 +642,7 @@ class TestDataProcSparkOperator(unittest.TestCase):
     def test_deprecation_warning(self, mock_hook):
         with self.assertWarns(DeprecationWarning) as warning:
             DataprocSubmitSparkJobOperator(
-                task_id=TASK_ID,
-                region=GCP_LOCATION,
-                main_class=self.main_class,
-                dataproc_jars=self.jars,
+                task_id=TASK_ID, region=GCP_LOCATION, main_class=self.main_class, dataproc_jars=self.jars,
             )
         assert_warning("DataprocSubmitJobOperator", warning)
 
@@ -704,10 +669,7 @@ class TestDataProcHadoopOperator(unittest.TestCase):
     jar = "file:///usr/lib/spark/examples/jars/spark-examples.jar"
     job_id = "uuid_id"
     job = {
-        "reference": {
-            "project_id": GCP_PROJECT,
-            "job_id": "{{task.task_id}}_{{ds_nodash}}_" + job_id,
-        },
+        "reference": {"project_id": GCP_PROJECT, "job_id": "{{task.task_id}}_{{ds_nodash}}_" + job_id,},
         "placement": {"cluster_name": "cluster-1"},
         "labels": {"airflow-version": AIRFLOW_VERSION},
         "hadoop_job": {"main_jar_file_uri": jar, "args": args},
@@ -717,10 +679,7 @@ class TestDataProcHadoopOperator(unittest.TestCase):
     def test_deprecation_warning(self, mock_hook):
         with self.assertWarns(DeprecationWarning) as warning:
             DataprocSubmitHadoopJobOperator(
-                task_id=TASK_ID,
-                region=GCP_LOCATION,
-                main_jar=self.jar,
-                arguments=self.args,
+                task_id=TASK_ID, region=GCP_LOCATION, main_jar=self.jar, arguments=self.args,
             )
         assert_warning("DataprocSubmitJobOperator", warning)
 
@@ -746,10 +705,7 @@ class TestDataProcPySparkOperator(unittest.TestCase):
     uri = "gs://{}/{}"
     job_id = "uuid_id"
     job = {
-        "reference": {
-            "project_id": GCP_PROJECT,
-            "job_id": "{{task.task_id}}_{{ds_nodash}}_" + job_id,
-        },
+        "reference": {"project_id": GCP_PROJECT, "job_id": "{{task.task_id}}_{{ds_nodash}}_" + job_id,},
         "placement": {"cluster_name": "cluster-1"},
         "labels": {"airflow-version": AIRFLOW_VERSION},
         "pyspark_job": {"main_python_file_uri": uri},
@@ -759,9 +715,7 @@ class TestDataProcPySparkOperator(unittest.TestCase):
     def test_deprecation_warning(self, mock_hook):
         with self.assertWarns(DeprecationWarning) as warning:
             DataprocSubmitPySparkJobOperator(
-                task_id=TASK_ID,
-                region=GCP_LOCATION,
-                main=self.uri,
+                task_id=TASK_ID, region=GCP_LOCATION, main=self.uri,
             )
         assert_warning("DataprocSubmitJobOperator", warning)
 

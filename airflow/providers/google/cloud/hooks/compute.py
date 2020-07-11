@@ -35,6 +35,7 @@ class GceOperationStatus:
     """
     Class with GCE operations statuses.
     """
+
     PENDING = "PENDING"
     RUNNING = "RUNNING"
     DONE = "DONE"
@@ -48,13 +49,14 @@ class ComputeEngineHook(GoogleBaseHook):
     All the methods in the hook where project_id is used must be called with
     keyword arguments rather than positional.
     """
+
     _conn = None  # type: Optional[Any]
 
     def __init__(
         self,
         api_version: str = 'v1',
         gcp_conn_id: str = 'google_cloud_default',
-        delegate_to: Optional[str] = None
+        delegate_to: Optional[str] = None,
     ) -> None:
         super().__init__(gcp_conn_id, delegate_to)
         self.api_version = api_version
@@ -68,8 +70,7 @@ class ComputeEngineHook(GoogleBaseHook):
         """
         if not self._conn:
             http_authorized = self._authorize()
-            self._conn = build('compute', self.api_version,
-                               http=http_authorized, cache_discovery=False)
+            self._conn = build('compute', self.api_version, http=http_authorized, cache_discovery=False)
         return self._conn
 
     @GoogleBaseHook.fallback_to_default_project_id
@@ -88,20 +89,19 @@ class ComputeEngineHook(GoogleBaseHook):
         :type project_id: str
         :return: None
         """
-        response = self.get_conn().instances().start(  # pylint: disable=no-member
-            project=project_id,
-            zone=zone,
-            instance=resource_id
-        ).execute(num_retries=self.num_retries)
+        response = (
+            self.get_conn()
+            .instances()
+            .start(project=project_id, zone=zone, instance=resource_id)  # pylint: disable=no-member
+            .execute(num_retries=self.num_retries)
+        )
         try:
             operation_name = response["name"]
         except KeyError:
             raise AirflowException(
-                "Wrong response '{}' returned - it should contain "
-                "'name' field".format(response))
-        self._wait_for_operation_to_complete(project_id=project_id,
-                                             operation_name=operation_name,
-                                             zone=zone)
+                "Wrong response '{}' returned - it should contain " "'name' field".format(response)
+            )
+        self._wait_for_operation_to_complete(project_id=project_id, operation_name=operation_name, zone=zone)
 
     @GoogleBaseHook.fallback_to_default_project_id
     def stop_instance(self, zone: str, resource_id: str, project_id: str) -> None:
@@ -119,29 +119,22 @@ class ComputeEngineHook(GoogleBaseHook):
         :type project_id: str
         :return: None
         """
-        response = self.get_conn().instances().stop(  # pylint: disable=no-member
-            project=project_id,
-            zone=zone,
-            instance=resource_id
-        ).execute(num_retries=self.num_retries)
+        response = (
+            self.get_conn()
+            .instances()
+            .stop(project=project_id, zone=zone, instance=resource_id)  # pylint: disable=no-member
+            .execute(num_retries=self.num_retries)
+        )
         try:
             operation_name = response["name"]
         except KeyError:
             raise AirflowException(
-                "Wrong response '{}' returned - it should contain "
-                "'name' field".format(response))
-        self._wait_for_operation_to_complete(project_id=project_id,
-                                             operation_name=operation_name,
-                                             zone=zone)
+                "Wrong response '{}' returned - it should contain " "'name' field".format(response)
+            )
+        self._wait_for_operation_to_complete(project_id=project_id, operation_name=operation_name, zone=zone)
 
     @GoogleBaseHook.fallback_to_default_project_id
-    def set_machine_type(
-        self,
-        zone: str,
-        resource_id: str,
-        body: Dict,
-        project_id: str
-    ) -> None:
+    def set_machine_type(self, zone: str, resource_id: str, body: Dict, project_id: str) -> None:
         """
         Sets machine type of an instance defined by project_id, zone and resource_id.
         Must be called with keyword arguments rather than positional.
@@ -165,22 +158,19 @@ class ComputeEngineHook(GoogleBaseHook):
             operation_name = response["name"]
         except KeyError:
             raise AirflowException(
-                "Wrong response '{}' returned - it should contain "
-                "'name' field".format(response))
-        self._wait_for_operation_to_complete(project_id=project_id,
-                                             operation_name=operation_name,
-                                             zone=zone)
+                "Wrong response '{}' returned - it should contain " "'name' field".format(response)
+            )
+        self._wait_for_operation_to_complete(project_id=project_id, operation_name=operation_name, zone=zone)
 
-    def _execute_set_machine_type(
-        self,
-        zone: str,
-        resource_id: str,
-        body: Dict,
-        project_id: str
-    ) -> Dict:
-        return self.get_conn().instances().setMachineType(  # pylint: disable=no-member
-            project=project_id, zone=zone, instance=resource_id, body=body)\
+    def _execute_set_machine_type(self, zone: str, resource_id: str, body: Dict, project_id: str) -> Dict:
+        return (
+            self.get_conn()
+            .instances()
+            .setMachineType(  # pylint: disable=no-member
+                project=project_id, zone=zone, instance=resource_id, body=body
+            )
             .execute(num_retries=self.num_retries)
+        )
 
     @GoogleBaseHook.fallback_to_default_project_id
     def get_instance_template(self, resource_id: str, project_id: str) -> Dict:
@@ -198,18 +188,17 @@ class ComputeEngineHook(GoogleBaseHook):
             https://cloud.google.com/compute/docs/reference/rest/v1/instanceTemplates
         :rtype: dict
         """
-        response = self.get_conn().instanceTemplates().get(  # pylint: disable=no-member
-            project=project_id,
-            instanceTemplate=resource_id
-        ).execute(num_retries=self.num_retries)
+        response = (
+            self.get_conn()
+            .instanceTemplates()
+            .get(project=project_id, instanceTemplate=resource_id)  # pylint: disable=no-member
+            .execute(num_retries=self.num_retries)
+        )
         return response
 
     @GoogleBaseHook.fallback_to_default_project_id
     def insert_instance_template(
-        self,
-        body: Dict,
-        project_id: str,
-        request_id: Optional[str] = None,
+        self, body: Dict, project_id: str, request_id: Optional[str] = None,
     ) -> None:
         """
         Inserts instance template using body specified
@@ -229,27 +218,22 @@ class ComputeEngineHook(GoogleBaseHook):
         :type project_id: str
         :return: None
         """
-        response = self.get_conn().instanceTemplates().insert(  # pylint: disable=no-member
-            project=project_id,
-            body=body,
-            requestId=request_id
-        ).execute(num_retries=self.num_retries)
+        response = (
+            self.get_conn()
+            .instanceTemplates()
+            .insert(project=project_id, body=body, requestId=request_id)  # pylint: disable=no-member
+            .execute(num_retries=self.num_retries)
+        )
         try:
             operation_name = response["name"]
         except KeyError:
             raise AirflowException(
-                "Wrong response '{}' returned - it should contain "
-                "'name' field".format(response))
-        self._wait_for_operation_to_complete(project_id=project_id,
-                                             operation_name=operation_name)
+                "Wrong response '{}' returned - it should contain " "'name' field".format(response)
+            )
+        self._wait_for_operation_to_complete(project_id=project_id, operation_name=operation_name)
 
     @GoogleBaseHook.fallback_to_default_project_id
-    def get_instance_group_manager(
-        self,
-        zone: str,
-        resource_id: str,
-        project_id: str,
-    ) -> Dict:
+    def get_instance_group_manager(self, zone: str, resource_id: str, project_id: str,) -> Dict:
         """
         Retrieves Instance Group Manager by project_id, zone and resource_id.
         Must be called with keyword arguments rather than positional.
@@ -266,21 +250,17 @@ class ComputeEngineHook(GoogleBaseHook):
             https://cloud.google.com/compute/docs/reference/rest/beta/instanceGroupManagers
         :rtype: dict
         """
-        response = self.get_conn().instanceGroupManagers().get(  # pylint: disable=no-member
-            project=project_id,
-            zone=zone,
-            instanceGroupManager=resource_id
-        ).execute(num_retries=self.num_retries)
+        response = (
+            self.get_conn()
+            .instanceGroupManagers()
+            .get(project=project_id, zone=zone, instanceGroupManager=resource_id)  # pylint: disable=no-member
+            .execute(num_retries=self.num_retries)
+        )
         return response
 
     @GoogleBaseHook.fallback_to_default_project_id
     def patch_instance_group_manager(
-        self,
-        zone: str,
-        resource_id: str,
-        body: Dict,
-        project_id: str,
-        request_id: Optional[str] = None,
+        self, zone: str, resource_id: str, body: Dict, project_id: str, request_id: Optional[str] = None,
     ) -> None:
         """
         Patches Instance Group Manager with the specified body.
@@ -305,28 +285,28 @@ class ComputeEngineHook(GoogleBaseHook):
         :type project_id: str
         :return: None
         """
-        response = self.get_conn().instanceGroupManagers().patch(  # pylint: disable=no-member
-            project=project_id,
-            zone=zone,
-            instanceGroupManager=resource_id,
-            body=body,
-            requestId=request_id
-        ).execute(num_retries=self.num_retries)
+        response = (
+            self.get_conn()
+            .instanceGroupManagers()
+            .patch(  # pylint: disable=no-member
+                project=project_id,
+                zone=zone,
+                instanceGroupManager=resource_id,
+                body=body,
+                requestId=request_id,
+            )
+            .execute(num_retries=self.num_retries)
+        )
         try:
             operation_name = response["name"]
         except KeyError:
             raise AirflowException(
-                "Wrong response '{}' returned - it should contain "
-                "'name' field".format(response))
-        self._wait_for_operation_to_complete(project_id=project_id,
-                                             operation_name=operation_name,
-                                             zone=zone)
+                "Wrong response '{}' returned - it should contain " "'name' field".format(response)
+            )
+        self._wait_for_operation_to_complete(project_id=project_id, operation_name=operation_name, zone=zone)
 
     def _wait_for_operation_to_complete(
-        self,
-        project_id: str,
-        operation_name: str,
-        zone: Optional[str] = None
+        self, project_id: str, operation_name: str, zone: Optional[str] = None
     ) -> None:
         """
         Waits for the named operation to complete - checks status of the async call.
@@ -345,12 +325,13 @@ class ComputeEngineHook(GoogleBaseHook):
                     service=service,
                     operation_name=operation_name,
                     project_id=project_id,
-                    num_retries=self.num_retries
+                    num_retries=self.num_retries,
                 )
             else:
                 # noinspection PyTypeChecker
                 operation_response = self._check_zone_operation_status(
-                    service, operation_name, project_id, zone, self.num_retries)
+                    service, operation_name, project_id, zone, self.num_retries
+                )
             if operation_response.get("status") == GceOperationStatus.DONE:
                 error = operation_response.get("error")
                 if error:
@@ -364,23 +345,20 @@ class ComputeEngineHook(GoogleBaseHook):
 
     @staticmethod
     def _check_zone_operation_status(
-        service: Any,
-        operation_name: str,
-        project_id: str,
-        zone: str,
-        num_retries: int
+        service: Any, operation_name: str, project_id: str, zone: str, num_retries: int
     ) -> Dict:
-        return service.zoneOperations().get(
-            project=project_id, zone=zone, operation=operation_name).execute(
-            num_retries=num_retries)
+        return (
+            service.zoneOperations()
+            .get(project=project_id, zone=zone, operation=operation_name)
+            .execute(num_retries=num_retries)
+        )
 
     @staticmethod
     def _check_global_operation_status(
-        service: Any,
-        operation_name: str,
-        project_id: str,
-        num_retries: int
+        service: Any, operation_name: str, project_id: str, num_retries: int
     ) -> Dict:
-        return service.globalOperations().get(
-            project=project_id, operation=operation_name).execute(
-            num_retries=num_retries)
+        return (
+            service.globalOperations()
+            .get(project=project_id, operation=operation_name)
+            .execute(num_retries=num_retries)
+        )

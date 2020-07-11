@@ -64,22 +64,10 @@ def puller(**kwargs):
         raise ValueError(f'The two values differ {pulled_value_2} and {value_2}')
 
 
-push1 = PythonOperator(
-    task_id='push',
-    dag=dag,
-    python_callable=push,
-)
+push1 = PythonOperator(task_id='push', dag=dag, python_callable=push,)
 
-push2 = PythonOperator(
-    task_id='push_by_returning',
-    dag=dag,
-    python_callable=push_by_returning,
-)
+push2 = PythonOperator(task_id='push_by_returning', dag=dag, python_callable=push_by_returning,)
 
-pull = PythonOperator(
-    task_id='puller',
-    dag=dag,
-    python_callable=puller,
-)
+pull = PythonOperator(task_id='puller', dag=dag, python_callable=puller,)
 
 pull << [push1, push2]

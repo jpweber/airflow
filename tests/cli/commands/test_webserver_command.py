@@ -33,7 +33,6 @@ from tests.test_utils.config import conf_vars
 
 
 class TestGunicornMonitor(unittest.TestCase):
-
     def setUp(self) -> None:
         self.monitor = GunicornMonitor(
             gunicorn_master_pid=1,
@@ -123,8 +122,9 @@ class TestGunicornMonitorGeneratePluginState(unittest.TestCase):
             file.flush()
 
     def test_should_detect_changes_in_directory(self):
-        with tempfile.TemporaryDirectory() as tempdir,\
-             mock.patch("airflow.cli.commands.webserver_command.settings.PLUGINS_FOLDER", tempdir):
+        with tempfile.TemporaryDirectory() as tempdir, mock.patch(
+            "airflow.cli.commands.webserver_command.settings.PLUGINS_FOLDER", tempdir
+        ):
             self._prepare_test_file(f"{tempdir}/file1.txt", 100)
             self._prepare_test_file(f"{tempdir}/nested/nested/nested/nested/file2.txt", 200)
             self._prepare_test_file(f"{tempdir}/file3.txt", 300)
@@ -171,7 +171,6 @@ class TestGunicornMonitorGeneratePluginState(unittest.TestCase):
 
 
 class TestCLIGetNumReadyWorkersRunning(unittest.TestCase):
-
     @classmethod
     def setUpClass(cls):
         cls.parser = cli_parser.get_parser()
@@ -270,7 +269,7 @@ class TestCliWebServer(unittest.TestCase):
             "os.environ",
             AIRFLOW__CORE__DAGS_FOLDER="/dev/null",
             AIRFLOW__CORE__LOAD_EXAMPLES="False",
-            AIRFLOW__WEBSERVER__WORKERS="1"
+            AIRFLOW__WEBSERVER__WORKERS="1",
         ):
             # Run webserver in foreground and terminate it.
             proc = subprocess.Popen(["airflow", "webserver"])
@@ -292,7 +291,7 @@ class TestCliWebServer(unittest.TestCase):
                 "os.environ",
                 AIRFLOW__CORE__DAGS_FOLDER="/dev/null",
                 AIRFLOW__CORE__LOAD_EXAMPLES="False",
-                AIRFLOW__WEBSERVER__WORKERS="1"
+                AIRFLOW__WEBSERVER__WORKERS="1",
             ):
                 proc = subprocess.Popen(["airflow", "webserver", "--pid", pidfile])
                 self.assertEqual(None, proc.poll())
@@ -305,12 +304,12 @@ class TestCliWebServer(unittest.TestCase):
             self.assertEqual(0, proc.wait(60))
 
     def test_cli_webserver_background(self):
-        with tempfile.TemporaryDirectory(prefix="gunicorn") as tmpdir, \
-                mock.patch.dict(
-                    "os.environ",
-                    AIRFLOW__CORE__DAGS_FOLDER="/dev/null",
-                    AIRFLOW__CORE__LOAD_EXAMPLES="False",
-                    AIRFLOW__WEBSERVER__WORKERS="1"):
+        with tempfile.TemporaryDirectory(prefix="gunicorn") as tmpdir, mock.patch.dict(
+            "os.environ",
+            AIRFLOW__CORE__DAGS_FOLDER="/dev/null",
+            AIRFLOW__CORE__LOAD_EXAMPLES="False",
+            AIRFLOW__WEBSERVER__WORKERS="1",
+        ):
             pidfile_webserver = "{}/pidflow-webserver.pid".format(tmpdir)
             pidfile_monitor = "{}/pidflow-webserver-monitor.pid".format(tmpdir)
             stdout = "{}/airflow-webserver.out".format(tmpdir)
@@ -318,15 +317,21 @@ class TestCliWebServer(unittest.TestCase):
             logfile = "{}/airflow-webserver.log".format(tmpdir)
             try:
                 # Run webserver as daemon in background. Note that the wait method is not called.
-                proc = subprocess.Popen([
-                    "airflow",
-                    "webserver",
-                    "--daemon",
-                    "--pid", pidfile_webserver,
-                    "--stdout", stdout,
-                    "--stderr", stderr,
-                    "--log-file", logfile,
-                ])
+                proc = subprocess.Popen(
+                    [
+                        "airflow",
+                        "webserver",
+                        "--daemon",
+                        "--pid",
+                        pidfile_webserver,
+                        "--stdout",
+                        stdout,
+                        "--stderr",
+                        stderr,
+                        "--log-file",
+                        logfile,
+                    ]
+                )
                 self.assertEqual(None, proc.poll())
 
                 pid_monitor = self._wait_pidfile(pidfile_monitor)
@@ -352,8 +357,9 @@ class TestCliWebServer(unittest.TestCase):
                 raise
 
     # Patch for causing webserver timeout
-    @mock.patch("airflow.cli.commands.webserver_command.GunicornMonitor._get_num_workers_running",
-                return_value=0)
+    @mock.patch(
+        "airflow.cli.commands.webserver_command.GunicornMonitor._get_num_workers_running", return_value=0
+    )
     def test_cli_webserver_shutdown_when_gunicorn_master_is_killed(self, _):
         # Shorten timeout so that this test doesn't take too long time
         args = self.parser.parse_args(['webserver'])
@@ -368,8 +374,7 @@ class TestCliWebServer(unittest.TestCase):
         sleep(3)  # wait for webserver to start
         return_code = proc.poll()
         self.assertEqual(
-            None,
-            return_code,
-            "webserver terminated with return code {} in debug mode".format(return_code))
+            None, return_code, "webserver terminated with return code {} in debug mode".format(return_code)
+        )
         proc.terminate()
         self.assertEqual(-15, proc.wait(60))

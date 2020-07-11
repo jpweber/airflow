@@ -32,40 +32,19 @@ def create_subdag_opt(main_dag):
         schedule_interval=None,
         concurrency=2,
     )
-    BashOperator(
-        bash_command="echo 1",
-        task_id="daily_job_subdag_task",
-        dag=subdag
-    )
-    return SubDagOperator(
-        task_id=subdag_name,
-        subdag=subdag,
-        dag=main_dag,
-    )
+    BashOperator(bash_command="echo 1", task_id="daily_job_subdag_task", dag=subdag)
+    return SubDagOperator(task_id=subdag_name, subdag=subdag, dag=main_dag,)
 
 
 dag_name = "clear_subdag_test_dag"
 
 start_date = datetime.datetime(2016, 1, 1)
 
-dag = DAG(
-    dag_id=dag_name,
-    concurrency=3,
-    start_date=start_date,
-    schedule_interval="0 0 * * *"
-)
+dag = DAG(dag_id=dag_name, concurrency=3, start_date=start_date, schedule_interval="0 0 * * *")
 
-daily_job_irrelevant = BashOperator(
-    bash_command="echo 1",
-    task_id="daily_job_irrelevant",
-    dag=dag,
-)
+daily_job_irrelevant = BashOperator(bash_command="echo 1", task_id="daily_job_irrelevant", dag=dag,)
 
-daily_job_downstream = BashOperator(
-    bash_command="echo 1",
-    task_id="daily_job_downstream",
-    dag=dag,
-)
+daily_job_downstream = BashOperator(bash_command="echo 1", task_id="daily_job_downstream", dag=dag,)
 
 daily_job = create_subdag_opt(main_dag=dag)
 

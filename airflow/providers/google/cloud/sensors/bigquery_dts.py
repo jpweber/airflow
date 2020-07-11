@@ -78,7 +78,7 @@ class BigQueryDataTransferServiceTransferRunSensor(BaseSensorOperator):
         request_timeout: Optional[float] = None,
         metadata: Optional[Sequence[Tuple[str, str]]] = None,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.run_id = run_id
@@ -87,9 +87,7 @@ class BigQueryDataTransferServiceTransferRunSensor(BaseSensorOperator):
         self.request_timeout = request_timeout
         self.metadata = metadata
         self.expected_statuses = (
-            {expected_statuses}
-            if isinstance(expected_statuses, str)
-            else expected_statuses
+            {expected_statuses} if isinstance(expected_statuses, str) else expected_statuses
         )
         self.project_id = project_id
         self.gcp_cloud_conn_id = gcp_conn_id

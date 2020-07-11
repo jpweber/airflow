@@ -32,12 +32,8 @@ class DockerHook(BaseHook, LoggingMixin):
         credentials and extra configuration are stored
     :type docker_conn_id: str
     """
-    def __init__(self,
-                 docker_conn_id='docker_default',
-                 base_url=None,
-                 version=None,
-                 tls=None
-                 ):
+
+    def __init__(self, docker_conn_id='docker_default', base_url=None, version=None, tls=None):
         super().__init__()
         if not base_url:
             raise AirflowException('No Docker base URL provided')
@@ -64,11 +60,7 @@ class DockerHook(BaseHook, LoggingMixin):
         self.__reauth = extra_options.get('reauth') != 'no'
 
     def get_conn(self):
-        client = APIClient(
-            base_url=self.__base_url,
-            version=self.__version,
-            tls=self.__tls
-        )
+        client = APIClient(base_url=self.__base_url, version=self.__version, tls=self.__tls)
         self.__login(client)
         return client
 
@@ -80,7 +72,7 @@ class DockerHook(BaseHook, LoggingMixin):
                 password=self.__password,
                 registry=self.__registry,
                 email=self.__email,
-                reauth=self.__reauth
+                reauth=self.__reauth,
             )
             self.log.debug('Login successful')
         except APIError as docker_error:

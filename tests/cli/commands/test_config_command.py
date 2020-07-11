@@ -35,9 +35,7 @@ class TestCliConfig(unittest.TestCase):
         config_command.show_config(self.parser.parse_args(['config', '--color', 'off']))
         mock_conf.write.assert_called_once_with(mock_stringio.return_value.__enter__.return_value)
 
-    @conf_vars({
-        ('core', 'testkey'): 'test_value'
-    })
+    @conf_vars({('core', 'testkey'): 'test_value'})
     def test_cli_show_config_should_display_key(self):
         with contextlib.redirect_stdout(io.StringIO()) as temp_stdout:
             config_command.show_config(self.parser.parse_args(['config', '--color', 'off']))

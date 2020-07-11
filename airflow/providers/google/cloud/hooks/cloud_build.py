@@ -53,7 +53,7 @@ class CloudBuildHook(GoogleBaseHook):
         self,
         api_version: str = "v1",
         gcp_conn_id: str = "google_cloud_default",
-        delegate_to: Optional[str] = None
+        delegate_to: Optional[str] = None,
     ) -> None:
         super().__init__(gcp_conn_id, delegate_to)
         self.api_version = api_version
@@ -123,7 +123,9 @@ class CloudBuildHook(GoogleBaseHook):
         while True:
             operation_response = (
                 # pylint: disable=no-member
-                service.operations().get(name=operation_name).execute(num_retries=self.num_retries)
+                service.operations()
+                .get(name=operation_name)
+                .execute(num_retries=self.num_retries)
             )
             if operation_response.get("done"):
                 response = operation_response.get("response")

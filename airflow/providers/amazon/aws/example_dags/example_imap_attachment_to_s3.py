@@ -39,7 +39,7 @@ with DAG(
     dag_id="example_imap_attachment_to_s3",
     default_args=default_args,
     schedule_interval=None,
-    tags=['example']
+    tags=['example'],
 ) as dag:
     # [START howto_operator_imap_attachment_to_s3_task_1]
     task_transfer_imap_attachment_to_s3 = ImapAttachmentToS3Operator(
@@ -48,6 +48,6 @@ with DAG(
         imap_mail_folder=IMAP_MAIL_FOLDER,
         imap_mail_filter=IMAP_MAIL_FILTER,
         task_id='transfer_imap_attachment_to_s3',
-        dag=dag
+        dag=dag,
     )
     # [END howto_operator_imap_attachment_to_s3_task_1]

@@ -23,7 +23,6 @@ from airflow.www import validators
 
 
 class TestGreaterEqualThan(unittest.TestCase):
-
     def setUp(self):
         super().setUp()
         self.form_field_mock = mock.MagicMock(data='2017-05-06')
@@ -39,17 +38,13 @@ class TestGreaterEqualThan(unittest.TestCase):
         if fieldname is None:
             fieldname = 'other_field'
 
-        validator = validators.GreaterEqualThan(fieldname=fieldname,
-                                                message=message)
+        validator = validators.GreaterEqualThan(fieldname=fieldname, message=message)
 
         return validator(self.form_mock, self.form_field_mock)
 
     def test_field_not_found(self):
         self.assertRaisesRegex(
-            validators.ValidationError,
-            "^Invalid field name 'some'.$",
-            self._validate,
-            fieldname='some',
+            validators.ValidationError, "^Invalid field name 'some'.$", self._validate, fieldname='some',
         )
 
     def test_form_field_is_none(self):
@@ -92,7 +87,6 @@ class TestGreaterEqualThan(unittest.TestCase):
 
 
 class TestValidJson(unittest.TestCase):
-
     def setUp(self):
         super().setUp()
         self.form_field_mock = mock.MagicMock(data='{"valid":"True"}')
@@ -117,17 +111,12 @@ class TestValidJson(unittest.TestCase):
         self.form_field_mock.data = '2017-05-04'
 
         self.assertRaisesRegex(
-            validators.ValidationError,
-            "JSON Validation Error:.*",
-            self._validate,
+            validators.ValidationError, "JSON Validation Error:.*", self._validate,
         )
 
     def test_validation_raises_custom_message(self):
         self.form_field_mock.data = '2017-05-04'
 
         self.assertRaisesRegex(
-            validators.ValidationError,
-            "Invalid JSON",
-            self._validate,
-            message="Invalid JSON: {}",
+            validators.ValidationError, "Invalid JSON", self._validate, message="Invalid JSON: {}",
         )

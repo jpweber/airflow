@@ -39,10 +39,9 @@ test_command = dedent(
         echo current user $(whoami) is not {user}!
         exit 1
     fi
-    """.format(user=deelevated_user))
-
-task = BashOperator(
-    task_id='test_deelevated_user',
-    bash_command=test_command,
-    dag=dag,
+    """.format(
+        user=deelevated_user
+    )
 )
+
+task = BashOperator(task_id='test_deelevated_user', bash_command=test_command, dag=dag,)

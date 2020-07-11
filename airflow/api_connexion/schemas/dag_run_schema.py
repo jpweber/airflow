@@ -30,6 +30,7 @@ from airflow.utils.types import DagRunType
 
 class ConfObject(fields.Field):
     """ The conf field"""
+
     def _serialize(self, value, attr, obj, **kwargs):
         if not value:
             return {}

@@ -23,7 +23,6 @@ from airflow.utils.log.logging_mixin import LoggingMixin
 
 
 class LoggingCommandExecutor(LoggingMixin):
-
     def execute_cmd(self, cmd, silent=False, cwd=None, env=None):
         if silent:
             self.log.info("Executing in silent mode: '%s'", " ".join(cmd))
@@ -32,8 +31,12 @@ class LoggingCommandExecutor(LoggingMixin):
         else:
             self.log.info("Executing: '%s'", " ".join(cmd))
             process = subprocess.Popen(
-                args=cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                universal_newlines=True, cwd=cwd, env=env
+                args=cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                universal_newlines=True,
+                cwd=cwd,
+                env=env,
             )
             output, err = process.communicate()
             retcode = process.poll()
@@ -45,16 +48,16 @@ class LoggingCommandExecutor(LoggingMixin):
 
     def check_output(self, cmd):
         self.log.info("Executing for output: '%s'", " ".join(cmd))
-        process = subprocess.Popen(args=cmd, stdout=subprocess.PIPE,
-                                   stderr=subprocess.PIPE)
+        process = subprocess.Popen(args=cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         output, err = process.communicate()
         retcode = process.poll()
         if retcode:
             self.log.error("Error when executing '%s'", " ".join(cmd))
             self.log.info("Stdout: %s", output)
             self.log.info("Stderr: %s", err)
-            raise AirflowException("Retcode {} on {} with stdout: {}, stderr: {}".
-                                   format(retcode, " ".join(cmd), output, err))
+            raise AirflowException(
+                "Retcode {} on {} with stdout: {}, stderr: {}".format(retcode, " ".join(cmd), output, err)
+            )
         return output
 
 

@@ -1,5 +1,3 @@
-
-
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -28,20 +26,21 @@ from airflow.providers.amazon.aws.operators.glue import AwsGlueJobOperator
 
 
 class TestAwsGlueJobOperator(unittest.TestCase):
-
     @mock.patch('airflow.providers.amazon.aws.hooks.glue.AwsGlueJobHook')
     def setUp(self, glue_hook_mock):
         configuration.load_test_config()
 
         self.glue_hook_mock = glue_hook_mock
         some_script = "s3:/glue-examples/glue-scripts/sample_aws_glue_job.py"
-        self.glue = AwsGlueJobOperator(task_id='test_glue_operator',
-                                       job_name='my_test_job',
-                                       script_location=some_script,
-                                       aws_conn_id='aws_default',
-                                       region_name='us-west-2',
-                                       s3_bucket='some_bucket',
-                                       iam_role_name='my_test_role')
+        self.glue = AwsGlueJobOperator(
+            task_id='test_glue_operator',
+            job_name='my_test_job',
+            script_location=some_script,
+            aws_conn_id='aws_default',
+            region_name='us-west-2',
+            s3_bucket='some_bucket',
+            iam_role_name='my_test_role',
+        )
 
     @mock.patch.object(AwsGlueJobHook, 'initialize_job')
     @mock.patch.object(AwsGlueJobHook, "get_conn")

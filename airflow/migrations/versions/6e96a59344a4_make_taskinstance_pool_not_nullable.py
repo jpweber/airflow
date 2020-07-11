@@ -86,10 +86,9 @@ def upgrade():
     Make TaskInstance.pool field not nullable.
     """
     with create_session() as session:
-        session.query(TaskInstance) \
-            .filter(TaskInstance.pool.is_(None)) \
-            .update({TaskInstance.pool: 'default_pool'},
-                    synchronize_session=False)  # Avoid select updated rows
+        session.query(TaskInstance).filter(TaskInstance.pool.is_(None)).update(
+            {TaskInstance.pool: 'default_pool'}, synchronize_session=False
+        )  # Avoid select updated rows
         session.commit()
 
     conn = op.get_bind()
@@ -99,9 +98,7 @@ def upgrade():
     # use batch_alter_table to support SQLite workaround
     with op.batch_alter_table('task_instance') as batch_op:
         batch_op.alter_column(
-            column_name='pool',
-            type_=sa.String(50),
-            nullable=False,
+            column_name='pool', type_=sa.String(50), nullable=False,
         )
 
     if conn.dialect.name == "mssql":
@@ -120,17 +117,14 @@ def downgrade():
     # use batch_alter_table to support SQLite workaround
     with op.batch_alter_table('task_instance') as batch_op:
         batch_op.alter_column(
-            column_name='pool',
-            type_=sa.String(50),
-            nullable=True,
+            column_name='pool', type_=sa.String(50), nullable=True,
         )
 
     if conn.dialect.name == "mssql":
         op.create_index('ti_pool', 'task_instance', ['pool', 'state', 'priority_weight'])
 
     with create_session() as session:
-        session.query(TaskInstance) \
-            .filter(TaskInstance.pool == 'default_pool') \
-            .update({TaskInstance.pool: None},
-                    synchronize_session=False)  # Avoid select updated rows
+        session.query(TaskInstance).filter(TaskInstance.pool == 'default_pool').update(
+            {TaskInstance.pool: None}, synchronize_session=False
+        )  # Avoid select updated rows
         session.commit()

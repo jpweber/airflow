@@ -41,16 +41,12 @@ def subdag(parent_dag_name, child_dag_name, args):
     Create a subdag.
     """
     dag_subdag = DAG(
-        dag_id='%s.%s' % (parent_dag_name, child_dag_name),
-        default_args=args,
-        schedule_interval="@daily",
+        dag_id='%s.%s' % (parent_dag_name, child_dag_name), default_args=args, schedule_interval="@daily",
     )
 
     for i in range(2):
         DummyOperator(
-            task_id='%s-task-%s' % (child_dag_name, i + 1),
-            default_args=args,
-            dag=dag_subdag,
+            task_id='%s-task-%s' % (child_dag_name, i + 1), default_args=args, dag=dag_subdag,
         )
 
     return dag_subdag
@@ -64,9 +60,7 @@ with DAG(
     schedule_interval=timedelta(minutes=1),
 ) as dag:
 
-    start = DummyOperator(
-        task_id='start',
-    )
+    start = DummyOperator(task_id='start',)
 
     section_1 = SubDagOperator(
         task_id='section-1',
@@ -74,8 +68,6 @@ with DAG(
         default_args=DEFAULT_TASK_ARGS,
     )
 
-    some_other_task = DummyOperator(
-        task_id='some-other-task',
-    )
+    some_other_task = DummyOperator(task_id='some-other-task',)
 
     start >> section_1 >> some_other_task  # pylint: disable=W0104

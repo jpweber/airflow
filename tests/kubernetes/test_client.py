@@ -23,7 +23,6 @@ from airflow.kubernetes.kube_client import RefreshConfiguration, get_kube_client
 
 
 class TestClient(unittest.TestCase):
-
     @mock.patch('airflow.kubernetes.kube_client.config')
     def test_load_cluster_config(self, _):
         client = get_kube_client(in_cluster=True)

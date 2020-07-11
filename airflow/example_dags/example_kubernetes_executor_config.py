@@ -25,10 +25,7 @@ from airflow.example_dags.libs.helper import print_stuff
 from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
 
-default_args = {
-    'owner': 'airflow',
-    'start_date': days_ago(2)
-}
+default_args = {'owner': 'airflow', 'start_date': days_ago(2)}
 
 with DAG(
     dag_id='example_kubernetes_executor_config',
@@ -52,11 +49,7 @@ with DAG(
     start_task = PythonOperator(
         task_id="start_task",
         python_callable=print_stuff,
-        executor_config={
-            "KubernetesExecutor": {
-                "annotations": {"test": "annotation"}
-            }
-        }
+        executor_config={"KubernetesExecutor": {"annotations": {"test": "annotation"}}},
     )
 
     # You can mount volume or secret to the worker pod
@@ -65,46 +58,25 @@ with DAG(
         python_callable=test_volume_mount,
         executor_config={
             "KubernetesExecutor": {
-                "volumes": [
-                    {
-                        "name": "example-kubernetes-test-volume",
-                        "hostPath": {"path": "/tmp/"},
-                    },
-                ],
-                "volume_mounts": [
-                    {
-                        "mountPath": "/foo/",
-                        "name": "example-kubernetes-test-volume",
-                    },
-                ]
+                "volumes": [{"name": "example-kubernetes-test-volume", "hostPath": {"path": "/tmp/"},},],
+                "volume_mounts": [{"mountPath": "/foo/", "name": "example-kubernetes-test-volume",},],
             }
-        }
+        },
     )
 
     # Test that we can add labels to pods
     third_task = PythonOperator(
         task_id="non_root_task",
         python_callable=print_stuff,
-        executor_config={
-            "KubernetesExecutor": {
-                "labels": {
-                    "release": "stable"
-                }
-            }
-        }
+        executor_config={"KubernetesExecutor": {"labels": {"release": "stable"}}},
     )
 
     other_ns_task = PythonOperator(
         task_id="other_namespace_task",
         python_callable=print_stuff,
         executor_config={
-            "KubernetesExecutor": {
-                "namespace": "test-namespace",
-                "labels": {
-                    "release": "stable"
-                }
-            }
-        }
+            "KubernetesExecutor": {"namespace": "test-namespace", "labels": {"release": "stable"}}
+        },
     )
 
     start_task >> second_task >> third_task

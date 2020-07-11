@@ -85,6 +85,7 @@ def timeout(seconds=1):
 
     :param seconds: Number of seconds
     """
+
     def handle_timeout(signum, frame):
         raise TimeoutException("Process timed out.")
 

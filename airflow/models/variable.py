@@ -36,6 +36,7 @@ class Variable(Base, LoggingMixin):
     Variables are a generic way to store and retrieve arbitrary content or settings
     as a simple key value store within Airflow.
     """
+
     __tablename__ = "variable"
     __NO_DEFAULT_SENTINEL = object()
 
@@ -80,7 +81,7 @@ class Variable(Base, LoggingMixin):
             self.is_encrypted = fernet.is_encrypted
 
     @declared_attr
-    def val(cls):   # pylint: disable=no-self-argument
+    def val(cls):  # pylint: disable=no-self-argument
         """
         Get Airflow Variable from Metadata DB and decode it using the Fernet Key
         """
@@ -101,8 +102,7 @@ class Variable(Base, LoggingMixin):
             and un-encode it when retrieving a value
         :return: Mixed
         """
-        obj = Variable.get(key, default_var=None,
-                           deserialize_json=deserialize_json)
+        obj = Variable.get(key, default_var=None, deserialize_json=deserialize_json)
         if obj is None:
             if default is not None:
                 Variable.set(key, default, serialize_json=deserialize_json)
@@ -113,12 +113,7 @@ class Variable(Base, LoggingMixin):
             return obj
 
     @classmethod
-    def get(
-        cls,
-        key: str,
-        default_var: Any = __NO_DEFAULT_SENTINEL,
-        deserialize_json: bool = False,
-    ) -> Any:
+    def get(cls, key: str, default_var: Any = __NO_DEFAULT_SENTINEL, deserialize_json: bool = False,) -> Any:
         """
         Sets a value for an Airflow Key
 
@@ -140,13 +135,7 @@ class Variable(Base, LoggingMixin):
 
     @classmethod
     @provide_session
-    def set(
-        cls,
-        key: str,
-        value: Any,
-        serialize_json: bool = False,
-        session: Session = None
-    ):
+    def set(cls, key: str, value: Any, serialize_json: bool = False, session: Session = None):
         """
         Sets a value for an Airflow Variable with a given Key
 

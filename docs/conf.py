@@ -137,14 +137,9 @@ extensions = [
     'sphinx_copybutton',
 ]
 
-autodoc_default_options = {
-    'show-inheritance': True,
-    'members': True
-}
+autodoc_default_options = {'show-inheritance': True, 'members': True}
 
-jinja_contexts = {
-    'config_ctx': {"configs": default_config_yaml()}
-}
+jinja_contexts = {'config_ctx': {"configs": default_config_yaml()}}
 
 viewcode_follow_imported_members = True
 
@@ -236,8 +231,7 @@ providers_packages_roots = {
 }
 
 providers_package_indexes = {
-    f"_api/{os.path.relpath(name, ROOT_DIR)}/index.rst"
-    for name in providers_packages_roots
+    f"_api/{os.path.relpath(name, ROOT_DIR)}/index.rst" for name in providers_packages_roots
 }
 
 exclude_patterns.extend(providers_package_indexes)
@@ -364,13 +358,7 @@ html_js_files = ['jira-links.js']
 
 # Custom sidebar templates, maps document names to template names.
 if airflow_theme_is_available:
-    html_sidebars = {
-        '**': [
-            'version-selector.html',
-            'searchbox.html',
-            'globaltoc.html',
-        ]
-    }
+    html_sidebars = {'**': ['version-selector.html', 'searchbox.html', 'globaltoc.html',]}
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
@@ -410,10 +398,8 @@ htmlhelp_basename = 'Airflowdoc'
 latex_elements = {
     # The paper size ('letterpaper' or 'a4paper').
     # 'papersize': 'letterpaper',
-
     # The font size ('10pt', '11pt' or '12pt').
     # 'pointsize': '10pt',
-
     # Additional stuff for the LaTeX preamble.
     # 'preamble': '',
 }  # type: Dict[str,str]
@@ -422,8 +408,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    ('index', 'Airflow.tex', 'Airflow Documentation',
-     'Apache Airflow', 'manual'),
+    ('index', 'Airflow.tex', 'Airflow Documentation', 'Apache Airflow', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -451,10 +436,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    ('index', 'airflow', 'Airflow Documentation',
-     ['Apache Airflow'], 1)
-]
+man_pages = [('index', 'airflow', 'Airflow Documentation', ['Apache Airflow'], 1)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
@@ -465,12 +447,17 @@ man_pages = [
 # Grouping the document tree into Texinfo files. List of tuples
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
-texinfo_documents = [(
-    'index', 'Airflow', 'Airflow Documentation',
-    'Apache Airflow', 'Airflow',
-    'Airflow is a system to programmatically author, schedule and monitor data pipelines.',
-    'Miscellaneous'
-), ]
+texinfo_documents = [
+    (
+        'index',
+        'Airflow',
+        'Airflow Documentation',
+        'Apache Airflow',
+        'Airflow',
+        'Airflow is a system to programmatically author, schedule and monitor data pipelines.',
+        'Miscellaneous',
+    ),
+]
 
 # Documents to append as an appendix to all manuals.
 # texinfo_appendices = []

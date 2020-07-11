@@ -55,11 +55,11 @@ class BaseExecutor(LoggingMixin):
     :param parallelism: how many jobs should run at one time. Set to
         ``0`` for infinity
     """
+
     def __init__(self, parallelism: int = PARALLELISM):
         super().__init__()
         self.parallelism: int = parallelism
-        self.queued_tasks: OrderedDict[TaskInstanceKey, QueuedTaskInstanceType] \
-            = OrderedDict()
+        self.queued_tasks: OrderedDict[TaskInstanceKey, QueuedTaskInstanceType] = OrderedDict()
         self.running: Set[TaskInstanceKey] = set()
         self.event_buffer: Dict[TaskInstanceKey, EventBufferValueType] = {}
 
@@ -68,11 +68,13 @@ class BaseExecutor(LoggingMixin):
         Executors may need to get things started.
         """
 
-    def queue_command(self,
-                      simple_task_instance: SimpleTaskInstance,
-                      command: CommandType,
-                      priority: int = 1,
-                      queue: Optional[str] = None):
+    def queue_command(
+        self,
+        simple_task_instance: SimpleTaskInstance,
+        command: CommandType,
+        priority: int = 1,
+        queue: Optional[str] = None,
+    ):
         """Queues command to task"""
         if simple_task_instance.key not in self.queued_tasks and simple_task_instance.key not in self.running:
             self.log.info("Adding to queue: %s", command)
@@ -81,16 +83,17 @@ class BaseExecutor(LoggingMixin):
             self.log.error("could not queue task %s", simple_task_instance.key)
 
     def queue_task_instance(
-            self,
-            task_instance: TaskInstance,
-            mark_success: bool = False,
-            pickle_id: Optional[str] = None,
-            ignore_all_deps: bool = False,
-            ignore_depends_on_past: bool = False,
-            ignore_task_deps: bool = False,
-            ignore_ti_state: bool = False,
-            pool: Optional[str] = None,
-            cfg_path: Optional[str] = None) -> None:
+        self,
+        task_instance: TaskInstance,
+        mark_success: bool = False,
+        pickle_id: Optional[str] = None,
+        ignore_all_deps: bool = False,
+        ignore_depends_on_past: bool = False,
+        ignore_task_deps: bool = False,
+        ignore_ti_state: bool = False,
+        pool: Optional[str] = None,
+        cfg_path: Optional[str] = None,
+    ) -> None:
         """Queues task instance."""
         pool = pool or task_instance.pool
 
@@ -107,12 +110,14 @@ class BaseExecutor(LoggingMixin):
             ignore_ti_state=ignore_ti_state,
             pool=pool,
             pickle_id=pickle_id,
-            cfg_path=cfg_path)
+            cfg_path=cfg_path,
+        )
         self.queue_command(
             SimpleTaskInstance(task_instance),
             command_list_to_run,
             priority=task_instance.task.priority_weight_total,
-            queue=task_instance.task.queue)
+            queue=task_instance.task.queue,
+        )
 
     def has_task(self, task_instance: TaskInstance) -> bool:
         """
@@ -164,7 +169,8 @@ class BaseExecutor(LoggingMixin):
         return sorted(
             [(k, v) for k, v in self.queued_tasks.items()],  # pylint: disable=unnecessary-comprehension
             key=lambda x: x[1][1],
-            reverse=True)
+            reverse=True,
+        )
 
     def trigger_tasks(self, open_slots: int) -> None:
         """
@@ -178,10 +184,9 @@ class BaseExecutor(LoggingMixin):
             key, (command, _, _, simple_ti) = sorted_queue.pop(0)
             self.queued_tasks.pop(key)
             self.running.add(key)
-            self.execute_async(key=key,
-                               command=command,
-                               queue=None,
-                               executor_config=simple_ti.executor_config)
+            self.execute_async(
+                key=key, command=command, queue=None, executor_config=simple_ti.executor_config
+            )
 
     def change_state(self, key: TaskInstanceKey, state: str, info=None) -> None:
         """
@@ -236,11 +241,13 @@ class BaseExecutor(LoggingMixin):
 
         return cleared_events
 
-    def execute_async(self,
-                      key: TaskInstanceKey,
-                      command: CommandType,
-                      queue: Optional[str] = None,
-                      executor_config: Optional[Any] = None) -> None:  # pragma: no cover
+    def execute_async(
+        self,
+        key: TaskInstanceKey,
+        command: CommandType,
+        queue: Optional[str] = None,
+        executor_config: Optional[Any] = None,
+    ) -> None:  # pragma: no cover
         """
         This method will execute the command asynchronously.
 

@@ -131,8 +131,7 @@ class SystemTest(TestCase, LoggingMixin):
             # to side packages path of the installed providers package
             python = f"python{sys.version_info.major}.{sys.version_info.minor}"
             dag_folder = dag_folder.replace(
-                "/opt/airflow/airflow/providers",
-                f"/usr/local/lib/{python}/site-packages/airflow/providers",
+                "/opt/airflow/airflow/providers", f"/usr/local/lib/{python}/site-packages/airflow/providers",
             )
         self.log.info("Looking for DAG: %s in %s", dag_id, dag_folder)
         dag_bag = DagBag(dag_folder=dag_folder, include_examples=False)
@@ -142,9 +141,7 @@ class SystemTest(TestCase, LoggingMixin):
                 "The Dag {dag_id} could not be found. It's either an import problem,"
                 "wrong dag_id or DAG is not in provided dag_folder."
                 "The content of the {dag_folder} folder is {content}".format(
-                    dag_id=dag_id,
-                    dag_folder=dag_folder,
-                    content=os.listdir(dag_folder),
+                    dag_id=dag_id, dag_folder=dag_folder, content=os.listdir(dag_folder),
                 )
             )
 

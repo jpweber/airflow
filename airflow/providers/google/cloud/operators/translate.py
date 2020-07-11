@@ -73,6 +73,7 @@ class CloudTranslateTextOperator(BaseOperator):
       as ``'base'`` or ``'nmt'``.
 
     """
+
     # [START translate_template_fields]
     template_fields = ('values', 'target_language', 'format_', 'source_language', 'model', 'gcp_conn_id')
     # [END translate_template_fields]
@@ -87,7 +88,7 @@ class CloudTranslateTextOperator(BaseOperator):
         model: str,
         gcp_conn_id: str = 'google_cloud_default',
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.values = values

@@ -47,11 +47,7 @@ JIRA_API_BASE = "https://issues.apache.org/jira"
 GIT_COMMIT_FIELDS = ['id', 'author_name', 'author_email', 'date', 'subject', 'body']
 GIT_LOG_FORMAT = '%x1f'.join(['%h', '%an', '%ae', '%ad', '%s', '%b']) + '%x1e'
 
-STATUS_COLUR_MAP = {
-    'Resolved': 'green',
-    'Open': 'red',
-    'Closed': 'yellow'
-}
+STATUS_COLUR_MAP = {'Resolved': 'green', 'Open': 'red', 'Closed': 'yellow'}
 
 
 def get_jiras_for_version(version):
@@ -64,7 +60,9 @@ def get_jiras_for_version(version):
             '''PROJECT={} and fixVersion={} AND
                (Resolution IS NULL OR Resolution NOT IN (Duplicate, "Cannot Reproduce"))
                ORDER BY updated DESC
-            '''.format(PROJECT, version),
+            '''.format(
+                PROJECT, version
+            ),
             maxResults=page_size,
             startAt=start_at,
         )
@@ -83,6 +81,7 @@ issue_id_re = re.compile(r"AIRFLOW[- ]([0-9]{1,6})", flags=re.I)
 pr_re = re.compile(r"(.*)Closes (#[0-9]{1,6})", flags=re.DOTALL)
 pr_title_re = re.compile(r".*\((#[0-9]{1,6})\)$")
 
+
 def _process_git_log_item(log_item):
     match = pr_title_re.match(log_item['subject'])
     if match:
@@ -96,8 +95,10 @@ def _process_git_log_item(log_item):
     else:
         log_item['pull_request'] = '-'
 
+
 def normalize_issue_id(issue_id):
     return "AIRFLOW-" + issue_id_re.match(issue_id)[1]
+
 
 def get_merged_issues(repo, version, previous_version=None):
     log_args = ['--format={}'.format(GIT_LOG_FORMAT)]
@@ -129,7 +130,8 @@ def get_commits_from_master(repo, issue):
         '--format={}'.format(GIT_LOG_FORMAT),
         '--grep',
         r'.*{issue}\(\]\|:\|\s\)'.format(issue=issue.key),
-        'origin/master')
+        'origin/master',
+    )
     if not log:
         return []
 
@@ -159,10 +161,12 @@ def cli():
 
 @cli.command(short_help='Compare a jira target version against git merges')
 @click.argument('target_version', default=None)
-@click.option('--previous-version',
-              'previous_version',
-              help="Specify the previous tag on the working branch to limit"
-                   " searching for few commits to find the cherry-picked commits")
+@click.option(
+    '--previous-version',
+    'previous_version',
+    help="Specify the previous tag on the working branch to limit"
+    " searching for few commits to find the cherry-picked commits",
+)
 @click.option('--unmerged', 'unmerged_only', help="Show unmerged issues only", is_flag=True)
 def compare(target_version, previous_version=None, unmerged_only=False):
     repo = git.Repo(".", search_parent_directories=True)
@@ -178,18 +182,23 @@ def compare(target_version, previous_version=None, unmerged_only=False):
     # :<50.50 truncates after 50 chars
     # !s forces as string - some of the Jira objects have a string method, but
     #    Py3 doesn't call by default
-    formatstr = "{id:<18}|{typ!s:<12}||{priority!s:<10}||{status!s}|" \
-                "{description:<83.83}|{merged:<6}|{pr:<6}|{commit:>9}"
+    formatstr = (
+        "{id:<18}|{typ!s:<12}||{priority!s:<10}||{status!s}|"
+        "{description:<83.83}|{merged:<6}|{pr:<6}|{commit:>9}"
+    )
 
-    print(formatstr.format(
-        id="ISSUE ID",
-        typ="TYPE",
-        priority="PRIORITY",
-        status="STATUS".ljust(10),
-        description="DESCRIPTION",
-        merged="MERGED",
-        pr="PR",
-        commit="COMMIT"))
+    print(
+        formatstr.format(
+            id="ISSUE ID",
+            typ="TYPE",
+            priority="PRIORITY",
+            status="STATUS".ljust(10),
+            description="DESCRIPTION",
+            merged="MERGED",
+            pr="PR",
+            commit="COMMIT",
+        )
+    )
 
     for issue in issues:
 
@@ -204,10 +213,7 @@ def compare(target_version, previous_version=None, unmerged_only=False):
         # Find the merges in master targeting this issue
         master_merges = get_commits_from_master(repo, issue)
 
-        on_branch = {
-            m['pull_request']: m
-            for m in branch_merges.get(issue.key, [])
-        }
+        on_branch = {m['pull_request']: m for m in branch_merges.get(issue.key, [])}
 
         def print_merge_info(merge, printed_desc):
             nonlocal num_merged
@@ -231,18 +237,8 @@ def compare(target_version, previous_version=None, unmerged_only=False):
                     description=issue.fields.summary,
                 )
             else:
-                fields = dict(
-                    id=issue.key,
-                    typ="",
-                    priority="",
-                    status=" " * 10,
-                    description="",
-                )
-            print(formatstr.format(
-                **fields,
-                merged=is_merged,
-                pr=merge['pull_request'],
-                commit=merge['id']))
+                fields = dict(id=issue.key, typ="", priority="", status=" " * 10, description="",)
+            print(formatstr.format(**fields, merged=is_merged, pr=merge['pull_request'], commit=merge['id']))
             return True
 
         printed_desc = False
@@ -258,13 +254,13 @@ def compare(target_version, previous_version=None, unmerged_only=False):
                     printed_desc = print_merge_info(merge, printed_desc)
             else:
                 # No merges, issue likely still open
-                print_merge_info({
-                    'merged': 0,
-                    'pull_request': '-',
-                    'id': '-',
-                }, printed_desc)
+                print_merge_info({'merged': 0, 'pull_request': '-', 'id': '-',}, printed_desc)
 
-    print("Commits on branch: {0:d}, {1:d} ({2}) yet to be cherry-picked".format(num_merged, sum(num_unmerged.values()), dict(num_unmerged)))
+    print(
+        "Commits on branch: {0:d}, {1:d} ({2}) yet to be cherry-picked".format(
+            num_merged, sum(num_unmerged.values()), dict(num_unmerged)
+        )
+    )
 
 
 @cli.command(short_help='Build a CHANGELOG grouped by Jira Issue type')
@@ -288,12 +284,13 @@ def changelog(previous_version, target_version):
 
     def process_batch(batch):
         page_size = 50
-        results = {i.key: i for i in asf_jira.search_issues(
-            'PROJECT={} AND key IN ({})'.format(
-                PROJECT,
-                ','.join(key for key, _ in batch)),
-            maxResults=page_size,
-        )}
+        results = {
+            i.key: i
+            for i in asf_jira.search_issues(
+                'PROJECT={} AND key IN ({})'.format(PROJECT, ','.join(key for key, _ in batch)),
+                maxResults=page_size,
+            )
+        }
 
         for key, subject in batch:
             sections[results[key].fields.issuetype.name].append(subject)
@@ -323,6 +320,7 @@ def changelog(previous_version, target_version):
 
 if __name__ == "__main__":
     import doctest
+
     (failure_count, test_count) = doctest.testmod()
     if failure_count:
         exit(-1)

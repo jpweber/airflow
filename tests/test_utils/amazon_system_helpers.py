@@ -28,9 +28,7 @@ from tests.test_utils import AIRFLOW_MAIN_FOLDER
 from tests.test_utils.system_tests_class import SystemTest
 from tests.utils.logging_command_executor import get_executor
 
-AWS_DAG_FOLDER = os.path.join(
-    AIRFLOW_MAIN_FOLDER, "airflow", "providers", "amazon", "aws", "example_dags"
-)
+AWS_DAG_FOLDER = os.path.join(AIRFLOW_MAIN_FOLDER, "airflow", "providers", "amazon", "aws", "example_dags")
 
 
 @contextmanager
@@ -53,7 +51,6 @@ def provide_aws_s3_bucket(name):
 
 @pytest.mark.system("amazon")
 class AmazonSystemTest(SystemTest):
-
     @staticmethod
     def _region_name():
         return os.environ.get("REGION_NAME")
@@ -85,8 +82,7 @@ class AmazonSystemTest(SystemTest):
             executor.execute_cmd(cmd=cmd)
 
     @staticmethod
-    def create_connection(aws_conn_id: str,
-                          region: str) -> None:
+    def create_connection(aws_conn_id: str, region: str) -> None:
         """
         Create aws connection with region
 
@@ -96,11 +92,7 @@ class AmazonSystemTest(SystemTest):
         :type region: str
         """
         db.merge_conn(
-            Connection(
-                conn_id=aws_conn_id,
-                conn_type="aws",
-                extra=f'{{"region_name": "{region}"}}',
-            ),
+            Connection(conn_id=aws_conn_id, conn_type="aws", extra=f'{{"region_name": "{region}"}}',),
         )
 
     @classmethod
@@ -137,8 +129,7 @@ class AmazonSystemTest(SystemTest):
         cls.execute_with_ctx(cmd)
 
     @staticmethod
-    def create_ecs_cluster(aws_conn_id: str,
-                           cluster_name: str) -> None:
+    def create_ecs_cluster(aws_conn_id: str, cluster_name: str) -> None:
         """
         Create ecs cluster with given name
 
@@ -149,33 +140,18 @@ class AmazonSystemTest(SystemTest):
         :param cluster_name: name of the cluster to create in aws ecs
         :type cluster_name: str
         """
-        hook = AwsBaseHook(
-            aws_conn_id=aws_conn_id,
-            client_type="ecs",
-        )
+        hook = AwsBaseHook(aws_conn_id=aws_conn_id, client_type="ecs",)
         hook.conn.create_cluster(
             clusterName=cluster_name,
-            capacityProviders=[
-                "FARGATE_SPOT",
-                "FARGATE",
-            ],
+            capacityProviders=["FARGATE_SPOT", "FARGATE",],
             defaultCapacityProviderStrategy=[
-                {
-                    "capacityProvider": "FARGATE_SPOT",
-                    "weight": 1,
-                    "base": 0,
-                },
-                {
-                    "capacityProvider": "FARGATE",
-                    "weight": 1,
-                    "base": 0,
-                },
+                {"capacityProvider": "FARGATE_SPOT", "weight": 1, "base": 0,},
+                {"capacityProvider": "FARGATE", "weight": 1, "base": 0,},
             ],
         )
 
     @staticmethod
-    def delete_ecs_cluster(aws_conn_id: str,
-                           cluster_name: str) -> None:
+    def delete_ecs_cluster(aws_conn_id: str, cluster_name: str) -> None:
         """
         Delete ecs cluster with given short name or full Amazon Resource Name (ARN)
 
@@ -184,23 +160,20 @@ class AmazonSystemTest(SystemTest):
         :param cluster_name: name of the cluster to delete in aws ecs
         :type cluster_name: str
         """
-        hook = AwsBaseHook(
-            aws_conn_id=aws_conn_id,
-            client_type="ecs",
-        )
-        hook.conn.delete_cluster(
-            cluster=cluster_name,
-        )
+        hook = AwsBaseHook(aws_conn_id=aws_conn_id, client_type="ecs",)
+        hook.conn.delete_cluster(cluster=cluster_name,)
 
     @staticmethod
-    def create_ecs_task_definition(aws_conn_id: str,
-                                   task_definition: str,
-                                   container: str,
-                                   image: str,
-                                   execution_role_arn: str,
-                                   awslogs_group: str,
-                                   awslogs_region: str,
-                                   awslogs_stream_prefix: str) -> None:
+    def create_ecs_task_definition(
+        aws_conn_id: str,
+        task_definition: str,
+        container: str,
+        image: str,
+        execution_role_arn: str,
+        awslogs_group: str,
+        awslogs_region: str,
+        awslogs_stream_prefix: str,
+    ) -> None:
         """
         Create ecs task definition with given name
 
@@ -223,10 +196,7 @@ class AmazonSystemTest(SystemTest):
         :param awslogs_stream_prefix: awslogs stream prefix option in log configuration
         :type awslogs_stream_prefix: str
         """
-        hook = AwsBaseHook(
-            aws_conn_id=aws_conn_id,
-            client_type="ecs",
-        )
+        hook = AwsBaseHook(aws_conn_id=aws_conn_id, client_type="ecs",)
         hook.conn.register_task_definition(
             family=task_definition,
             executionRoleArn=execution_role_arn,
@@ -248,16 +218,13 @@ class AmazonSystemTest(SystemTest):
                     },
                 },
             ],
-            requiresCompatibilities=[
-                "FARGATE",
-            ],
+            requiresCompatibilities=["FARGATE",],
             cpu="256",  # task cpu limit (total of all containers)
             memory="512",  # task memory limit (total of all containers)
         )
 
     @staticmethod
-    def delete_ecs_task_definition(aws_conn_id: str,
-                                   task_definition: str) -> None:
+    def delete_ecs_task_definition(aws_conn_id: str, task_definition: str) -> None:
         """
         Delete all revisions of given ecs task definition
 
@@ -266,25 +233,16 @@ class AmazonSystemTest(SystemTest):
         :param task_definition: family prefix for task definition to delete in aws ecs
         :type task_definition: str
         """
-        hook = AwsBaseHook(
-            aws_conn_id=aws_conn_id,
-            client_type="ecs",
-        )
+        hook = AwsBaseHook(aws_conn_id=aws_conn_id, client_type="ecs",)
         response = hook.conn.list_task_definitions(
-            familyPrefix=task_definition,
-            status="ACTIVE",
-            sort="ASC",
-            maxResults=100,
+            familyPrefix=task_definition, status="ACTIVE", sort="ASC", maxResults=100,
         )
         revisions = [arn.split(":")[-1] for arn in response["taskDefinitionArns"]]
         for revision in revisions:
-            hook.conn.deregister_task_definition(
-                taskDefinition=f"{task_definition}:{revision}",
-            )
+            hook.conn.deregister_task_definition(taskDefinition=f"{task_definition}:{revision}",)
 
     @staticmethod
-    def is_ecs_task_definition_exists(aws_conn_id: str,
-                                      task_definition: str) -> bool:
+    def is_ecs_task_definition_exists(aws_conn_id: str, task_definition: str) -> bool:
         """
         Check whether given task definition exits in ecs
 
@@ -293,13 +251,8 @@ class AmazonSystemTest(SystemTest):
         :param task_definition: family prefix for task definition to check in aws ecs
         :type task_definition: str
         """
-        hook = AwsBaseHook(
-            aws_conn_id=aws_conn_id,
-            client_type="ecs",
-        )
+        hook = AwsBaseHook(aws_conn_id=aws_conn_id, client_type="ecs",)
         response = hook.conn.list_task_definition_families(
-            familyPrefix=task_definition,
-            status="ACTIVE",
-            maxResults=100,
+            familyPrefix=task_definition, status="ACTIVE", maxResults=100,
         )
         return task_definition in response["families"]

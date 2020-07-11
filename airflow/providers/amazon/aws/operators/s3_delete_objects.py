@@ -59,13 +59,7 @@ class S3DeleteObjectsOperator(BaseOperator):
     template_fields = ('keys', 'bucket')
 
     @apply_defaults
-    def __init__(
-            self,
-            bucket,
-            keys,
-            aws_conn_id='aws_default',
-            verify=None,
-            *args, **kwargs):
+    def __init__(self, bucket, keys, aws_conn_id='aws_default', verify=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.bucket = bucket
         self.keys = keys

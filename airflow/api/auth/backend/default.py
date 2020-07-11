@@ -26,6 +26,7 @@ class ClientAuthProtocol(Protocol):
     """
     Protocol type for CLIENT_AUTH
     """
+
     def handle_response(self, _):
         """
         CLIENT_AUTH.handle_response method
@@ -42,6 +43,7 @@ def init_app(_):
 
 def requires_authentication(function):
     """Decorator for functions that require authentication"""
+
     @wraps(function)
     def decorated(*args, **kwargs):
         return function(*args, **kwargs)

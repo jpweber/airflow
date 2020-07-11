@@ -37,16 +37,14 @@ class Volume(K8SModel):
         configs.
     :type configs: dict
     """
+
     def __init__(self, name, configs):
         self.name = name
         self.configs = configs
 
     def to_k8s_client_obj(self) -> Dict[str, str]:
         """Converts to k8s object"""
-        return {
-            'name': self.name,
-            **self.configs
-        }
+        return {'name': self.name, **self.configs}
 
     def attach_to_pod(self, pod: k8s.V1Pod) -> k8s.V1Pod:
         cp_pod = copy.deepcopy(pod)

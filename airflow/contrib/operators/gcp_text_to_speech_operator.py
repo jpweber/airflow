@@ -25,7 +25,8 @@ from airflow.providers.google.cloud.operators.text_to_speech import CloudTextToS
 
 warnings.warn(
     "This module is deprecated. Please use `airflow.providers.google.cloud.operators.text_to_speech`",
-    DeprecationWarning, stacklevel=2
+    DeprecationWarning,
+    stacklevel=2,
 )
 
 
@@ -40,6 +41,7 @@ class GcpTextToSpeechSynthesizeOperator(CloudTextToSpeechSynthesizeOperator):
             """This class is deprecated.
             Please use
             `airflow.providers.google.cloud.operators.text_to_speech.CloudTextToSpeechSynthesizeOperator`.""",
-            DeprecationWarning, stacklevel=3
+            DeprecationWarning,
+            stacklevel=3,
         )
         super().__init__(*args, **kwargs)

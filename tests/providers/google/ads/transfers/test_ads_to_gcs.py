@@ -19,7 +19,13 @@ from unittest import mock
 
 from airflow.providers.google.ads.transfers.ads_to_gcs import GoogleAdsToGcsOperator
 from tests.providers.google.ads.operators.test_ads import (
-    BUCKET, CLIENT_IDS, FIELDS_TO_EXTRACT, GCS_OBJ_PATH, QUERY, gcp_conn_id, google_ads_conn_id,
+    BUCKET,
+    CLIENT_IDS,
+    FIELDS_TO_EXTRACT,
+    GCS_OBJ_PATH,
+    QUERY,
+    gcp_conn_id,
+    google_ads_conn_id,
 )
 
 
@@ -38,9 +44,7 @@ class TestGoogleAdsToGcsOperator:
             task_id="run_operator",
         )
         op.execute({})
-        mock_ads_hook.assert_called_once_with(
-            gcp_conn_id=gcp_conn_id, google_ads_conn_id=google_ads_conn_id
-        )
+        mock_ads_hook.assert_called_once_with(gcp_conn_id=gcp_conn_id, google_ads_conn_id=google_ads_conn_id)
         mock_ads_hook.return_value.search.assert_called_once_with(
             client_ids=CLIENT_IDS, query=QUERY, page_size=10000
         )

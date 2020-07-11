@@ -40,12 +40,7 @@ class CloudFormationCreateStackSensor(BaseSensorOperator):
     ui_color = '#C5CAE9'
 
     @apply_defaults
-    def __init__(self,
-                 stack_name,
-                 aws_conn_id='aws_default',
-                 region_name=None,
-                 *args,
-                 **kwargs):
+    def __init__(self, stack_name, aws_conn_id='aws_default', region_name=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.stack_name = stack_name
         self.hook = AWSCloudFormationHook(aws_conn_id=aws_conn_id, region_name=region_name)
@@ -76,12 +71,7 @@ class CloudFormationDeleteStackSensor(BaseSensorOperator):
     ui_color = '#C5CAE9'
 
     @apply_defaults
-    def __init__(self,
-                 stack_name,
-                 aws_conn_id='aws_default',
-                 region_name=None,
-                 *args,
-                 **kwargs):
+    def __init__(self, stack_name, aws_conn_id='aws_default', region_name=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.aws_conn_id = aws_conn_id
         self.region_name = region_name
@@ -99,7 +89,5 @@ class CloudFormationDeleteStackSensor(BaseSensorOperator):
     def get_hook(self):
         """Create and return an AWSCloudFormationHook"""
         if not self.hook:
-            self.hook = AWSCloudFormationHook(
-                aws_conn_id=self.aws_conn_id,
-                region_name=self.region_name)
+            self.hook = AWSCloudFormationHook(aws_conn_id=self.aws_conn_id, region_name=self.region_name)
         return self.hook

@@ -26,52 +26,44 @@ from airflow.kubernetes.pod_generator import PodGenerator
 
 
 class TestPod(unittest.TestCase):
-
     def test_port_to_k8s_client_obj(self):
         port = Port('http', 80)
-        self.assertEqual(
-            port.to_k8s_client_obj(),
-            k8s.V1ContainerPort(
-                name='http',
-                container_port=80
-            )
-        )
+        self.assertEqual(port.to_k8s_client_obj(), k8s.V1ContainerPort(name='http', container_port=80))
 
     @mock.patch('uuid.uuid4')
     def test_port_attach_to_pod(self, mock_uuid):
         static_uuid = uuid.UUID('cf4a56d2-8101-4217-b027-2af6216feb48')
         mock_uuid.return_value = static_uuid
         pod = PodGenerator(image='airflow-worker:latest', name='base').gen_pod()
-        ports = [
-            Port('https', 443),
-            Port('http', 80)
-        ]
+        ports = [Port('https', 443), Port('http', 80)]
         k8s_client = ApiClient()
         result = append_to_pod(pod, ports)
         result = k8s_client.sanitize_for_serialization(result)
-        self.assertEqual({
-            'apiVersion': 'v1',
-            'kind': 'Pod',
-            'metadata': {'name': 'base-' + static_uuid.hex},
-            'spec': {
-                'containers': [{
-                    'args': [],
-                    'command': [],
-                    'env': [],
-                    'envFrom': [],
-                    'image': 'airflow-worker:latest',
-                    'name': 'base',
-                    'ports': [{
-                        'name': 'https',
-                        'containerPort': 443
-                    }, {
-                        'name': 'http',
-                        'containerPort': 80
-                    }],
-                    'volumeMounts': [],
-                }],
-                'hostNetwork': False,
-                'imagePullSecrets': [],
-                'volumes': []
-            }
-        }, result)
+        self.assertEqual(
+            {
+                'apiVersion': 'v1',
+                'kind': 'Pod',
+                'metadata': {'name': 'base-' + static_uuid.hex},
+                'spec': {
+                    'containers': [
+                        {
+                            'args': [],
+                            'command': [],
+                            'env': [],
+                            'envFrom': [],
+                            'image': 'airflow-worker:latest',
+                            'name': 'base',
+                            'ports': [
+                                {'name': 'https', 'containerPort': 443},
+                                {'name': 'http', 'containerPort': 80},
+                            ],
+                            'volumeMounts': [],
+                        }
+                    ],
+                    'hostNetwork': False,
+                    'imagePullSecrets': [],
+                    'volumes': [],
+                },
+            },
+            result,
+        )

@@ -73,7 +73,7 @@ class AutoMLTrainModelOperator(BaseOperator):
         retry: Optional[Retry] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
 
@@ -150,7 +150,7 @@ class AutoMLPredictOperator(BaseOperator):
         retry: Optional[Retry] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
 
@@ -244,7 +244,7 @@ class AutoMLBatchPredictOperator(BaseOperator):
         retry: Optional[Retry] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
 
@@ -321,7 +321,7 @@ class AutoMLCreateDatasetOperator(BaseOperator):
         retry: Optional[Retry] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
 
@@ -398,7 +398,7 @@ class AutoMLImportDataOperator(BaseOperator):
         retry: Optional[Retry] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
 
@@ -492,7 +492,7 @@ class AutoMLTablesListColumnSpecsOperator(BaseOperator):
         retry: Optional[Retry] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.dataset_id = dataset_id
@@ -571,7 +571,7 @@ class AutoMLTablesUpdateDatasetOperator(BaseOperator):
         retry: Optional[Retry] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
 
@@ -639,7 +639,7 @@ class AutoMLGetModelOperator(BaseOperator):
         retry: Optional[Retry] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
 
@@ -706,7 +706,7 @@ class AutoMLDeleteModelOperator(BaseOperator):
         retry: Optional[Retry] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
 
@@ -784,7 +784,7 @@ class AutoMLDeployModelOperator(BaseOperator):
         retry: Optional[Retry] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
 
@@ -865,7 +865,7 @@ class AutoMLTablesListTableSpecsOperator(BaseOperator):
         retry: Optional[Retry] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.dataset_id = dataset_id
@@ -934,7 +934,7 @@ class AutoMLListDatasetOperator(BaseOperator):
         retry: Optional[Retry] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.location = location
@@ -958,9 +958,7 @@ class AutoMLListDatasetOperator(BaseOperator):
         self.log.info("Datasets obtained.")
 
         self.xcom_push(
-            context,
-            key="dataset_id_list",
-            value=[hook.extract_object_id(d) for d in result],
+            context, key="dataset_id_list", value=[hook.extract_object_id(d) for d in result],
         )
         return result
 
@@ -1006,7 +1004,7 @@ class AutoMLDeleteDatasetOperator(BaseOperator):
         retry: Optional[Retry] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
 

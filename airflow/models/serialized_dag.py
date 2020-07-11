@@ -56,6 +56,7 @@ class SerializedDagModel(Base):
     Because reading from database is lightweight compared to importing from files,
     it solves the webserver scalability issue.
     """
+
     __tablename__ = 'serialized_dag'
 
     dag_id = Column(String(ID_LEN), primary_key=True)
@@ -65,9 +66,7 @@ class SerializedDagModel(Base):
     data = Column(sqlalchemy_jsonfield.JSONField(json=json), nullable=False)
     last_updated = Column(UtcDateTime, nullable=False)
 
-    __table_args__ = (
-        Index('idx_fileloc_hash', fileloc_hash, unique=False),
-    )
+    __table_args__ = (Index('idx_fileloc_hash', fileloc_hash, unique=False),)
 
     def __init__(self, dag: DAG):
         self.dag_id = dag.dag_id
@@ -89,9 +88,13 @@ class SerializedDagModel(Base):
         # If Yes, does nothing
         # If No or the DAG does not exists, updates / writes Serialized DAG to DB
         if min_update_interval is not None:
-            if session.query(exists().where(
-                and_(cls.dag_id == dag.dag_id,
-                     (timezone.utcnow() - timedelta(seconds=min_update_interval)) < cls.last_updated))
+            if session.query(
+                exists().where(
+                    and_(
+                        cls.dag_id == dag.dag_id,
+                        (timezone.utcnow() - timedelta(seconds=min_update_interval)) < cls.last_updated,
+                    )
+                )
             ).scalar():
                 return
         log.debug("Writing DAG: %s to the DB", dag.dag_id)
@@ -118,8 +121,10 @@ class SerializedDagModel(Base):
                 dags[row.dag_id] = dag
             else:
                 log.warning(
-                    "dag_id Mismatch in DB: Row with dag_id '%s' has Serialised DAG "
-                    "with '%s' dag_id", row.dag_id, dag.dag_id)
+                    "dag_id Mismatch in DB: Row with dag_id '%s' has Serialised DAG " "with '%s' dag_id",
+                    row.dag_id,
+                    dag.dag_id,
+                )
         return dags
 
     @property
@@ -155,8 +160,11 @@ class SerializedDagModel(Base):
         :type expiration_date: datetime
         :return: None
         """
-        log.debug("Deleting Serialized DAGs that haven't been touched by the "
-                  "scheduler since %s from %s table ", expiration_date, cls.__tablename__)
+        log.debug(
+            "Deleting Serialized DAGs that haven't been touched by the " "scheduler since %s from %s table ",
+            expiration_date,
+            cls.__tablename__,
+        )
 
         session.execute(
             # pylint: disable=no-member
@@ -190,8 +198,7 @@ class SerializedDagModel(Base):
 
         # If we didn't find a matching DAG id then ask the DAG table to find
         # out the root dag
-        root_dag_id = session.query(
-            DagModel.root_dag_id).filter(DagModel.dag_id == dag_id).scalar()
+        root_dag_id = session.query(DagModel.root_dag_id).filter(DagModel.dag_id == dag_id).scalar()
 
         return session.query(cls).filter(cls.dag_id == root_dag_id).one_or_none()
 
@@ -208,7 +215,5 @@ class SerializedDagModel(Base):
         for dag in dags:
             if not dag.is_subdag:
                 SerializedDagModel.write_dag(
-                    dag,
-                    min_update_interval=MIN_SERIALIZED_DAG_UPDATE_INTERVAL,
-                    session=session
+                    dag, min_update_interval=MIN_SERIALIZED_DAG_UPDATE_INTERVAL, session=session
                 )

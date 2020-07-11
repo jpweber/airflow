@@ -38,6 +38,7 @@ class DaskExecutor(BaseExecutor):
     """
     DaskExecutor submits tasks to a Dask Distributed cluster.
     """
+
     def __init__(self, cluster_address=None):
         super().__init__(parallelism=0)
         if cluster_address is None:
@@ -66,11 +67,13 @@ class DaskExecutor(BaseExecutor):
         self.client = Client(self.cluster_address, security=security)
         self.futures = {}
 
-    def execute_async(self,
-                      key: TaskInstanceKey,
-                      command: CommandType,
-                      queue: Optional[str] = None,
-                      executor_config: Optional[Any] = None) -> None:
+    def execute_async(
+        self,
+        key: TaskInstanceKey,
+        command: CommandType,
+        queue: Optional[str] = None,
+        executor_config: Optional[Any] = None,
+    ) -> None:
 
         if command[0:3] != ["airflow", "tasks", "run"]:
             raise ValueError('The command must start with ["airflow", "tasks", "run"].')

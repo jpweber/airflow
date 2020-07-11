@@ -94,16 +94,21 @@ class BashOperator(BaseOperator):
 
     """
     template_fields = ('bash_command', 'env')
-    template_ext = ('.sh', '.bash',)
+    template_ext = (
+        '.sh',
+        '.bash',
+    )
     ui_color = '#f0ede4'
 
     @apply_defaults
     def __init__(
-            self,
-            bash_command: str,
-            env: Optional[Dict[str, str]] = None,
-            output_encoding: str = 'utf-8',
-            *args, **kwargs) -> None:
+        self,
+        bash_command: str,
+        env: Optional[Dict[str, str]] = None,
+        output_encoding: str = 'utf-8',
+        *args,
+        **kwargs,
+    ) -> None:
 
         super().__init__(*args, **kwargs)
         self.bash_command = bash_command
@@ -126,9 +131,10 @@ class BashOperator(BaseOperator):
             env = os.environ.copy()
 
         airflow_context_vars = context_to_airflow_vars(context, in_env_var_format=True)
-        self.log.debug('Exporting the following env vars:\n%s',
-                       '\n'.join(["{}={}".format(k, v)
-                                  for k, v in airflow_context_vars.items()]))
+        self.log.debug(
+            'Exporting the following env vars:\n%s',
+            '\n'.join(["{}={}".format(k, v) for k, v in airflow_context_vars.items()]),
+        )
         env.update(airflow_context_vars)
 
         with TemporaryDirectory(prefix='airflowtmp') as tmp_dir:
@@ -148,7 +154,8 @@ class BashOperator(BaseOperator):
                 stderr=STDOUT,
                 cwd=tmp_dir,
                 env=env,
-                preexec_fn=pre_exec)
+                preexec_fn=pre_exec,
+            )
 
             self.log.info('Output:')
             line = ''

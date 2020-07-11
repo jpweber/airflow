@@ -38,6 +38,7 @@ class RefreshKubeConfigLoader(KubeConfigLoader):
     Patched KubeConfigLoader, this subclass takes expirationTimestamp into
     account and sets api key refresh callback hook in Configuration object
     """
+
     def __init__(self, *args, **kwargs):
         KubeConfigLoader.__init__(self, *args, **kwargs)
         self.api_key_expire_ts = None
@@ -82,6 +83,7 @@ class RefreshConfiguration(Configuration):
     Patched Configuration, this subclass taskes api key refresh callback hook
     into account
     """
+
     def __init__(self, *args, **kwargs):
         Configuration.__init__(self, *args, **kwargs)
         self.refresh_api_key = None
@@ -101,7 +103,8 @@ def _get_kube_config_loader_for_yaml_file(filename, **kwargs) -> Optional[Refres
         return RefreshKubeConfigLoader(
             config_dict=yaml.safe_load(f),
             config_base_path=os.path.abspath(os.path.dirname(filename)),
-            **kwargs)
+            **kwargs,
+        )
 
 
 def load_kube_config(client_configuration, config_file=None, context=None):
@@ -114,6 +117,5 @@ def load_kube_config(client_configuration, config_file=None, context=None):
     if config_file is None:
         config_file = os.path.expanduser(KUBE_CONFIG_DEFAULT_LOCATION)
 
-    loader = _get_kube_config_loader_for_yaml_file(
-        config_file, active_context=context, config_persister=None)
+    loader = _get_kube_config_loader_for_yaml_file(config_file, active_context=context, config_persister=None)
     loader.load_and_set(client_configuration)

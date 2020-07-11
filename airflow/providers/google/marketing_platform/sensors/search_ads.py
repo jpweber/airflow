@@ -60,7 +60,7 @@ class GoogleSearchAdsReportSensor(BaseSensorOperator):
         mode: str = "reschedule",
         poke_interval: int = 5 * 60,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(mode=mode, poke_interval=poke_interval, *args, **kwargs)
         self.report_id = report_id

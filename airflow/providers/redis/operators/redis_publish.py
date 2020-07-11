@@ -36,12 +36,7 @@ class RedisPublishOperator(BaseOperator):
     template_fields = ('channel', 'message')
 
     @apply_defaults
-    def __init__(
-            self,
-            channel,
-            message,
-            redis_conn_id='redis_default',
-            *args, **kwargs):
+    def __init__(self, channel, message, redis_conn_id='redis_default', *args, **kwargs):
 
         super().__init__(*args, **kwargs)
         self.redis_conn_id = redis_conn_id

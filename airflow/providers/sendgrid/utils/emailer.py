@@ -26,7 +26,15 @@ import os
 
 import sendgrid
 from sendgrid.helpers.mail import (
-    Attachment, Category, Content, CustomArg, Email, Mail, MailSettings, Personalization, SandBoxMode,
+    Attachment,
+    Category,
+    Content,
+    CustomArg,
+    Email,
+    Mail,
+    MailSettings,
+    Personalization,
+    SandBoxMode,
 )
 
 from airflow.utils.email import get_email_address_list
@@ -34,8 +42,7 @@ from airflow.utils.email import get_email_address_list
 log = logging.getLogger(__name__)
 
 
-def send_email(to, subject, html_content, files=None, cc=None,
-               bcc=None, sandbox_mode=False, **kwargs):
+def send_email(to, subject, html_content, files=None, cc=None, bcc=None, sandbox_mode=False, **kwargs):
     """
     Send an email with html content using `Sendgrid <https://sendgrid.com/>`__.
 
@@ -95,7 +102,7 @@ def send_email(to, subject, html_content, files=None, cc=None,
             file_type=mimetypes.guess_type(basename)[0],
             file_name=basename,
             disposition="attachment",
-            content_id=f"<{basename}>"
+            content_id=f"<{basename}>",
         )
 
         mail.add_attachment(attachment)
@@ -107,8 +114,14 @@ def _post_sendgrid_mail(mail_data):
     response = sendgrid_client.client.mail.send.post(request_body=mail_data)
     # 2xx status code.
     if 200 <= response.status_code < 300:
-        log.info('Email with subject %s is successfully sent to recipients: %s',
-                 mail_data['subject'], mail_data['personalizations'])
+        log.info(
+            'Email with subject %s is successfully sent to recipients: %s',
+            mail_data['subject'],
+            mail_data['personalizations'],
+        )
     else:
-        log.error('Failed to send out email with subject %s, status code: %s',
-                  mail_data['subject'], response.status_code)
+        log.error(
+            'Failed to send out email with subject %s, status code: %s',
+            mail_data['subject'],
+            response.status_code,
+        )

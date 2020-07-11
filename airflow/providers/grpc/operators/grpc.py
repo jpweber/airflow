@@ -51,17 +51,20 @@ class GrpcOperator(BaseOperator):
     template_fields = ('stub_class', 'call_func', 'data')
 
     @apply_defaults
-    def __init__(self,
-                 stub_class,
-                 call_func,
-                 grpc_conn_id="grpc_default",
-                 data=None,
-                 interceptors=None,
-                 custom_connection_func=None,
-                 streaming=False,
-                 response_callback=None,
-                 log_response=False,
-                 *args, **kwargs):
+    def __init__(
+        self,
+        stub_class,
+        call_func,
+        grpc_conn_id="grpc_default",
+        data=None,
+        interceptors=None,
+        custom_connection_func=None,
+        streaming=False,
+        response_callback=None,
+        log_response=False,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.stub_class = stub_class
         self.call_func = call_func
@@ -77,7 +80,7 @@ class GrpcOperator(BaseOperator):
         return GrpcHook(
             self.grpc_conn_id,
             interceptors=self.interceptors,
-            custom_connection_func=self.custom_connection_func
+            custom_connection_func=self.custom_connection_func,
         )
 
     def execute(self, context):

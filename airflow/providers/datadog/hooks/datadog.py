@@ -37,6 +37,7 @@ class DatadogHook(BaseHook, LoggingMixin):
     :param datadog_conn_id: The connection to datadog, containing metadata for api keys.
     :param datadog_conn_id: str
     """
+
     def __init__(self, datadog_conn_id='datadog_default'):
         super().__init__()
         conn = self.get_connection(datadog_conn_id)
@@ -49,8 +50,7 @@ class DatadogHook(BaseHook, LoggingMixin):
         self.host = conn.host
 
         if self.api_key is None:
-            raise AirflowException("api_key must be specified in the "
-                                   "Datadog connection details")
+            raise AirflowException("api_key must be specified in the " "Datadog connection details")
 
         self.log.info("Setting up api keys for Datadog")
         initialize(api_key=self.api_key, app_key=self.app_key)
@@ -79,20 +79,13 @@ class DatadogHook(BaseHook, LoggingMixin):
         :type interval: int
         """
         response = api.Metric.send(
-            metric=metric_name,
-            points=datapoint,
-            host=self.host,
-            tags=tags,
-            type=type_,
-            interval=interval)
+            metric=metric_name, points=datapoint, host=self.host, tags=tags, type=type_, interval=interval
+        )
 
         self.validate_response(response)
         return response
 
-    def query_metric(self,
-                     query,
-                     from_seconds_ago,
-                     to_seconds_ago):
+    def query_metric(self, query, from_seconds_ago, to_seconds_ago):
         """
         Queries datadog for a specific metric, potentially with some
         function applied to it and returns the results.
@@ -106,17 +99,25 @@ class DatadogHook(BaseHook, LoggingMixin):
         """
         now = int(time.time())
 
-        response = api.Metric.query(
-            start=now - from_seconds_ago,
-            end=now - to_seconds_ago,
-            query=query)
+        response = api.Metric.query(start=now - from_seconds_ago, end=now - to_seconds_ago, query=query)
 
         self.validate_response(response)
         return response
 
     # pylint: disable=too-many-arguments
-    def post_event(self, title, text, aggregation_key=None, alert_type=None, date_happened=None,
-                   handle=None, priority=None, related_event_id=None, tags=None, device_name=None):
+    def post_event(
+        self,
+        title,
+        text,
+        aggregation_key=None,
+        alert_type=None,
+        date_happened=None,
+        handle=None,
+        priority=None,
+        related_event_id=None,
+        tags=None,
+        device_name=None,
+    ):
         """
         Posts an event to datadog (processing finished, potentially alerts, other issues)
         Think about this as a means to maintain persistence of alerts, rather than
@@ -157,7 +158,8 @@ class DatadogHook(BaseHook, LoggingMixin):
             tags=tags,
             host=self.host,
             device_name=device_name,
-            source_type_name=self.source_type_name)
+            source_type_name=self.source_type_name,
+        )
 
         self.validate_response(response)
         return response

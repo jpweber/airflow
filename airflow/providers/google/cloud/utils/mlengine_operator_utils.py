@@ -35,21 +35,23 @@ from airflow.providers.google.cloud.operators.dataflow import DataflowCreatePyth
 from airflow.providers.google.cloud.operators.mlengine import MLEngineStartBatchPredictionJobOperator
 
 
-def create_evaluate_ops(task_prefix,  # pylint: disable=too-many-arguments
-                        data_format,
-                        input_paths,
-                        prediction_path,
-                        metric_fn_and_keys,
-                        validate_fn,
-                        batch_prediction_job_id=None,
-                        project_id=None,
-                        region=None,
-                        dataflow_options=None,
-                        model_uri=None,
-                        model_name=None,
-                        version_name=None,
-                        dag=None,
-                        py_interpreter="python3"):
+def create_evaluate_ops(
+    task_prefix,  # pylint: disable=too-many-arguments
+    data_format,
+    input_paths,
+    prediction_path,
+    metric_fn_and_keys,
+    validate_fn,
+    batch_prediction_job_id=None,
+    project_id=None,
+    region=None,
+    dataflow_options=None,
+    model_uri=None,
+    model_name=None,
+    version_name=None,
+    dag=None,
+    py_interpreter="python3",
+):
     """
     Creates Operators needed for model evaluation and returns.
 
@@ -192,7 +194,8 @@ def create_evaluate_ops(task_prefix,  # pylint: disable=too-many-arguments
     if not re.match(r"^[a-zA-Z][-A-Za-z0-9]*$", task_prefix):
         raise AirflowException(
             "Malformed task_id for DataFlowPythonOperator (only alphanumeric "
-            "and hyphens are allowed but got: " + task_prefix)
+            "and hyphens are allowed but got: " + task_prefix
+        )
 
     metric_fn, metric_keys = metric_fn_and_keys
     if not callable(metric_fn):
@@ -206,8 +209,7 @@ def create_evaluate_ops(task_prefix,  # pylint: disable=too-many-arguments
         region = region or default_args.get('region')
         model_name = model_name or default_args.get('model_name')
         version_name = version_name or default_args.get('version_name')
-        dataflow_options = dataflow_options or \
-            default_args.get('dataflow_default_options')
+        dataflow_options = dataflow_options or default_args.get('dataflow_default_options')
 
     evaluate_prediction = MLEngineStartBatchPredictionJobOperator(
         task_id=(task_prefix + "-prediction"),
@@ -220,7 +222,8 @@ def create_evaluate_ops(task_prefix,  # pylint: disable=too-many-arguments
         uri=model_uri,
         model_name=model_name,
         version_name=version_name,
-        dag=dag)
+        dag=dag,
+    )
 
     metric_fn_encoded = base64.b64encode(dill.dumps(metric_fn, recurse=True)).decode()
     evaluate_summary = DataflowCreatePythonJobOperator(
@@ -230,13 +233,12 @@ def create_evaluate_ops(task_prefix,  # pylint: disable=too-many-arguments
         options={
             "prediction_path": prediction_path,
             "metric_fn_encoded": metric_fn_encoded,
-            "metric_keys": ','.join(metric_keys)
+            "metric_keys": ','.join(metric_keys),
         },
         py_interpreter=py_interpreter,
-        py_requirements=[
-            'apache-beam[gcp]>=2.14.0'
-        ],
-        dag=dag)
+        py_requirements=['apache-beam[gcp]>=2.14.0'],
+        dag=dag,
+    )
     evaluate_summary.set_upstream(evaluate_prediction)
 
     def apply_validate_fn(*args, templates_dict, **kwargs):
@@ -244,8 +246,7 @@ def create_evaluate_ops(task_prefix,  # pylint: disable=too-many-arguments
         scheme, bucket, obj, _, _ = urlsplit(prediction_path)
         if scheme != "gs" or not bucket or not obj:
             raise ValueError("Wrong format prediction_path: {}".format(prediction_path))
-        summary = os.path.join(obj.strip("/"),
-                               "prediction.summary.json")
+        summary = os.path.join(obj.strip("/"), "prediction.summary.json")
         gcs_hook = GCSHook()
         summary = json.loads(gcs_hook.download(bucket, summary))
         return validate_fn(summary)
@@ -254,7 +255,8 @@ def create_evaluate_ops(task_prefix,  # pylint: disable=too-many-arguments
         task_id=(task_prefix + "-validation"),
         python_callable=apply_validate_fn,
         templates_dict={"prediction_path": prediction_path},
-        dag=dag)
+        dag=dag,
+    )
     evaluate_validation.set_upstream(evaluate_summary)
 
     return evaluate_prediction, evaluate_summary, evaluate_validation

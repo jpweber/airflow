@@ -93,7 +93,7 @@ class LivyOperator(BaseOperator):
         proxy_user=None,
         livy_conn_id='livy_default',
         polling_interval=0,
-        **kwargs
+        **kwargs,
     ):
         # pylint: disable-msg=too-many-arguments
 
@@ -115,7 +115,7 @@ class LivyOperator(BaseOperator):
             'queue': queue,
             'name': name,
             'conf': conf,
-            'proxy_user': proxy_user
+            'proxy_user': proxy_user,
         }
 
         self._livy_conn_id = livy_conn_id

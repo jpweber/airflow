@@ -45,7 +45,7 @@ BUILTIN_OPERATOR_EXTRA_LINKS: List[str] = [
     "airflow.providers.google.cloud.operators.bigquery.BigQueryConsoleLink",
     "airflow.providers.google.cloud.operators.bigquery.BigQueryConsoleIndexableLink",
     "airflow.providers.google.cloud.operators.mlengine.AIPlatformConsoleLink",
-    "airflow.providers.qubole.operators.qubole.QDSLink"
+    "airflow.providers.qubole.operators.qubole.QDSLink",
 ]
 
 
@@ -88,8 +88,9 @@ class BaseSerialization:
         return cls.from_dict(json.loads(serialized_obj))
 
     @classmethod
-    def from_dict(cls, serialized_obj: Dict[Encoding, Any]) -> \
-            Union['BaseSerialization', dict, list, set, tuple]:
+    def from_dict(
+        cls, serialized_obj: Dict[Encoding, Any]
+    ) -> Union['BaseSerialization', dict, list, set, tuple]:
         """Deserializes a python dict stored with type decorators and
         reconstructs all DAGs and operators it contains.
         """
@@ -128,14 +129,14 @@ class BaseSerialization:
                 return True
 
             return cls._value_is_hardcoded_default(attrname, var, instance)
-        return (
-            isinstance(var, cls._excluded_types) or
-            cls._value_is_hardcoded_default(attrname, var, instance)
+        return isinstance(var, cls._excluded_types) or cls._value_is_hardcoded_default(
+            attrname, var, instance
         )
 
     @classmethod
-    def serialize_to_json(cls, object_to_serialize: Union[BaseOperator, DAG], decorated_fields: Set) \
-            -> Dict[str, Any]:
+    def serialize_to_json(
+        cls, object_to_serialize: Union[BaseOperator, DAG], decorated_fields: Set
+    ) -> Dict[str, Any]:
         """Serializes an object to json"""
         serialized_object: Dict[str, Any] = {}
         keys_to_serialize = object_to_serialize.get_serialized_fields()
@@ -174,10 +175,7 @@ class BaseSerialization:
                     return var.value
                 return var
             elif isinstance(var, dict):
-                return cls._encode(
-                    {str(k): cls._serialize(v) for k, v in var.items()},
-                    type_=DAT.DICT
-                )
+                return cls._encode({str(k): cls._serialize(v) for k, v in var.items()}, type_=DAT.DICT)
             elif isinstance(var, list):
                 return [cls._serialize(v) for v in var]
             elif isinstance(var, DAG):
@@ -202,12 +200,10 @@ class BaseSerialization:
                 return str(get_python_source(var))
             elif isinstance(var, set):
                 # FIXME: casts set to list in customized serialization in future.
-                return cls._encode(
-                    [cls._serialize(v) for v in var], type_=DAT.SET)
+                return cls._encode([cls._serialize(v) for v in var], type_=DAT.SET)
             elif isinstance(var, tuple):
                 # FIXME: casts tuple to list in customized serialization in future.
-                return cls._encode(
-                    [cls._serialize(v) for v in var], type_=DAT.TUPLE)
+                return cls._encode([cls._serialize(v) for v in var], type_=DAT.TUPLE)
             else:
                 log.debug('Cast type %s to str in serialization.', type(var))
                 return str(var)
@@ -284,8 +280,9 @@ class BaseSerialization:
         ``field = field or {}`` set.
         """
         # pylint: disable=unused-argument
-        if attrname in cls._CONSTRUCTOR_PARAMS and \
-                (cls._CONSTRUCTOR_PARAMS[attrname] is value or (value in [{}, []])):
+        if attrname in cls._CONSTRUCTOR_PARAMS and (
+            cls._CONSTRUCTOR_PARAMS[attrname] is value or (value in [{}, []])
+        ):
             return True
         return False
 
@@ -300,7 +297,8 @@ class SerializedBaseOperator(BaseOperator, BaseSerialization):
     _decorated_fields = {'executor_config'}
 
     _CONSTRUCTOR_PARAMS = {
-        k: v.default for k, v in signature(BaseOperator.__init__).parameters.items()
+        k: v.default
+        for k, v in signature(BaseOperator.__init__).parameters.items()
         if v.default is not v.empty
     }
 
@@ -333,8 +331,9 @@ class SerializedBaseOperator(BaseOperator, BaseSerialization):
         serialize_op['_task_type'] = op.__class__.__name__
         serialize_op['_task_module'] = op.__class__.__module__
         if op.operator_extra_links:
-            serialize_op['_operator_extra_links'] = \
-                cls._serialize_operator_extra_links(op.operator_extra_links)
+            serialize_op['_operator_extra_links'] = cls._serialize_operator_extra_links(
+                op.operator_extra_links
+            )
 
         # Store all template_fields as they are if there are JSON Serializable
         # If not, store them as strings
@@ -351,6 +350,7 @@ class SerializedBaseOperator(BaseOperator, BaseSerialization):
         """Deserializes an operator from a JSON object.
         """
         from airflow import plugins_manager
+
         plugins_manager.initialize_extra_operators_links_plugins()
 
         if plugins_manager.operator_extra_links is None:
@@ -362,8 +362,10 @@ class SerializedBaseOperator(BaseOperator, BaseSerialization):
 
         for ope in plugins_manager.operator_extra_links:
             for operator in ope.operators:
-                if operator.__name__ == encoded_op["_task_type"] and \
-                        operator.__module__ == encoded_op["_task_module"]:
+                if (
+                    operator.__name__ == encoded_op["_task_type"]
+                    and operator.__module__ == encoded_op["_task_module"]
+                ):
                     op_extra_links_from_plugin.update({ope.name: ope})
 
         # If OperatorLinks are defined in Plugins but not in the Operator that is being Serialized
@@ -420,10 +422,7 @@ class SerializedBaseOperator(BaseOperator, BaseSerialization):
         return super()._is_excluded(var, attrname, op)
 
     @classmethod
-    def _deserialize_operator_extra_links(
-        cls,
-        encoded_op_links: list
-    ) -> Dict[str, BaseOperatorLink]:
+    def _deserialize_operator_extra_links(cls, encoded_op_links: list) -> Dict[str, BaseOperatorLink]:
         """
         Deserialize Operator Links if the Classes  are registered in Airflow Plugins.
         Error is raised if the OperatorLink is not found in Plugins too.
@@ -432,6 +431,7 @@ class SerializedBaseOperator(BaseOperator, BaseSerialization):
         :return: De-Serialized Operator Link
         """
         from airflow import plugins_manager
+
         plugins_manager.initialize_extra_operators_links_plugins()
 
         if plugins_manager.registered_operator_link_classes is None:
@@ -477,20 +477,14 @@ class SerializedBaseOperator(BaseOperator, BaseSerialization):
             else:
                 raise KeyError("Operator Link class %r not registered" % _operator_link_class_path)
 
-            op_predefined_extra_link: BaseOperatorLink = cattr.structure(
-                data, single_op_link_class)
+            op_predefined_extra_link: BaseOperatorLink = cattr.structure(data, single_op_link_class)
 
-            op_predefined_extra_links.update(
-                {op_predefined_extra_link.name: op_predefined_extra_link}
-            )
+            op_predefined_extra_links.update({op_predefined_extra_link.name: op_predefined_extra_link})
 
         return op_predefined_extra_links
 
     @classmethod
-    def _serialize_operator_extra_links(
-        cls,
-        operator_extra_links: Iterable[BaseOperatorLink]
-    ):
+    def _serialize_operator_extra_links(cls, operator_extra_links: Iterable[BaseOperatorLink]):
         """
         Serialize Operator Links. Store the import path of the OperatorLink and the arguments
         passed to it. Example
@@ -506,8 +500,9 @@ class SerializedBaseOperator(BaseOperator, BaseSerialization):
                 op_link_arguments = {}
             serialize_operator_extra_links.append(
                 {
-                    "{}.{}".format(operator_extra_link.__class__.__module__,
-                                   operator_extra_link.__class__.__name__): op_link_arguments
+                    "{}.{}".format(
+                        operator_extra_link.__class__.__module__, operator_extra_link.__class__.__name__
+                    ): op_link_arguments
                 }
             )
 
@@ -538,7 +533,8 @@ class SerializedDAG(DAG, BaseSerialization):
             'access_control': '_access_control',
         }
         return {
-            param_to_attr.get(k, k): v.default for k, v in signature(DAG.__init__).parameters.items()
+            param_to_attr.get(k, k): v.default
+            for k, v in signature(DAG.__init__).parameters.items()
             if v.default is not v.empty
         }
 
@@ -566,9 +562,7 @@ class SerializedDAG(DAG, BaseSerialization):
             if k == "_downstream_task_ids":
                 v = set(v)
             elif k == "tasks":
-                v = {
-                    task["task_id"]: SerializedBaseOperator.deserialize_operator(task) for task in v
-                }
+                v = {task["task_id"]: SerializedBaseOperator.deserialize_operator(task) for task in v}
                 k = "task_dict"
             elif k == "timezone":
                 v = cls._deserialize_timezone(v)
@@ -602,7 +596,9 @@ class SerializedDAG(DAG, BaseSerialization):
             for task_id in serializable_task.downstream_task_ids:
                 # Bypass set_upstream etc here - it does more than we want
                 # noinspection PyProtectedMember
-                dag.task_dict[task_id]._upstream_task_ids.add(serializable_task.task_id)  # noqa: E501 # pylint: disable=protected-access
+                dag.task_dict[task_id]._upstream_task_ids.add(
+                    serializable_task.task_id
+                )  # noqa: E501 # pylint: disable=protected-access
 
         return dag
 
@@ -610,10 +606,7 @@ class SerializedDAG(DAG, BaseSerialization):
     def to_dict(cls, var: Any) -> dict:
         """Stringifies DAGs and operators contained by var and returns a dict of var.
         """
-        json_dict = {
-            "__version": cls.SERIALIZER_VERSION,
-            "dag": cls.serialize_dag(var)
-        }
+        json_dict = {"__version": cls.SERIALIZER_VERSION, "dag": cls.serialize_dag(var)}
 
         # Validate Serialized DAG with Json Schema. Raises Error if it mismatches
         cls.validate_schema(json_dict)

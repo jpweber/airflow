@@ -37,10 +37,7 @@ default_args = {
 }
 
 with DAG(
-    dag_id='aci_example',
-    default_args=default_args,
-    schedule_interval=timedelta(1),
-    tags=['example'],
+    dag_id='aci_example', default_args=default_args, schedule_interval=timedelta(1), tags=['example'],
 ) as dag:
 
     t1 = AzureContainerInstancesOperator(
@@ -54,5 +51,5 @@ with DAG(
         volumes=[],
         memory_in_gb=4.0,
         cpu=1.0,
-        task_id='start_container'
+        task_id='start_container',
     )

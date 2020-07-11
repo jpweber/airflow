@@ -24,11 +24,8 @@ from tests.providers.apache.hive import DEFAULT_DATE, TestHiveEnvironment
 from tests.test_utils.mock_hooks import MockDBConnection
 
 
-@unittest.skipIf(
-    'AIRFLOW_RUNALL_TESTS' not in os.environ,
-    "Skipped because AIRFLOW_RUNALL_TESTS is not set")
+@unittest.skipIf('AIRFLOW_RUNALL_TESTS' not in os.environ, "Skipped because AIRFLOW_RUNALL_TESTS is not set")
 class TestWebHdfsSensor(TestHiveEnvironment):
-
     @mock.patch('airflow.providers.apache.hdfs.hooks.webhdfs.WebHDFSHook._find_valid_server')
     def test_webhdfs_sensor(self, mock_find_valid_server):
         mock_find_valid_server.return_value = MockDBConnection()
@@ -36,6 +33,6 @@ class TestWebHdfsSensor(TestHiveEnvironment):
             task_id='webhdfs_sensor_check',
             filepath='hdfs://user/hive/warehouse/airflow.db/static_babynames',
             timeout=120,
-            dag=self.dag)
-        op.run(start_date=DEFAULT_DATE, end_date=DEFAULT_DATE,
-               ignore_ti_state=True)
+            dag=self.dag,
+        )
+        op.run(start_date=DEFAULT_DATE, end_date=DEFAULT_DATE, ignore_ti_state=True)

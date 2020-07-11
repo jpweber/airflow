@@ -71,7 +71,7 @@ class MySqlHook(DbApiHook):
             "user": conn.login,
             "passwd": conn.password or '',
             "host": conn.host or 'localhost',
-            "db": self.schema or conn.schema or ''
+            "db": self.schema or conn.schema or '',
         }
 
         # check for authentication via AWS IAM
@@ -87,6 +87,7 @@ class MySqlHook(DbApiHook):
                 conn_config["use_unicode"] = True
         if conn.extra_dejson.get('cursor', False):
             import MySQLdb.cursors
+
             if (conn.extra_dejson["cursor"]).lower() == 'sscursor':
                 conn_config["cursorclass"] = MySQLdb.cursors.SSCursor
             elif (conn.extra_dejson["cursor"]).lower() == 'dictcursor':
@@ -114,7 +115,7 @@ class MySqlHook(DbApiHook):
             'password': conn.password or '',
             'host': conn.host or 'localhost',
             'database': self.schema or conn.schema or '',
-            'port': int(conn.port) if conn.port else 3306
+            'port': int(conn.port) if conn.port else 3306,
         }
 
         if conn.extra_dejson.get('allow_local_infile', False):
@@ -139,11 +140,13 @@ class MySqlHook(DbApiHook):
 
         if client_name == 'mysqlclient':
             import MySQLdb
+
             conn_config = self._get_conn_config_mysql_client(conn)
             return MySQLdb.connect(**conn_config)
 
         if client_name == 'mysql-connector-python':
             import mysql.connector  # pylint: disable=no-name-in-module
+
             conn_config = self._get_conn_config_mysql_connector_python(conn)
             return mysql.connector.connect(**conn_config)  # pylint: disable=no-member
 
@@ -163,10 +166,14 @@ class MySqlHook(DbApiHook):
         """
         conn = self.get_conn()
         cur = conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
             LOAD DATA LOCAL INFILE '{tmp_file}'
             INTO TABLE {table}
-            """.format(tmp_file=tmp_file, table=table))
+            """.format(
+                tmp_file=tmp_file, table=table
+            )
+        )
         conn.commit()
 
     def bulk_dump(self, table, tmp_file):
@@ -175,10 +182,14 @@ class MySqlHook(DbApiHook):
         """
         conn = self.get_conn()
         cur = conn.cursor()
-        cur.execute("""
+        cur.execute(
+            """
             SELECT * INTO OUTFILE '{tmp_file}'
             FROM {table}
-            """.format(tmp_file=tmp_file, table=table))
+            """.format(
+                tmp_file=tmp_file, table=table
+            )
+        )
         conn.commit()
 
     @staticmethod
@@ -241,17 +252,19 @@ class MySqlHook(DbApiHook):
         conn = self.get_conn()
         cursor = conn.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             LOAD DATA LOCAL INFILE '{tmp_file}'
             {duplicate_key_handling}
             INTO TABLE {table}
             {extra_options}
             """.format(
-            tmp_file=tmp_file,
-            table=table,
-            duplicate_key_handling=duplicate_key_handling,
-            extra_options=extra_options
-        ))
+                tmp_file=tmp_file,
+                table=table,
+                duplicate_key_handling=duplicate_key_handling,
+                extra_options=extra_options,
+            )
+        )
 
         cursor.close()
         conn.commit()

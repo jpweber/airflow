@@ -1,4 +1,3 @@
-
 # Licensed to the Apache Software Foundation (ASF) under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -35,9 +34,7 @@ os.environ["AIRFLOW__CORE__LOAD_DEFAULT_CONNECTIONS"] = "True"
 LOG_LEVEL = "INFO"
 LOG_FILE = "/files/sql_stats.log"  # Default to run in Breeze
 
-os.environ[
-    "AIRFLOW__LOGGING__LOGGING_CONFIG_CLASS"
-] = "scripts.perf.sql_queries.DEBUG_LOGGING_CONFIG"
+os.environ["AIRFLOW__LOGGING__LOGGING_CONFIG_CLASS"] = "scripts.perf.sql_queries.DEBUG_LOGGING_CONFIG"
 
 DEBUG_LOGGING_CONFIG = {
     "version": 1,
@@ -45,29 +42,13 @@ DEBUG_LOGGING_CONFIG = {
     "formatters": {"airflow": {"format": "%(message)s"}},
     "handlers": {
         "console": {"class": "logging.StreamHandler"},
-        "task": {
-            "class": "logging.FileHandler",
-            "formatter": "airflow",
-            "filename": LOG_FILE,
-        },
-        "processor": {
-            "class": "logging.FileHandler",
-            "formatter": "airflow",
-            "filename": LOG_FILE,
-        },
+        "task": {"class": "logging.FileHandler", "formatter": "airflow", "filename": LOG_FILE,},
+        "processor": {"class": "logging.FileHandler", "formatter": "airflow", "filename": LOG_FILE,},
     },
     "loggers": {
-        "airflow.processor": {
-            "handlers": ["processor"],
-            "level": LOG_LEVEL,
-            "propagate": False,
-        },
+        "airflow.processor": {"handlers": ["processor"], "level": LOG_LEVEL, "propagate": False,},
         "airflow.task": {"handlers": ["task"], "level": LOG_LEVEL, "propagate": False},
-        "flask_appbuilder": {
-            "handler": ["console"],
-            "level": LOG_LEVEL,
-            "propagate": True,
-        },
+        "flask_appbuilder": {"handler": ["console"], "level": LOG_LEVEL, "propagate": True,},
     },
     "root": {"handlers": ["console", "task"], "level": LOG_LEVEL},
 }
@@ -77,6 +58,7 @@ class Query(NamedTuple):
     """
     Define attributes of the queries that will be picked up by the performance tests.
     """
+
     function: str
     file: str
     location: int
@@ -111,6 +93,7 @@ def reset_db():
     Wrapper function that calls the airflows resetdb function.
     """
     from airflow.utils.db import resetdb
+
     resetdb()
 
 

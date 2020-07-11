@@ -33,19 +33,7 @@ def dummy(*args, **kwargs):
     return "pass"
 
 
-with DAG(
-    dag_id='example_xcom_args',
-    default_args=args,
-    schedule_interval=None,
-    tags=['example']
-) as dag:
-    task1 = PythonOperator(
-        task_id='task1',
-        python_callable=dummy,
-    )
+with DAG(dag_id='example_xcom_args', default_args=args, schedule_interval=None, tags=['example']) as dag:
+    task1 = PythonOperator(task_id='task1', python_callable=dummy,)
 
-    task2 = PythonOperator(
-        task_id='task2',
-        python_callable=dummy,
-        op_kwargs={"dummy": task1.output},
-    )
+    task2 = PythonOperator(task_id='task2', python_callable=dummy, op_kwargs={"dummy": task1.output},)

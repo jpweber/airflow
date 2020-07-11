@@ -33,6 +33,7 @@ class GCSTaskHandler(FileTaskHandler, LoggingMixin):
     uploads to and reads from GCS remote storage. Upon log reading
     failure, it reads from host machine's local disk.
     """
+
     def __init__(self, base_log_folder, gcs_log_folder, filename_template):
         super().__init__(base_log_folder, filename_template)
         self.remote_base = gcs_log_folder
@@ -49,14 +50,15 @@ class GCSTaskHandler(FileTaskHandler, LoggingMixin):
         remote_conn_id = conf.get('logging', 'REMOTE_LOG_CONN_ID')
         try:
             from airflow.providers.google.cloud.hooks.gcs import GCSHook
-            return GCSHook(
-                google_cloud_storage_conn_id=remote_conn_id
-            )
+
+            return GCSHook(google_cloud_storage_conn_id=remote_conn_id)
         except Exception as e:  # pylint: disable=broad-except
             self.log.error(
                 'Could not create a GoogleCloudStorageHook with connection id '
                 '"%s". %s\n\nPlease make sure that airflow[gcp] is installed '
-                'and the GCS connection exists.', remote_conn_id, str(e)
+                'and the GCS connection exists.',
+                remote_conn_id,
+                str(e),
             )
 
     def set_context(self, ti):
@@ -112,12 +114,10 @@ class GCSTaskHandler(FileTaskHandler, LoggingMixin):
 
         try:
             remote_log = self.gcs_read(remote_loc)
-            log = '*** Reading remote log from {}.\n{}\n'.format(
-                remote_loc, remote_log)
+            log = '*** Reading remote log from {}.\n{}\n'.format(remote_loc, remote_log)
             return log, {'end_of_log': True}
         except Exception as e:  # pylint: disable=broad-except
-            log = '*** Unable to read remote log from {}\n*** {}\n\n'.format(
-                remote_loc, str(e))
+            log = '*** Unable to read remote log from {}\n*** {}\n\n'.format(remote_loc, str(e))
             self.log.error(log)
             local_log, metadata = super()._read(ti, try_number)
             log += local_log
@@ -157,6 +157,7 @@ class GCSTaskHandler(FileTaskHandler, LoggingMixin):
         try:
             bkt, blob = self.parse_gcs_url(remote_log_location)
             from tempfile import NamedTemporaryFile
+
             with NamedTemporaryFile(mode='w+') as tmpfile:
                 tmpfile.write(log)
                 # Force the file to be flushed, since we're doing the

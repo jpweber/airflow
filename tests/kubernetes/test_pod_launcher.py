@@ -24,7 +24,6 @@ from airflow.kubernetes.pod_launcher import PodLauncher
 
 
 class TestPodLauncher(unittest.TestCase):
-
     def setUp(self):
         self.mock_kube_client = mock.Mock()
         self.pod_launcher = PodLauncher(kube_client=self.mock_kube_client)
@@ -39,59 +38,57 @@ class TestPodLauncher(unittest.TestCase):
         mock.sentinel.metadata = mock.MagicMock()
         self.mock_kube_client.read_namespaced_pod_log.side_effect = [
             BaseHTTPError('Boom'),
-            mock.sentinel.logs
+            mock.sentinel.logs,
         ]
         logs = self.pod_launcher.read_pod_logs(mock.sentinel)
         self.assertEqual(mock.sentinel.logs, logs)
-        self.mock_kube_client.read_namespaced_pod_log.assert_has_calls([
-            mock.call(
-                _preload_content=False,
-                container='base',
-                follow=True,
-                name=mock.sentinel.metadata.name,
-                namespace=mock.sentinel.metadata.namespace,
-                tail_lines=10
-            ),
-            mock.call(
-                _preload_content=False,
-                container='base',
-                follow=True,
-                name=mock.sentinel.metadata.name,
-                namespace=mock.sentinel.metadata.namespace,
-                tail_lines=10
-            )
-        ])
+        self.mock_kube_client.read_namespaced_pod_log.assert_has_calls(
+            [
+                mock.call(
+                    _preload_content=False,
+                    container='base',
+                    follow=True,
+                    name=mock.sentinel.metadata.name,
+                    namespace=mock.sentinel.metadata.namespace,
+                    tail_lines=10,
+                ),
+                mock.call(
+                    _preload_content=False,
+                    container='base',
+                    follow=True,
+                    name=mock.sentinel.metadata.name,
+                    namespace=mock.sentinel.metadata.namespace,
+                    tail_lines=10,
+                ),
+            ]
+        )
 
     def test_read_pod_logs_retries_fails(self):
         mock.sentinel.metadata = mock.MagicMock()
         self.mock_kube_client.read_namespaced_pod_log.side_effect = [
             BaseHTTPError('Boom'),
             BaseHTTPError('Boom'),
-            BaseHTTPError('Boom')
+            BaseHTTPError('Boom'),
         ]
-        self.assertRaises(
-            AirflowException,
-            self.pod_launcher.read_pod_logs,
-            mock.sentinel
-        )
+        self.assertRaises(AirflowException, self.pod_launcher.read_pod_logs, mock.sentinel)
 
     def test_read_pod_logs_successfully_with_tail_lines(self):
         mock.sentinel.metadata = mock.MagicMock()
-        self.mock_kube_client.read_namespaced_pod_log.side_effect = [
-            mock.sentinel.logs
-        ]
+        self.mock_kube_client.read_namespaced_pod_log.side_effect = [mock.sentinel.logs]
         logs = self.pod_launcher.read_pod_logs(mock.sentinel, 100)
         self.assertEqual(mock.sentinel.logs, logs)
-        self.mock_kube_client.read_namespaced_pod_log.assert_has_calls([
-            mock.call(
-                _preload_content=False,
-                container='base',
-                follow=True,
-                name=mock.sentinel.metadata.name,
-                namespace=mock.sentinel.metadata.namespace,
-                tail_lines=100
-            ),
-        ])
+        self.mock_kube_client.read_namespaced_pod_log.assert_has_calls(
+            [
+                mock.call(
+                    _preload_content=False,
+                    container='base',
+                    follow=True,
+                    name=mock.sentinel.metadata.name,
+                    namespace=mock.sentinel.metadata.namespace,
+                    tail_lines=100,
+                ),
+            ]
+        )
 
     def test_read_pod_events_successfully_returns_events(self):
         mock.sentinel.metadata = mock.MagicMock()
@@ -103,33 +100,31 @@ class TestPodLauncher(unittest.TestCase):
         mock.sentinel.metadata = mock.MagicMock()
         self.mock_kube_client.list_namespaced_event.side_effect = [
             BaseHTTPError('Boom'),
-            mock.sentinel.events
+            mock.sentinel.events,
         ]
         events = self.pod_launcher.read_pod_events(mock.sentinel)
         self.assertEqual(mock.sentinel.events, events)
-        self.mock_kube_client.list_namespaced_event.assert_has_calls([
-            mock.call(
-                namespace=mock.sentinel.metadata.namespace,
-                field_selector="involvedObject.name={}".format(mock.sentinel.metadata.name)
-            ),
-            mock.call(
-                namespace=mock.sentinel.metadata.namespace,
-                field_selector="involvedObject.name={}".format(mock.sentinel.metadata.name)
-            )
-        ])
+        self.mock_kube_client.list_namespaced_event.assert_has_calls(
+            [
+                mock.call(
+                    namespace=mock.sentinel.metadata.namespace,
+                    field_selector="involvedObject.name={}".format(mock.sentinel.metadata.name),
+                ),
+                mock.call(
+                    namespace=mock.sentinel.metadata.namespace,
+                    field_selector="involvedObject.name={}".format(mock.sentinel.metadata.name),
+                ),
+            ]
+        )
 
     def test_read_pod_events_retries_fails(self):
         mock.sentinel.metadata = mock.MagicMock()
         self.mock_kube_client.list_namespaced_event.side_effect = [
             BaseHTTPError('Boom'),
             BaseHTTPError('Boom'),
-            BaseHTTPError('Boom')
+            BaseHTTPError('Boom'),
         ]
-        self.assertRaises(
-            AirflowException,
-            self.pod_launcher.read_pod_events,
-            mock.sentinel
-        )
+        self.assertRaises(AirflowException, self.pod_launcher.read_pod_events, mock.sentinel)
 
     def test_read_pod_returns_logs(self):
         mock.sentinel.metadata = mock.MagicMock()
@@ -141,24 +136,22 @@ class TestPodLauncher(unittest.TestCase):
         mock.sentinel.metadata = mock.MagicMock()
         self.mock_kube_client.read_namespaced_pod.side_effect = [
             BaseHTTPError('Boom'),
-            mock.sentinel.pod_info
+            mock.sentinel.pod_info,
         ]
         pod_info = self.pod_launcher.read_pod(mock.sentinel)
         self.assertEqual(mock.sentinel.pod_info, pod_info)
-        self.mock_kube_client.read_namespaced_pod.assert_has_calls([
-            mock.call(mock.sentinel.metadata.name, mock.sentinel.metadata.namespace),
-            mock.call(mock.sentinel.metadata.name, mock.sentinel.metadata.namespace)
-        ])
+        self.mock_kube_client.read_namespaced_pod.assert_has_calls(
+            [
+                mock.call(mock.sentinel.metadata.name, mock.sentinel.metadata.namespace),
+                mock.call(mock.sentinel.metadata.name, mock.sentinel.metadata.namespace),
+            ]
+        )
 
     def test_read_pod_retries_fails(self):
         mock.sentinel.metadata = mock.MagicMock()
         self.mock_kube_client.read_namespaced_pod.side_effect = [
             BaseHTTPError('Boom'),
             BaseHTTPError('Boom'),
-            BaseHTTPError('Boom')
+            BaseHTTPError('Boom'),
         ]
-        self.assertRaises(
-            AirflowException,
-            self.pod_launcher.read_pod,
-            mock.sentinel
-        )
+        self.assertRaises(AirflowException, self.pod_launcher.read_pod, mock.sentinel)

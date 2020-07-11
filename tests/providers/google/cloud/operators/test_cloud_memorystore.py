@@ -23,11 +23,16 @@ from google.cloud.redis_v1.gapic.enums import FailoverInstanceRequest
 from google.cloud.redis_v1.types import Instance
 
 from airflow.providers.google.cloud.operators.cloud_memorystore import (
-    CloudMemorystoreCreateInstanceAndImportOperator, CloudMemorystoreCreateInstanceOperator,
-    CloudMemorystoreDeleteInstanceOperator, CloudMemorystoreExportInstanceOperator,
-    CloudMemorystoreFailoverInstanceOperator, CloudMemorystoreGetInstanceOperator,
-    CloudMemorystoreImportOperator, CloudMemorystoreListInstancesOperator,
-    CloudMemorystoreScaleInstanceOperator, CloudMemorystoreUpdateInstanceOperator,
+    CloudMemorystoreCreateInstanceAndImportOperator,
+    CloudMemorystoreCreateInstanceOperator,
+    CloudMemorystoreDeleteInstanceOperator,
+    CloudMemorystoreExportInstanceOperator,
+    CloudMemorystoreFailoverInstanceOperator,
+    CloudMemorystoreGetInstanceOperator,
+    CloudMemorystoreImportOperator,
+    CloudMemorystoreListInstancesOperator,
+    CloudMemorystoreScaleInstanceOperator,
+    CloudMemorystoreUpdateInstanceOperator,
 )
 
 TEST_GCP_CONN_ID = "test-gcp-conn-id"

@@ -45,27 +45,18 @@ class PodDefaults:
     """
     Static defaults for Pods
     """
+
     XCOM_MOUNT_PATH = '/airflow/xcom'
     SIDECAR_CONTAINER_NAME = 'airflow-xcom-sidecar'
     XCOM_CMD = 'trap "exit 0" INT; while true; do sleep 30; done;'
-    VOLUME_MOUNT = k8s.V1VolumeMount(
-        name='xcom',
-        mount_path=XCOM_MOUNT_PATH
-    )
-    VOLUME = k8s.V1Volume(
-        name='xcom',
-        empty_dir=k8s.V1EmptyDirVolumeSource()
-    )
+    VOLUME_MOUNT = k8s.V1VolumeMount(name='xcom', mount_path=XCOM_MOUNT_PATH)
+    VOLUME = k8s.V1Volume(name='xcom', empty_dir=k8s.V1EmptyDirVolumeSource())
     SIDECAR_CONTAINER = k8s.V1Container(
         name=SIDECAR_CONTAINER_NAME,
         command=['sh', '-c', XCOM_CMD],
         image='alpine',
         volume_mounts=[VOLUME_MOUNT],
-        resources=k8s.V1ResourceRequirements(
-            requests={
-                "cpu": "1m",
-            }
-        ),
+        resources=k8s.V1ResourceRequirements(requests={"cpu": "1m",}),
     )
 
 
@@ -83,7 +74,7 @@ def make_safe_label_value(string):
 
     if len(safe_label) > MAX_LABEL_LEN or string != safe_label:
         safe_hash = hashlib.md5(string.encode()).hexdigest()[:9]
-        safe_label = safe_label[:MAX_LABEL_LEN - len(safe_hash) - 1] + "-" + safe_hash
+        safe_label = safe_label[: MAX_LABEL_LEN - len(safe_hash) - 1] + "-" + safe_hash
 
     return safe_label
 
@@ -159,6 +150,7 @@ class PodGenerator:
     :param priority_class_name: priority class name for the launched Pod
     :type priority_class_name: str
     """
+
     def __init__(  # pylint: disable=too-many-arguments,too-many-locals
         self,
         image: Optional[str] = None,
@@ -217,21 +209,16 @@ class PodGenerator:
         if envs:
             if isinstance(envs, dict):
                 for key, val in envs.items():
-                    self.container.env.append(k8s.V1EnvVar(
-                        name=key,
-                        value=val
-                    ))
+                    self.container.env.append(k8s.V1EnvVar(name=key, value=val))
             elif isinstance(envs, list):
                 self.container.env.extend(envs)
 
         configmaps = configmaps or []
         self.container.env_from = []
         for configmap in configmaps:
-            self.container.env_from.append(k8s.V1EnvFromSource(
-                config_map_ref=k8s.V1ConfigMapEnvSource(
-                    name=configmap
-                )
-            ))
+            self.container.env_from.append(
+                k8s.V1EnvFromSource(config_map_ref=k8s.V1ConfigMapEnvSource(name=configmap))
+            )
 
         self.container.command = cmds or []
         self.container.args = args or []
@@ -259,9 +246,7 @@ class PodGenerator:
 
         if image_pull_secrets:
             for image_pull_secret in image_pull_secrets.split(','):
-                self.spec.image_pull_secrets.append(k8s.V1LocalObjectReference(
-                    name=image_pull_secret
-                ))
+                self.spec.image_pull_secrets.append(k8s.V1LocalObjectReference(name=image_pull_secret))
 
         # Attach sidecar
         self.extract_xcom = extract_xcom
@@ -307,7 +292,8 @@ class PodGenerator:
         if not isinstance(obj, dict):
             raise TypeError(
                 'Cannot convert a non-dictionary or non-PodGenerator '
-                'object into a KubernetesExecutorConfig')
+                'object into a KubernetesExecutorConfig'
+            )
 
         # We do not want to extract constant here from ExecutorLoader because it is just
         # A name in dictionary rather than executor selection mechanism and it causes cyclic import
@@ -322,21 +308,18 @@ class PodGenerator:
             requests = {
                 'cpu': namespaced.get('request_cpu'),
                 'memory': namespaced.get('request_memory'),
-                'ephemeral-storage': namespaced.get('ephemeral-storage')
+                'ephemeral-storage': namespaced.get('ephemeral-storage'),
             }
             limits = {
                 'cpu': namespaced.get('limit_cpu'),
                 'memory': namespaced.get('limit_memory'),
-                'ephemeral-storage': namespaced.get('ephemeral-storage')
+                'ephemeral-storage': namespaced.get('ephemeral-storage'),
             }
             all_resources = list(requests.values()) + list(limits.values())
             if all(r is None for r in all_resources):
                 resources = None
             else:
-                resources = k8s.V1ResourceRequirements(
-                    requests=requests,
-                    limits=limits
-                )
+                resources = k8s.V1ResourceRequirements(requests=requests, limits=limits)
         namespaced['resources'] = resources
         return PodGenerator(**namespaced).gen_pod()
 
@@ -364,8 +347,9 @@ class PodGenerator:
         return client_pod_cp
 
     @staticmethod
-    def reconcile_specs(base_spec: Optional[k8s.V1PodSpec],
-                        client_spec: Optional[k8s.V1PodSpec]) -> Optional[k8s.V1PodSpec]:
+    def reconcile_specs(
+        base_spec: Optional[k8s.V1PodSpec], client_spec: Optional[k8s.V1PodSpec]
+    ) -> Optional[k8s.V1PodSpec]:
         """
         :param base_spec: has the base attributes which are overwritten if they exist
             in the client_spec and remain if they do not exist in the client_spec
@@ -388,8 +372,9 @@ class PodGenerator:
         return None
 
     @staticmethod
-    def reconcile_containers(base_containers: List[k8s.V1Container],
-                             client_containers: List[k8s.V1Container]) -> List[k8s.V1Container]:
+    def reconcile_containers(
+        base_containers: List[k8s.V1Container], client_containers: List[k8s.V1Container]
+    ) -> List[k8s.V1Container]:
         """
         :param base_containers: has the base attributes which are overwritten if they exist
             in the client_containers and remain if they do not exist in the client_containers
@@ -429,7 +414,7 @@ class PodGenerator:
         kube_executor_config: Optional[k8s.V1Pod],
         worker_config: k8s.V1Pod,
         namespace: str,
-        worker_uuid: str
+        worker_uuid: str,
     ) -> k8s.V1Pod:
         """
         Construct a pod by gathering and consolidating the configuration from 3 places:
@@ -449,7 +434,7 @@ class PodGenerator:
                 'kubernetes_executor': 'True',
             },
             cmds=command,
-            name=pod_id
+            name=pod_id,
         ).gen_pod()
 
         # Reconcile the pods starting with the first chronologically,
@@ -492,7 +477,7 @@ class PodGenerator:
             return None
 
         safe_uuid = uuid.uuid4().hex
-        safe_pod_id = dag_id[:MAX_POD_ID_LEN - len(safe_uuid) - 1] + "-" + safe_uuid
+        safe_pod_id = dag_id[: MAX_POD_ID_LEN - len(safe_uuid) - 1] + "-" + safe_uuid
 
         return safe_pod_id
 
@@ -521,8 +506,12 @@ class PodGenerator:
             in `non_empty_fields`.
             """
             non_empty_fields = {
-                'pod', 'pod_template_file', 'extract_xcom', 'service_account_name', 'image_pull_policy',
-                'restart_policy'
+                'pod',
+                'pod_template_file',
+                'extract_xcom',
+                'service_account_name',
+                'image_pull_policy',
+                'restart_policy',
             }
 
             return (v.default is None or v.default is v.empty) and k not in non_empty_fields
@@ -573,8 +562,9 @@ def extend_object_field(base_obj, client_obj, field_name):
     base_obj_field = getattr(base_obj, field_name, None)
     client_obj_field = getattr(client_obj, field_name, None)
 
-    if (not isinstance(base_obj_field, list) and base_obj_field is not None) or \
-       (not isinstance(client_obj_field, list) and client_obj_field is not None):
+    if (not isinstance(base_obj_field, list) and base_obj_field is not None) or (
+        not isinstance(client_obj_field, list) and client_obj_field is not None
+    ):
         raise ValueError("The chosen field must be a list.")
 
     if not base_obj_field:

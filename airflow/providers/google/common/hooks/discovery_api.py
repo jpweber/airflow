@@ -42,6 +42,7 @@ class GoogleDiscoveryApiHook(GoogleBaseHook):
         domain-wide delegation enabled.
     :type delegate_to: str
     """
+
     _conn = None  # type: Optional[Resource]
 
     def __init__(
@@ -49,7 +50,7 @@ class GoogleDiscoveryApiHook(GoogleBaseHook):
         api_service_name: str,
         api_version: str,
         gcp_conn_id='google_cloud_default',
-        delegate_to: Optional[str] = None
+        delegate_to: Optional[str] = None,
     ) -> None:
         super().__init__(gcp_conn_id=gcp_conn_id, delegate_to=delegate_to)
         self.api_service_name = api_service_name
@@ -70,7 +71,7 @@ class GoogleDiscoveryApiHook(GoogleBaseHook):
                 serviceName=self.api_service_name,
                 version=self.api_version,
                 http=http_authorized,
-                cache_discovery=False
+                cache_discovery=False,
             )
         return self._conn
 
@@ -103,9 +104,7 @@ class GoogleDiscoveryApiHook(GoogleBaseHook):
         api_endpoint_parts = endpoint.split('.')
 
         google_api_endpoint_instance = self._build_api_request(
-            google_api_conn_client,
-            api_sub_functions=api_endpoint_parts[1:],
-            api_endpoint_params=data
+            google_api_conn_client, api_sub_functions=api_endpoint_parts[1:], api_endpoint_params=data
         )
 
         if paginate:

@@ -139,6 +139,7 @@ def git_version(version_: str) -> str:
     """
     try:
         import git
+
         try:
             repo = git.Repo(os.path.join(*[my_dir, '.git']))
         except git.NoSuchPathError:
@@ -214,10 +215,7 @@ cgroups = [
 cloudant = [
     'cloudant>=2.0',
 ]
-dask = [
-    'cloudpickle>=1.4.1, <1.5.0',
-    'distributed>=2.11.1, <2.20'
-]
+dask = ['cloudpickle>=1.4.1, <1.5.0', 'distributed>=2.11.1, <2.20']
 databricks = [
     'requests>=2.20.0, <3',
 ]
@@ -357,9 +355,7 @@ pinot = [
 postgres = [
     'psycopg2-binary>=2.7.4',
 ]
-presto = [
-    'presto-python-client>=0.7.0,<0.8'
-]
+presto = ['presto-python-client>=0.7.0,<0.8']
 qds = [
     'qds-sdk>=1.10.4',
 ]
@@ -427,8 +423,21 @@ zendesk = [
 ]
 # End dependencies group
 
-all_dbs = (cassandra + cloudant + druid + exasol + hdfs + hive + mongo + mssql + mysql +
-           pinot + postgres + presto + vertica)
+all_dbs = (
+    cassandra
+    + cloudant
+    + druid
+    + exasol
+    + hdfs
+    + hive
+    + mongo
+    + mssql
+    + mysql
+    + pinot
+    + postgres
+    + presto
+    + vertica
+)
 
 ############################################################################################################
 # IMPORTANT NOTE!!!!!!!!!!!!!!!
@@ -628,22 +637,25 @@ EXTRAS_REQUIREMENTS: Dict[str, Iterable[str]] = {
 }
 
 # Make devel_all contain all providers + extras + unique
-devel_all = list(set(devel +
-                     [req for req_list in EXTRAS_REQUIREMENTS.values() for req in req_list] +
-                     [req for req_list in PROVIDERS_REQUIREMENTS.values() for req in req_list]))
+devel_all = list(
+    set(
+        devel
+        + [req for req_list in EXTRAS_REQUIREMENTS.values() for req in req_list]
+        + [req for req_list in PROVIDERS_REQUIREMENTS.values() for req in req_list]
+    )
+)
 
-PACKAGES_EXCLUDED_FOR_ALL = [
-]
+PACKAGES_EXCLUDED_FOR_ALL = []
 
 if PY3:
-    PACKAGES_EXCLUDED_FOR_ALL.extend([
-        'snakebite',
-    ])
+    PACKAGES_EXCLUDED_FOR_ALL.extend(
+        ['snakebite',]
+    )
 
 if PY38:
-    PACKAGES_EXCLUDED_FOR_ALL.extend([
-        'pymssql',
-    ])
+    PACKAGES_EXCLUDED_FOR_ALL.extend(
+        ['pymssql',]
+    )
 
 # Those packages are excluded because they break tests (downgrading mock) and they are
 # not needed to run our test suite.
@@ -662,20 +674,21 @@ def is_package_excluded(package: str, exclusion_list: List[str]):
     return any([package.startswith(excluded_package) for excluded_package in exclusion_list])
 
 
-devel_all = [package for package in devel_all if not is_package_excluded(
-    package=package,
-    exclusion_list=PACKAGES_EXCLUDED_FOR_ALL)
+devel_all = [
+    package
+    for package in devel_all
+    if not is_package_excluded(package=package, exclusion_list=PACKAGES_EXCLUDED_FOR_ALL)
 ]
-devel_ci = [package for package in devel_all if not is_package_excluded(
-    package=package,
-    exclusion_list=PACKAGES_EXCLUDED_FOR_CI + PACKAGES_EXCLUDED_FOR_ALL)
+devel_ci = [
+    package
+    for package in devel_all
+    if not is_package_excluded(
+        package=package, exclusion_list=PACKAGES_EXCLUDED_FOR_CI + PACKAGES_EXCLUDED_FOR_ALL
+    )
 ]
 
 EXTRAS_REQUIREMENTS.update(
-    {
-        'all': devel_all,
-        'devel_ci': devel_ci,
-    }
+    {'all': devel_all, 'devel_ci': devel_ci,}
 )
 
 #####################################################################################################
@@ -748,26 +761,20 @@ def do_setup():
         version=version,
         packages=find_packages(exclude=['tests*']),
         package_data={
-            '': ['airflow/alembic.ini', "airflow/git_version", "*.ipynb",
-                 "airflow/providers/cncf/kubernetes/example_dags/*.yaml"],
+            '': [
+                'airflow/alembic.ini',
+                "airflow/git_version",
+                "*.ipynb",
+                "airflow/providers/cncf/kubernetes/example_dags/*.yaml",
+            ],
             'airflow.api_connexion.openapi': ['*.yaml'],
             'airflow.serialization': ["*.json"],
         },
         include_package_data=True,
         zip_safe=False,
-        entry_points={
-            "console_scripts": [
-                "airflow = airflow.__main__:main",
-            ],
-        },
+        entry_points={"console_scripts": ["airflow = airflow.__main__:main",],},
         install_requires=INSTALL_REQUIREMENTS,
-        setup_requires=[
-            'bowler',
-            'docutils',
-            'gitpython',
-            'setuptools',
-            'wheel',
-        ],
+        setup_requires=['bowler', 'docutils', 'gitpython', 'setuptools', 'wheel',],
         extras_require=EXTRAS_REQUIREMENTS,
         classifiers=[
             'Development Status :: 5 - Production/Stable',
@@ -784,13 +791,8 @@ def do_setup():
         author='Apache Software Foundation',
         author_email='dev@airflow.apache.org',
         url='http://airflow.apache.org/',
-        download_url=(
-            'https://dist.apache.org/repos/dist/release/airflow/' + version),
-        cmdclass={
-            'extra_clean': CleanCommand,
-            'compile_assets': CompileAssets,
-            'list_extras': ListExtras,
-        },
+        download_url=('https://dist.apache.org/repos/dist/release/airflow/' + version),
+        cmdclass={'extra_clean': CleanCommand, 'compile_assets': CompileAssets, 'list_extras': ListExtras,},
         test_suite='setup.airflow_test_suite',
         python_requires='~=3.6',
     )

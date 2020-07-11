@@ -28,10 +28,25 @@ from typing import List, Optional, Sequence, Tuple, Union
 from google.api_core.retry import Retry
 from google.cloud.dlp_v2 import DlpServiceClient
 from google.cloud.dlp_v2.types import (
-    ByteContentItem, ContentItem, DeidentifyConfig, DeidentifyContentResponse, DeidentifyTemplate, DlpJob,
-    FieldMask, InspectConfig, InspectContentResponse, InspectJobConfig, InspectTemplate, JobTrigger,
-    ListInfoTypesResponse, RedactImageRequest, RedactImageResponse, ReidentifyContentResponse,
-    RiskAnalysisJobConfig, StoredInfoType, StoredInfoTypeConfig,
+    ByteContentItem,
+    ContentItem,
+    DeidentifyConfig,
+    DeidentifyContentResponse,
+    DeidentifyTemplate,
+    DlpJob,
+    FieldMask,
+    InspectConfig,
+    InspectContentResponse,
+    InspectJobConfig,
+    InspectTemplate,
+    JobTrigger,
+    ListInfoTypesResponse,
+    RedactImageRequest,
+    RedactImageResponse,
+    ReidentifyContentResponse,
+    RiskAnalysisJobConfig,
+    StoredInfoType,
+    StoredInfoTypeConfig,
 )
 
 from airflow.exceptions import AirflowException
@@ -178,7 +193,7 @@ class CloudDLPHook(GoogleBaseHook):
         timeout: Optional[float] = None,
         metadata: Optional[Sequence[Tuple[str, str]]] = None,
         wait_until_finished: bool = True,
-        time_to_sleep_in_seconds: int = 60
+        time_to_sleep_in_seconds: int = 60,
     ) -> DlpJob:
         """
         Creates a new job to inspect storage or calculate risk metrics.

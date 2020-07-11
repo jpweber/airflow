@@ -26,7 +26,8 @@ import os
 
 from airflow import models
 from airflow.providers.google.cloud.operators.datastore import (
-    CloudDatastoreExportEntitiesOperator, CloudDatastoreImportEntitiesOperator,
+    CloudDatastoreExportEntitiesOperator,
+    CloudDatastoreImportEntitiesOperator,
 )
 from airflow.utils import dates
 
@@ -42,17 +43,14 @@ with models.DAG(
     tags=['example'],
 ) as dag:
     export_task = CloudDatastoreExportEntitiesOperator(
-        task_id="export_task",
-        bucket=BUCKET,
-        project_id=GCP_PROJECT_ID,
-        overwrite_existing=True,
+        task_id="export_task", bucket=BUCKET, project_id=GCP_PROJECT_ID, overwrite_existing=True,
     )
 
     import_task = CloudDatastoreImportEntitiesOperator(
         task_id="import_task",
         bucket="{{ task_instance.xcom_pull('export_task')['response']['outputUrl'].split('/')[2] }}",
         file="{{ '/'.join(task_instance.xcom_pull('export_task')['response']['outputUrl'].split('/')[3:]) }}",
-        project_id=GCP_PROJECT_ID
+        project_id=GCP_PROJECT_ID,
     )
 
     export_task >> import_task

@@ -59,9 +59,7 @@ class Secret(K8SModel):
             self.deploy_target = deploy_target.upper()
 
         if key is not None and deploy_target is None:
-            raise AirflowConfigException(
-                'If `key` is set, `deploy_target` should not be None'
-            )
+            raise AirflowConfigException('If `key` is set, `deploy_target` should not be None')
 
         self.secret = secret
         self.key = key
@@ -71,34 +69,20 @@ class Secret(K8SModel):
         return k8s.V1EnvVar(
             name=self.deploy_target,
             value_from=k8s.V1EnvVarSource(
-                secret_key_ref=k8s.V1SecretKeySelector(
-                    name=self.secret,
-                    key=self.key
-                )
-            )
+                secret_key_ref=k8s.V1SecretKeySelector(name=self.secret, key=self.key)
+            ),
         )
 
     def to_env_from_secret(self) -> k8s.V1EnvFromSource:
         """Reads from environment to secret"""
-        return k8s.V1EnvFromSource(
-            secret_ref=k8s.V1SecretEnvSource(name=self.secret)
-        )
+        return k8s.V1EnvFromSource(secret_ref=k8s.V1SecretEnvSource(name=self.secret))
 
     def to_volume_secret(self) -> Tuple[k8s.V1Volume, k8s.V1VolumeMount]:
         """Converts to volume secret"""
         vol_id = 'secretvol{}'.format(uuid.uuid4())
         return (
-            k8s.V1Volume(
-                name=vol_id,
-                secret=k8s.V1SecretVolumeSource(
-                    secret_name=self.secret
-                )
-            ),
-            k8s.V1VolumeMount(
-                mount_path=self.deploy_target,
-                name=vol_id,
-                read_only=True
-            )
+            k8s.V1Volume(name=vol_id, secret=k8s.V1SecretVolumeSource(secret_name=self.secret)),
+            k8s.V1VolumeMount(mount_path=self.deploy_target, name=vol_id, read_only=True),
         )
 
     def attach_to_pod(self, pod: k8s.V1Pod) -> k8s.V1Pod:
@@ -122,16 +106,11 @@ class Secret(K8SModel):
 
     def __eq__(self, other):
         return (
-            self.deploy_type == other.deploy_type and
-            self.deploy_target == other.deploy_target and
-            self.secret == other.secret and
-            self.key == other.key
+            self.deploy_type == other.deploy_type
+            and self.deploy_target == other.deploy_target
+            and self.secret == other.secret
+            and self.key == other.key
         )
 
     def __repr__(self):
-        return 'Secret({}, {}, {}, {})'.format(
-            self.deploy_type,
-            self.deploy_target,
-            self.secret,
-            self.key
-        )
+        return 'Secret({}, {}, {}, {})'.format(self.deploy_type, self.deploy_target, self.secret, self.key)

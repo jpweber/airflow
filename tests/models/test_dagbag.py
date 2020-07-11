@@ -54,8 +54,7 @@ class TestDagBag(unittest.TestCase):
         """
         dagbag = models.DagBag(dag_folder=self.empty_dir, include_examples=True)
 
-        some_expected_dag_ids = ["example_bash_operator",
-                                 "example_branch_operator"]
+        some_expected_dag_ids = ["example_bash_operator", "example_branch_operator"]
 
         for dag_id in some_expected_dag_ids:
             dag = dagbag.get_dag(dag_id)
@@ -95,9 +94,7 @@ class TestDagBag(unittest.TestCase):
                 dagbag = models.DagBag(include_examples=False, safe_mode=True)
 
             self.assertEqual(len(dagbag.dagbag_stats), 1)
-            self.assertEqual(
-                dagbag.dagbag_stats[0].file,
-                "/{}".format(os.path.basename(f.name)))
+            self.assertEqual(dagbag.dagbag_stats[0].file, "/{}".format(os.path.basename(f.name)))
 
     def test_safe_mode_heuristic_mismatch(self):
         """With safe mode enabled, a file not matching the discovery heuristics
@@ -115,9 +112,7 @@ class TestDagBag(unittest.TestCase):
             with conf_vars({('core', 'dags_folder'): self.empty_dir}):
                 dagbag = models.DagBag(include_examples=False, safe_mode=False)
             self.assertEqual(len(dagbag.dagbag_stats), 1)
-            self.assertEqual(
-                dagbag.dagbag_stats[0].file,
-                "/{}".format(os.path.basename(f.name)))
+            self.assertEqual(dagbag.dagbag_stats[0].file, "/{}".format(os.path.basename(f.name)))
 
     def test_process_file_that_contains_multi_bytes_char(self):
         """
@@ -143,7 +138,7 @@ class TestDagBag(unittest.TestCase):
             self.assertIn(
                 f'INFO:airflow.models.dagbag.DagBag:File {test_zip_path}:file_no_airflow_dag.py '
                 'assumed to contain no DAGs. Skipping.',
-                cm.output
+                cm.output,
             )
 
     def test_zip(self):
@@ -207,7 +202,7 @@ class TestDagBag(unittest.TestCase):
             'example_bash_operator': 'airflow/example_dags/example_bash_operator.py',
             'example_subdag_operator': 'airflow/example_dags/example_subdag_operator.py',
             'example_subdag_operator.section-1': 'airflow/example_dags/subdags/subdag.py',
-            'test_zip_dag': 'dags/test_zip.zip/test_zip.py'
+            'test_zip_dag': 'dags/test_zip.zip/test_zip.py',
         }
 
         for dag_id, path in expected.items():
@@ -222,14 +217,10 @@ class TestDagBag(unittest.TestCase):
         example_dags_folder = airflow.example_dags.__path__[0]
 
         dag_id = "example_bash_operator"
-        fileloc = os.path.realpath(
-            os.path.join(example_dags_folder, "example_bash_operator.py")
-        )
+        fileloc = os.path.realpath(os.path.join(example_dags_folder, "example_bash_operator.py"))
 
         mock_dagmodel.return_value = DagModel()
-        mock_dagmodel.return_value.last_expired = datetime.max.replace(
-            tzinfo=timezone.utc
-        )
+        mock_dagmodel.return_value.last_expired = datetime.max.replace(tzinfo=timezone.utc)
         mock_dagmodel.return_value.fileloc = fileloc
 
         class _TestDagBag(DagBag):
@@ -254,14 +245,10 @@ class TestDagBag(unittest.TestCase):
         Test that we can refresh a packaged DAG
         """
         dag_id = "test_zip_dag"
-        fileloc = os.path.realpath(
-            os.path.join(TEST_DAGS_FOLDER, "test_zip.zip/test_zip.py")
-        )
+        fileloc = os.path.realpath(os.path.join(TEST_DAGS_FOLDER, "test_zip.zip/test_zip.py"))
 
         mock_dagmodel.return_value = DagModel()
-        mock_dagmodel.return_value.last_expired = datetime.max.replace(
-            tzinfo=timezone.utc
-        )
+        mock_dagmodel.return_value.last_expired = datetime.max.replace(tzinfo=timezone.utc)
         mock_dagmodel.return_value.fileloc = fileloc
 
         class _TestDagBag(DagBag):
@@ -285,8 +272,7 @@ class TestDagBag(unittest.TestCase):
         Helper method to process a file generated from the input create_dag function.
         """
         # write source to file
-        source = textwrap.dedent(''.join(
-            inspect.getsource(create_dag).splitlines(True)[1:-1]))
+        source = textwrap.dedent(''.join(inspect.getsource(create_dag).splitlines(True)[1:-1]))
         f = NamedTemporaryFile()
         f.write(source.encode('utf8'))
         f.flush()
@@ -295,8 +281,7 @@ class TestDagBag(unittest.TestCase):
         found_dags = dagbag.process_file(f.name)
         return dagbag, found_dags, f.name
 
-    def validate_dags(self, expected_parent_dag, actual_found_dags, actual_dagbag,
-                      should_be_found=True):
+    def validate_dags(self, expected_parent_dag, actual_found_dags, actual_dagbag, should_be_found=True):
         expected_dag_ids = list(map(lambda dag: dag.dag_id, expected_parent_dag.subdags))
         expected_dag_ids.append(expected_parent_dag.dag_id)
 
@@ -305,14 +290,16 @@ class TestDagBag(unittest.TestCase):
         for dag_id in expected_dag_ids:
             actual_dagbag.log.info('validating %s' % dag_id)
             self.assertEqual(
-                dag_id in actual_found_dag_ids, should_be_found,
-                'dag "%s" should %shave been found after processing dag "%s"' %
-                (dag_id, '' if should_be_found else 'not ', expected_parent_dag.dag_id)
+                dag_id in actual_found_dag_ids,
+                should_be_found,
+                'dag "%s" should %shave been found after processing dag "%s"'
+                % (dag_id, '' if should_be_found else 'not ', expected_parent_dag.dag_id),
             )
             self.assertEqual(
-                dag_id in actual_dagbag.dags, should_be_found,
-                'dag "%s" should %sbe in dagbag.dags after processing dag "%s"' %
-                (dag_id, '' if should_be_found else 'not ', expected_parent_dag.dag_id)
+                dag_id in actual_dagbag.dags,
+                should_be_found,
+                'dag "%s" should %sbe in dagbag.dags after processing dag "%s"'
+                % (dag_id, '' if should_be_found else 'not ', expected_parent_dag.dag_id),
             )
 
     def test_load_subdags(self):
@@ -323,14 +310,10 @@ class TestDagBag(unittest.TestCase):
             from airflow.models import DAG
             from airflow.operators.dummy_operator import DummyOperator
             from airflow.operators.subdag_operator import SubDagOperator
+
             dag_name = 'master'
-            default_args = {
-                'owner': 'owner1',
-                'start_date': datetime.datetime(2016, 1, 1)
-            }
-            dag = DAG(
-                dag_name,
-                default_args=default_args)
+            default_args = {'owner': 'owner1', 'start_date': datetime.datetime(2016, 1, 1)}
+            dag = DAG(dag_name, default_args=default_args)
 
             # master:
             #     A -> opSubDag_0
@@ -341,6 +324,7 @@ class TestDagBag(unittest.TestCase):
             #              -> subdag_1.task
 
             with dag:
+
                 def subdag_0():
                     subdag_0 = DAG('master.op_subdag_0', default_args=default_args)
                     DummyOperator(task_id='subdag_0.task', dag=subdag_0)
@@ -351,10 +335,8 @@ class TestDagBag(unittest.TestCase):
                     DummyOperator(task_id='subdag_1.task', dag=subdag_1)
                     return subdag_1
 
-                op_subdag_0 = SubDagOperator(
-                    task_id='op_subdag_0', dag=dag, subdag=subdag_0())
-                op_subdag_1 = SubDagOperator(
-                    task_id='op_subdag_1', dag=dag, subdag=subdag_1())
+                op_subdag_0 = SubDagOperator(task_id='op_subdag_0', dag=dag, subdag=subdag_0())
+                op_subdag_1 = SubDagOperator(task_id='op_subdag_1', dag=dag, subdag=subdag_1())
 
                 op_a = DummyOperator(task_id='A')
                 op_a.set_downstream(op_subdag_0)
@@ -379,14 +361,10 @@ class TestDagBag(unittest.TestCase):
             from airflow.models import DAG
             from airflow.operators.dummy_operator import DummyOperator
             from airflow.operators.subdag_operator import SubDagOperator
+
             dag_name = 'master'
-            default_args = {
-                'owner': 'owner1',
-                'start_date': datetime.datetime(2016, 1, 1)
-            }
-            dag = DAG(
-                dag_name,
-                default_args=default_args)
+            default_args = {'owner': 'owner1', 'start_date': datetime.datetime(2016, 1, 1)}
+            dag = DAG(dag_name, default_args=default_args)
 
             # master:
             #     A -> op_subdag_0
@@ -407,27 +385,24 @@ class TestDagBag(unittest.TestCase):
             #                     -> subdag_d.task
 
             with dag:
+
                 def subdag_a():
-                    subdag_a = DAG(
-                        'master.op_subdag_0.opSubdag_A', default_args=default_args)
+                    subdag_a = DAG('master.op_subdag_0.opSubdag_A', default_args=default_args)
                     DummyOperator(task_id='subdag_a.task', dag=subdag_a)
                     return subdag_a
 
                 def subdag_b():
-                    subdag_b = DAG(
-                        'master.op_subdag_0.opSubdag_B', default_args=default_args)
+                    subdag_b = DAG('master.op_subdag_0.opSubdag_B', default_args=default_args)
                     DummyOperator(task_id='subdag_b.task', dag=subdag_b)
                     return subdag_b
 
                 def subdag_c():
-                    subdag_c = DAG(
-                        'master.op_subdag_1.opSubdag_C', default_args=default_args)
+                    subdag_c = DAG('master.op_subdag_1.opSubdag_C', default_args=default_args)
                     DummyOperator(task_id='subdag_c.task', dag=subdag_c)
                     return subdag_c
 
                 def subdag_d():
-                    subdag_d = DAG(
-                        'master.op_subdag_1.opSubdag_D', default_args=default_args)
+                    subdag_d = DAG('master.op_subdag_1.opSubdag_D', default_args=default_args)
                     DummyOperator(task_id='subdag_d.task', dag=subdag_d)
                     return subdag_d
 
@@ -443,10 +418,8 @@ class TestDagBag(unittest.TestCase):
                     SubDagOperator(task_id='opSubdag_D', dag=subdag_1, subdag=subdag_d())
                     return subdag_1
 
-                op_subdag_0 = SubDagOperator(
-                    task_id='op_subdag_0', dag=dag, subdag=subdag_0())
-                op_subdag_1 = SubDagOperator(
-                    task_id='op_subdag_1', dag=dag, subdag=subdag_1())
+                op_subdag_0 = SubDagOperator(task_id='op_subdag_0', dag=dag, subdag=subdag_0())
+                op_subdag_1 = SubDagOperator(task_id='op_subdag_1', dag=dag, subdag=subdag_1())
 
                 op_a = DummyOperator(task_id='A')
                 op_a.set_downstream(op_subdag_0)
@@ -477,14 +450,10 @@ class TestDagBag(unittest.TestCase):
 
             from airflow.models import DAG
             from airflow.operators.dummy_operator import DummyOperator
+
             dag_name = 'cycle_dag'
-            default_args = {
-                'owner': 'owner1',
-                'start_date': datetime.datetime(2016, 1, 1)
-            }
-            dag = DAG(
-                dag_name,
-                default_args=default_args)
+            default_args = {'owner': 'owner1', 'start_date': datetime.datetime(2016, 1, 1)}
+            dag = DAG(dag_name, default_args=default_args)
 
             # A -> A
             with dag:
@@ -512,14 +481,10 @@ class TestDagBag(unittest.TestCase):
             from airflow.models import DAG
             from airflow.operators.dummy_operator import DummyOperator
             from airflow.operators.subdag_operator import SubDagOperator
+
             dag_name = 'nested_cycle'
-            default_args = {
-                'owner': 'owner1',
-                'start_date': datetime.datetime(2016, 1, 1)
-            }
-            dag = DAG(
-                dag_name,
-                default_args=default_args)
+            default_args = {'owner': 'owner1', 'start_date': datetime.datetime(2016, 1, 1)}
+            dag = DAG(dag_name, default_args=default_args)
 
             # cycle:
             #     A -> op_subdag_0
@@ -540,30 +505,26 @@ class TestDagBag(unittest.TestCase):
             #                     -> subdag_d.task
 
             with dag:
+
                 def subdag_a():
-                    subdag_a = DAG(
-                        'nested_cycle.op_subdag_0.opSubdag_A', default_args=default_args)
+                    subdag_a = DAG('nested_cycle.op_subdag_0.opSubdag_A', default_args=default_args)
                     DummyOperator(task_id='subdag_a.task', dag=subdag_a)
                     return subdag_a
 
                 def subdag_b():
-                    subdag_b = DAG(
-                        'nested_cycle.op_subdag_0.opSubdag_B', default_args=default_args)
+                    subdag_b = DAG('nested_cycle.op_subdag_0.opSubdag_B', default_args=default_args)
                     DummyOperator(task_id='subdag_b.task', dag=subdag_b)
                     return subdag_b
 
                 def subdag_c():
-                    subdag_c = DAG(
-                        'nested_cycle.op_subdag_1.opSubdag_C', default_args=default_args)
-                    op_subdag_c_task = DummyOperator(
-                        task_id='subdag_c.task', dag=subdag_c)
+                    subdag_c = DAG('nested_cycle.op_subdag_1.opSubdag_C', default_args=default_args)
+                    op_subdag_c_task = DummyOperator(task_id='subdag_c.task', dag=subdag_c)
                     # introduce a loop in opSubdag_C
                     op_subdag_c_task.set_downstream(op_subdag_c_task)
                     return subdag_c
 
                 def subdag_d():
-                    subdag_d = DAG(
-                        'nested_cycle.op_subdag_1.opSubdag_D', default_args=default_args)
+                    subdag_d = DAG('nested_cycle.op_subdag_1.opSubdag_D', default_args=default_args)
                     DummyOperator(task_id='subdag_d.task', dag=subdag_d)
                     return subdag_d
 
@@ -579,10 +540,8 @@ class TestDagBag(unittest.TestCase):
                     SubDagOperator(task_id='opSubdag_D', dag=subdag_1, subdag=subdag_d())
                     return subdag_1
 
-                op_subdag_0 = SubDagOperator(
-                    task_id='op_subdag_0', dag=dag, subdag=subdag_0())
-                op_subdag_1 = SubDagOperator(
-                    task_id='op_subdag_1', dag=dag, subdag=subdag_1())
+                op_subdag_0 = SubDagOperator(task_id='op_subdag_0', dag=dag, subdag=subdag_0())
+                op_subdag_1 = SubDagOperator(task_id='op_subdag_1', dag=dag, subdag=subdag_1())
 
                 op_a = DummyOperator(task_id='A')
                 op_a.set_downstream(op_subdag_0)

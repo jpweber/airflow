@@ -53,11 +53,7 @@ class CloudKMSHook(GoogleBaseHook):
     :type delegate_to: str
     """
 
-    def __init__(
-        self,
-        gcp_conn_id: str = "google_cloud_default",
-        delegate_to: Optional[str] = None
-    ) -> None:
+    def __init__(self, gcp_conn_id: str = "google_cloud_default", delegate_to: Optional[str] = None) -> None:
         super().__init__(gcp_conn_id=gcp_conn_id, delegate_to=delegate_to)
         self._conn = None  # type: Optional[KeyManagementServiceClient]
 
@@ -70,8 +66,7 @@ class CloudKMSHook(GoogleBaseHook):
         """
         if not self._conn:
             self._conn = KeyManagementServiceClient(
-                credentials=self._get_credentials(),
-                client_info=self.client_info
+                credentials=self._get_credentials(), client_info=self.client_info
             )
         return self._conn
 

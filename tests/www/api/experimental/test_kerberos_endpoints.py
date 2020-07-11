@@ -34,10 +34,12 @@ KRB5_KTNAME = os.environ.get("KRB5_KTNAME")
 
 @pytest.mark.integration("kerberos")
 class TestApiKerberos(unittest.TestCase):
-    @conf_vars({
-        ("api", "auth_backend"): "airflow.api.auth.backend.kerberos_auth",
-        ("kerberos", "keytab"): KRB5_KTNAME,
-    })
+    @conf_vars(
+        {
+            ("api", "auth_backend"): "airflow.api.auth.backend.kerberos_auth",
+            ("kerberos", "keytab"): KRB5_KTNAME,
+        }
+    )
     def setUp(self):
         self.app = application.create_app(testing=True)
 
@@ -47,7 +49,7 @@ class TestApiKerberos(unittest.TestCase):
             response = client.post(
                 url_template.format('example_bash_operator'),
                 data=json.dumps(dict(run_id='my_run' + datetime.now().isoformat())),
-                content_type="application/json"
+                content_type="application/json",
             )
             self.assertEqual(401, response.status_code)
 
@@ -75,7 +77,7 @@ class TestApiKerberos(unittest.TestCase):
                 url_template.format('example_bash_operator'),
                 data=json.dumps(dict(run_id='my_run' + datetime.now().isoformat())),
                 content_type="application/json",
-                headers=response.request.headers
+                headers=response.request.headers,
             )
             self.assertEqual(200, response2.status_code)
 
@@ -85,7 +87,7 @@ class TestApiKerberos(unittest.TestCase):
             response = client.post(
                 url_template.format('example_bash_operator'),
                 data=json.dumps(dict(run_id='my_run' + datetime.now().isoformat())),
-                content_type="application/json"
+                content_type="application/json",
             )
 
             self.assertEqual(401, response.status_code)

@@ -33,7 +33,7 @@ DEFAULT_ARGS = {
     'start_date': days_ago(2),
     'email': ['airflow@example.com'],
     'email_on_failure': False,
-    'email_on_retry': False
+    'email_on_retry': False,
 }
 
 with DAG(

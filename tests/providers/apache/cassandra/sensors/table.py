@@ -26,10 +26,7 @@ class TestCassandraRecordSensor(unittest.TestCase):
     @patch("airflow.providers.apache.cassandra.sensors.record.CassandraHook")
     def test_poke(self, mock_hook):
         sensor = CassandraRecordSensor(
-            task_id='test_task',
-            cassandra_conn_id='cassandra_default',
-            table='t',
-            keys={'foo': 'bar'}
+            task_id='test_task', cassandra_conn_id='cassandra_default', table='t', keys={'foo': 'bar'}
         )
         sensor.poke(None)
         mock_hook.return_value.record_exists.assert_called_once_with('t', {'foo': 'bar'})

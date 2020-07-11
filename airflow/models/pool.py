@@ -30,6 +30,7 @@ from airflow.utils.state import State
 
 class PoolStats(TypedDict):
     """ Dictionary containing Pool Stats """
+
     total: int
     running: int
     queued: int
@@ -39,6 +40,7 @@ class Pool(Base):
     """
     the class to get Pool info.
     """
+
     __tablename__ = "slot_pool"
 
     id = Column(Integer, primary_key=True)
@@ -50,7 +52,7 @@ class Pool(Base):
     DEFAULT_POOL_NAME = 'default_pool'
 
     def __repr__(self):
-        return str(self.pool)    # pylint: disable=E0012
+        return str(self.pool)  # pylint: disable=E0012
 
     @staticmethod
     @provide_session
@@ -136,9 +138,9 @@ class Pool(Base):
         :return: the used number of slots
         """
         from airflow.models.taskinstance import TaskInstance  # Avoid circular import
+
         return (
-            session
-            .query(func.sum(TaskInstance.pool_slots))
+            session.query(func.sum(TaskInstance.pool_slots))
             .filter(TaskInstance.pool == self.pool)
             .filter(TaskInstance.state.in_(list(EXECUTION_STATES)))
             .scalar()
@@ -155,8 +157,7 @@ class Pool(Base):
         from airflow.models.taskinstance import TaskInstance  # Avoid circular import
 
         return (
-            session
-            .query(func.sum(TaskInstance.pool_slots))
+            session.query(func.sum(TaskInstance.pool_slots))
             .filter(TaskInstance.pool == self.pool)
             .filter(TaskInstance.state == State.RUNNING)
             .scalar()
@@ -173,8 +174,7 @@ class Pool(Base):
         from airflow.models.taskinstance import TaskInstance  # Avoid circular import
 
         return (
-            session
-            .query(func.sum(TaskInstance.pool_slots))
+            session.query(func.sum(TaskInstance.pool_slots))
             .filter(TaskInstance.pool == self.pool)
             .filter(TaskInstance.state == State.QUEUED)
             .scalar()

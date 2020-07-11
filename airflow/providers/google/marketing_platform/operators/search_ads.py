@@ -63,7 +63,7 @@ class GoogleSearchAdsInsertReportOperator(BaseOperator):
         gcp_conn_id: str = "google_cloud_default",
         delegate_to: Optional[str] = None,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.report = report
@@ -79,9 +79,7 @@ class GoogleSearchAdsInsertReportOperator(BaseOperator):
 
     def execute(self, context: Dict):
         hook = GoogleSearchAdsHook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            api_version=self.api_version,
+            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, api_version=self.api_version,
         )
         self.log.info("Generating Search Ads report")
         response = hook.insert_report(report=self.report)
@@ -135,7 +133,7 @@ class GoogleSearchAdsDownloadReportOperator(BaseOperator):
         gcp_conn_id: str = "google_cloud_default",
         delegate_to: Optional[str] = None,
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.report_id = report_id
@@ -171,14 +169,10 @@ class GoogleSearchAdsDownloadReportOperator(BaseOperator):
 
     def execute(self, context: Dict):
         hook = GoogleSearchAdsHook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            api_version=self.api_version,
+            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, api_version=self.api_version,
         )
 
-        gcs_hook = GCSHook(
-            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to
-        )
+        gcs_hook = GCSHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
 
         # Resolve file name of the report
         report_name = self.report_name or self.report_id
@@ -195,14 +189,8 @@ class GoogleSearchAdsDownloadReportOperator(BaseOperator):
         self.log.info("Downloading Search Ads report %s", self.report_id)
         with NamedTemporaryFile() as temp_file:
             for i in range(fragments_count):
-                byte_content = hook.get_file(
-                    report_fragment=i, report_id=self.report_id
-                )
-                fragment = (
-                    byte_content
-                    if i == 0
-                    else self._handle_report_fragment(byte_content)
-                )
+                byte_content = hook.get_file(report_fragment=i, report_id=self.report_id)
+                fragment = byte_content if i == 0 else self._handle_report_fragment(byte_content)
                 temp_file.write(fragment)
 
             temp_file.flush()

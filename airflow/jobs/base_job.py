@@ -63,10 +63,7 @@ class BaseJob(Base, LoggingMixin):
     hostname = Column(String(500))
     unixname = Column(String(1000))
 
-    __mapper_args__ = {
-        'polymorphic_on': job_type,
-        'polymorphic_identity': 'BaseJob'
-    }
+    __mapper_args__ = {'polymorphic_on': job_type, 'polymorphic_identity': 'BaseJob'}
 
     __table_args__ = (
         Index('job_type_heart', job_type, latest_heartbeat),
@@ -75,11 +72,7 @@ class BaseJob(Base, LoggingMixin):
 
     heartrate = conf.getfloat('scheduler', 'JOB_HEARTBEAT_SEC')
 
-    def __init__(
-            self,
-            executor=None,
-            heartrate=None,
-            *args, **kwargs):
+    def __init__(self, executor=None, heartrate=None, *args, **kwargs):
         self.hostname = get_hostname()
         self.executor = executor or ExecutorLoader.get_default_executor()
         self.executor_class = self.executor.__class__.__name__
@@ -119,8 +112,9 @@ class BaseJob(Base, LoggingMixin):
         :rtype: boolean
         """
         return (
-            self.state == State.RUNNING and
-            (timezone.utcnow() - self.latest_heartbeat).total_seconds() < self.heartrate * grace_multiplier
+            self.state == State.RUNNING
+            and (timezone.utcnow() - self.latest_heartbeat).total_seconds()
+            < self.heartrate * grace_multiplier
         )
 
     @provide_session
@@ -192,9 +186,9 @@ class BaseJob(Base, LoggingMixin):
             # Figure out how long to sleep for
             sleep_for = 0
             if self.latest_heartbeat:
-                seconds_remaining = self.heartrate - \
-                    (timezone.utcnow() - self.latest_heartbeat)\
-                    .total_seconds()
+                seconds_remaining = (
+                    self.heartrate - (timezone.utcnow() - self.latest_heartbeat).total_seconds()
+                )
                 sleep_for = max(0, seconds_remaining)
             sleep(sleep_for)
 
@@ -210,9 +204,7 @@ class BaseJob(Base, LoggingMixin):
                 self.heartbeat_callback(session=session)
                 self.log.debug('[heartbeat]')
         except OperationalError:
-            Stats.incr(
-                convert_camel_to_snake(self.__class__.__name__) + '_heartbeat_failure', 1,
-                1)
+            Stats.incr(convert_camel_to_snake(self.__class__.__name__) + '_heartbeat_failure', 1, 1)
             self.log.exception("%s heartbeat got an exception", self.__class__.__name__)
             # We didn't manage to heartbeat, so make sure that the timestamp isn't updated
             self.latest_heartbeat = previous_heartbeat
@@ -271,21 +263,23 @@ class BaseJob(Base, LoggingMixin):
         resettable_states = [State.SCHEDULED, State.QUEUED]
         if filter_by_dag_run is None:
             resettable_tis = (
-                session
-                .query(TaskInstance)
+                session.query(TaskInstance)
                 .join(
                     DagRun,
                     and_(
                         TaskInstance.dag_id == DagRun.dag_id,
-                        TaskInstance.execution_date == DagRun.execution_date))
+                        TaskInstance.execution_date == DagRun.execution_date,
+                    ),
+                )
                 .filter(
                     # pylint: disable=comparison-with-callable
                     DagRun.state == State.RUNNING,
                     DagRun.run_type != DagRunType.BACKFILL_JOB.value,
-                    TaskInstance.state.in_(resettable_states))).all()
+                    TaskInstance.state.in_(resettable_states),
+                )
+            ).all()
         else:
-            resettable_tis = filter_by_dag_run.get_task_instances(state=resettable_states,
-                                                                  session=session)
+            resettable_tis = filter_by_dag_run.get_task_instances(state=resettable_states, session=session)
         tis_to_reset = []
         # Can't use an update here since it doesn't support joins
         for ti in resettable_tis:
@@ -300,9 +294,12 @@ class BaseJob(Base, LoggingMixin):
                 return result
 
             filter_for_tis = TaskInstance.filter_for_tis(items)
-            reset_tis = session.query(TaskInstance).filter(
-                filter_for_tis, TaskInstance.state.in_(resettable_states)
-            ).with_for_update().all()
+            reset_tis = (
+                session.query(TaskInstance)
+                .filter(filter_for_tis, TaskInstance.state.in_(resettable_states))
+                .with_for_update()
+                .all()
+            )
 
             for ti in reset_tis:
                 ti.state = State.NONE
@@ -310,16 +307,10 @@ class BaseJob(Base, LoggingMixin):
 
             return result + reset_tis
 
-        reset_tis = helpers.reduce_in_chunks(query,
-                                             tis_to_reset,
-                                             [],
-                                             self.max_tis_per_query)
+        reset_tis = helpers.reduce_in_chunks(query, tis_to_reset, [], self.max_tis_per_query)
 
         task_instance_str = '\n\t'.join([repr(x) for x in reset_tis])
         session.commit()
 
-        self.log.info(
-            "Reset the following %s TaskInstances:\n\t%s",
-            len(reset_tis), task_instance_str
-        )
+        self.log.info("Reset the following %s TaskInstances:\n\t%s", len(reset_tis), task_instance_str)
         return reset_tis

@@ -52,26 +52,32 @@ class LocalFilesystemToGCSOperator(BaseOperator):
     :param gzip: Allows for file to be compressed and uploaded as gzip
     :type gzip: bool
     """
+
     template_fields = ('src', 'dst', 'bucket')
 
     @apply_defaults
-    def __init__(self,
-                 src,
-                 dst,
-                 bucket,
-                 gcp_conn_id='google_cloud_default',
-                 google_cloud_storage_conn_id=None,
-                 mime_type='application/octet-stream',
-                 delegate_to=None,
-                 gzip=False,
-                 *args,
-                 **kwargs):
+    def __init__(
+        self,
+        src,
+        dst,
+        bucket,
+        gcp_conn_id='google_cloud_default',
+        google_cloud_storage_conn_id=None,
+        mime_type='application/octet-stream',
+        delegate_to=None,
+        gzip=False,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
 
         if google_cloud_storage_conn_id:
             warnings.warn(
                 "The google_cloud_storage_conn_id parameter has been deprecated. You should pass "
-                "the gcp_conn_id parameter.", DeprecationWarning, stacklevel=3)
+                "the gcp_conn_id parameter.",
+                DeprecationWarning,
+                stacklevel=3,
+            )
             gcp_conn_id = google_cloud_storage_conn_id
 
         self.src = src
@@ -86,9 +92,7 @@ class LocalFilesystemToGCSOperator(BaseOperator):
         """
         Uploads the file to Google Cloud Storage
         """
-        hook = GCSHook(
-            google_cloud_storage_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to)
+        hook = GCSHook(google_cloud_storage_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
 
         hook.upload(
             bucket_name=self.bucket,

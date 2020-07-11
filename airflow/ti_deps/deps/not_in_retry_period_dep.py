@@ -26,6 +26,7 @@ class NotInRetryPeriodDep(BaseTIDep):
     """
     Determines whether a task is not in retry period.
     """
+
     NAME = "Not In Retry Period"
     IGNOREABLE = True
     IS_TASK_DEP = True
@@ -34,12 +35,12 @@ class NotInRetryPeriodDep(BaseTIDep):
     def _get_dep_statuses(self, ti, session, dep_context):
         if dep_context.ignore_in_retry_period:
             yield self._passing_status(
-                reason="The context specified that being in a retry period was permitted.")
+                reason="The context specified that being in a retry period was permitted."
+            )
             return
 
         if ti.state != State.UP_FOR_RETRY:
-            yield self._passing_status(
-                reason="The task instance was not marked for retrying.")
+            yield self._passing_status(reason="The task instance was not marked for retrying.")
             return
 
         # Calculate the date first so that it is always smaller than the timestamp used by
@@ -49,6 +50,6 @@ class NotInRetryPeriodDep(BaseTIDep):
         if ti.is_premature:
             yield self._failing_status(
                 reason="Task is not ready for retry yet but will be retried "
-                       "automatically. Current date is {0} and task will be retried "
-                       "at {1}.".format(cur_date.isoformat(),
-                                        next_task_retry_date.isoformat()))
+                "automatically. Current date is {0} and task will be retried "
+                "at {1}.".format(cur_date.isoformat(), next_task_retry_date.isoformat())
+            )

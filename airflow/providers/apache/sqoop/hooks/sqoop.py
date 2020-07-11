@@ -53,9 +53,15 @@ class SqoopHook(BaseHook):
     :type properties: dict
     """
 
-    def __init__(self, conn_id='sqoop_default', verbose=False,
-                 num_mappers=None, hcatalog_database=None,
-                 hcatalog_table=None, properties=None):
+    def __init__(
+        self,
+        conn_id='sqoop_default',
+        verbose=False,
+        num_mappers=None,
+        hcatalog_database=None,
+        hcatalog_table=None,
+        properties=None,
+    ):
         # No mutable types in the default parameters
         super().__init__()
         self.conn = self.get_connection(conn_id)
@@ -71,8 +77,7 @@ class SqoopHook(BaseHook):
         self.verbose = verbose
         self.num_mappers = num_mappers
         self.properties = properties or {}
-        self.log.info("Using connection to: %s:%s/%s",
-                      self.conn.host, self.conn.port, self.conn.schema)
+        self.log.info("Using connection to: %s:%s/%s", self.conn.host, self.conn.port, self.conn.schema)
         self.sub_process = None
 
     def get_conn(self):
@@ -100,11 +105,7 @@ class SqoopHook(BaseHook):
         """
         masked_cmd = ' '.join(self.cmd_mask_password(cmd))
         self.log.info("Executing command: %s", masked_cmd)
-        self.sub_process = subprocess.Popen(
-            cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            **kwargs)
+        self.sub_process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, **kwargs)
 
         for line in iter(self.sub_process.stdout):
             self.log.info(line.strip())
@@ -168,11 +169,9 @@ class SqoopHook(BaseHook):
         elif file_type == "text":
             return ["--as-textfile"]
         else:
-            raise AirflowException("Argument file_type should be 'avro', "
-                                   "'sequence', 'parquet' or 'text'.")
+            raise AirflowException("Argument file_type should be 'avro', " "'sequence', 'parquet' or 'text'.")
 
-    def _import_cmd(self, target_dir, append, file_type, split_by, direct,
-                    driver, extra_import_options):
+    def _import_cmd(self, target_dir, append, file_type, split_by, direct, driver, extra_import_options):
 
         cmd = self._prepare_command(export=False)
 
@@ -202,9 +201,19 @@ class SqoopHook(BaseHook):
         return cmd
 
     # pylint: disable=too-many-arguments
-    def import_table(self, table, target_dir=None, append=False, file_type="text",
-                     columns=None, split_by=None, where=None, direct=False,
-                     driver=None, extra_import_options=None):
+    def import_table(
+        self,
+        table,
+        target_dir=None,
+        append=False,
+        file_type="text",
+        columns=None,
+        split_by=None,
+        where=None,
+        direct=False,
+        driver=None,
+        extra_import_options=None,
+    ):
         """
         Imports table from remote location to target dir. Arguments are
         copies of direct sqoop command line arguments
@@ -223,8 +232,7 @@ class SqoopHook(BaseHook):
             If a key doesn't have a value, just pass an empty string to it.
             Don't include prefix of -- for sqoop options.
         """
-        cmd = self._import_cmd(target_dir, append, file_type, split_by, direct,
-                               driver, extra_import_options)
+        cmd = self._import_cmd(target_dir, append, file_type, split_by, direct, driver, extra_import_options)
 
         cmd += ["--table", table]
 
@@ -235,8 +243,17 @@ class SqoopHook(BaseHook):
 
         self.popen(cmd)
 
-    def import_query(self, query, target_dir, append=False, file_type="text",
-                     split_by=None, direct=None, driver=None, extra_import_options=None):
+    def import_query(
+        self,
+        query,
+        target_dir,
+        append=False,
+        file_type="text",
+        split_by=None,
+        direct=None,
+        driver=None,
+        extra_import_options=None,
+    ):
         """
         Imports a specific query from the rdbms to hdfs
 
@@ -252,18 +269,29 @@ class SqoopHook(BaseHook):
             If a key doesn't have a value, just pass an empty string to it.
             Don't include prefix of -- for sqoop options.
         """
-        cmd = self._import_cmd(target_dir, append, file_type, split_by, direct,
-                               driver, extra_import_options)
+        cmd = self._import_cmd(target_dir, append, file_type, split_by, direct, driver, extra_import_options)
         cmd += ["--query", query]
 
         self.popen(cmd)
 
     # pylint: disable=too-many-arguments
-    def _export_cmd(self, table, export_dir, input_null_string,
-                    input_null_non_string, staging_table, clear_staging_table,
-                    enclosed_by, escaped_by, input_fields_terminated_by,
-                    input_lines_terminated_by, input_optionally_enclosed_by,
-                    batch, relaxed_isolation, extra_export_options):
+    def _export_cmd(
+        self,
+        table,
+        export_dir,
+        input_null_string,
+        input_null_non_string,
+        staging_table,
+        clear_staging_table,
+        enclosed_by,
+        escaped_by,
+        input_fields_terminated_by,
+        input_lines_terminated_by,
+        input_optionally_enclosed_by,
+        batch,
+        relaxed_isolation,
+        extra_export_options,
+    ):
 
         cmd = self._prepare_command(export=True)
 
@@ -292,8 +320,7 @@ class SqoopHook(BaseHook):
             cmd += ["--input-lines-terminated-by", input_lines_terminated_by]
 
         if input_optionally_enclosed_by:
-            cmd += ["--input-optionally-enclosed-by",
-                    input_optionally_enclosed_by]
+            cmd += ["--input-optionally-enclosed-by", input_optionally_enclosed_by]
 
         if batch:
             cmd += ["--batch"]
@@ -316,13 +343,23 @@ class SqoopHook(BaseHook):
         return cmd
 
     # pylint: disable=too-many-arguments
-    def export_table(self, table, export_dir, input_null_string,
-                     input_null_non_string, staging_table,
-                     clear_staging_table, enclosed_by,
-                     escaped_by, input_fields_terminated_by,
-                     input_lines_terminated_by,
-                     input_optionally_enclosed_by, batch,
-                     relaxed_isolation, extra_export_options=None):
+    def export_table(
+        self,
+        table,
+        export_dir,
+        input_null_string,
+        input_null_non_string,
+        staging_table,
+        clear_staging_table,
+        enclosed_by,
+        escaped_by,
+        input_fields_terminated_by,
+        input_lines_terminated_by,
+        input_optionally_enclosed_by,
+        batch,
+        relaxed_isolation,
+        extra_export_options=None,
+    ):
         """
         Exports Hive table to remote location. Arguments are copies of direct
         sqoop command line Arguments
@@ -349,12 +386,21 @@ class SqoopHook(BaseHook):
             If a key doesn't have a value, just pass an empty string to it.
             Don't include prefix of -- for sqoop options.
         """
-        cmd = self._export_cmd(table, export_dir, input_null_string,
-                               input_null_non_string, staging_table,
-                               clear_staging_table, enclosed_by, escaped_by,
-                               input_fields_terminated_by,
-                               input_lines_terminated_by,
-                               input_optionally_enclosed_by, batch,
-                               relaxed_isolation, extra_export_options)
+        cmd = self._export_cmd(
+            table,
+            export_dir,
+            input_null_string,
+            input_null_non_string,
+            staging_table,
+            clear_staging_table,
+            enclosed_by,
+            escaped_by,
+            input_fields_terminated_by,
+            input_lines_terminated_by,
+            input_optionally_enclosed_by,
+            batch,
+            relaxed_isolation,
+            extra_export_options,
+        )
 
         self.popen(cmd)

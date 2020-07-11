@@ -84,9 +84,7 @@ class GoogleDisplayVideo360CreateReportOperator(BaseOperator):
 
     def execute(self, context: Dict):
         hook = GoogleDisplayVideo360Hook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            api_version=self.api_version,
+            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, api_version=self.api_version,
         )
         self.log.info("Creating Display & Video 360 report.")
         response = hook.create_query(query=self.body)
@@ -145,24 +143,18 @@ class GoogleDisplayVideo360DeleteReportOperator(BaseOperator):
             raise AirflowException("Use only one value - `report_name` or `report_id`.")
 
         if not (report_name or report_id):
-            raise AirflowException(
-                "Provide one of the values: `report_name` or `report_id`."
-            )
+            raise AirflowException("Provide one of the values: `report_name` or `report_id`.")
 
     def execute(self, context: Dict):
         hook = GoogleDisplayVideo360Hook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            api_version=self.api_version,
+            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, api_version=self.api_version,
         )
         if self.report_id:
             reports_ids_to_delete = [self.report_id]
         else:
             reports = hook.list_queries()
             reports_ids_to_delete = [
-                report["queryId"]
-                for report in reports
-                if report["metadata"]["title"] == self.report_name
+                report["queryId"] for report in reports if report["metadata"]["title"] == self.report_name
             ]
 
         for report_id in reports_ids_to_delete:
@@ -240,13 +232,9 @@ class GoogleDisplayVideo360DownloadReportOperator(BaseOperator):
 
     def execute(self, context: Dict):
         hook = GoogleDisplayVideo360Hook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            api_version=self.api_version,
+            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, api_version=self.api_version,
         )
-        gcs_hook = GCSHook(
-            google_cloud_storage_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to
-        )
+        gcs_hook = GCSHook(google_cloud_storage_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
 
         resource = hook.get_query(query_id=self.report_id)
         # Check if report is ready
@@ -274,10 +262,7 @@ class GoogleDisplayVideo360DownloadReportOperator(BaseOperator):
                 mime_type="text/csv",
             )
         self.log.info(
-            "Report %s was saved in bucket %s as %s.",
-            self.report_id,
-            self.bucket_name,
-            report_name,
+            "Report %s was saved in bucket %s as %s.", self.report_id, self.bucket_name, report_name,
         )
         self.xcom_push(context, key="report_name", value=report_name)
 
@@ -330,14 +315,10 @@ class GoogleDisplayVideo360RunReportOperator(BaseOperator):
 
     def execute(self, context: Dict):
         hook = GoogleDisplayVideo360Hook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            api_version=self.api_version,
+            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, api_version=self.api_version,
         )
         self.log.info(
-            "Running report %s with the following params:\n %s",
-            self.report_id,
-            self.params,
+            "Running report %s with the following params:\n %s", self.report_id, self.params,
         )
         hook.run_query(query_id=self.report_id, params=self.params)
 
@@ -373,7 +354,7 @@ class GoogleDisplayVideo360DownloadLineItemsOperator(BaseOperator):
         gcp_conn_id: str = "google_cloud_default",
         delegate_to: Optional[str] = None,
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.request_body = request_body
@@ -387,9 +368,7 @@ class GoogleDisplayVideo360DownloadLineItemsOperator(BaseOperator):
     def execute(self, context: Dict) -> str:
         gcs_hook = GCSHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
         hook = GoogleDisplayVideo360Hook(
-            gcp_conn_id=self.gcp_conn_id,
-            api_version=self.api_version,
-            delegate_to=self.delegate_to,
+            gcp_conn_id=self.gcp_conn_id, api_version=self.api_version, delegate_to=self.delegate_to,
         )
 
         self.log.info("Retrieving report...")
@@ -459,9 +438,7 @@ class GoogleDisplayVideo360UploadLineItemsOperator(BaseOperator):
     def execute(self, context: Dict):
         gcs_hook = GCSHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
         hook = GoogleDisplayVideo360Hook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            api_version=self.api_version,
+            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, api_version=self.api_version,
         )
 
         self.log.info("Uploading file %s...")
@@ -469,9 +446,7 @@ class GoogleDisplayVideo360UploadLineItemsOperator(BaseOperator):
         # downloaded file from the GCS could be a 1GB size or even more
         with tempfile.NamedTemporaryFile("w+") as f:
             line_items = gcs_hook.download(
-                bucket_name=self.bucket_name,
-                object_name=self.object_name,
-                filename=f.name,
+                bucket_name=self.bucket_name, object_name=self.object_name, filename=f.name,
             )
             f.flush()
             hook.upload_line_items(line_items=line_items)
@@ -508,7 +483,7 @@ class GoogleDisplayVideo360CreateSDFDownloadTaskOperator(BaseOperator):
     :type delegate_to: str
     """
 
-    template_fields = ("body_request", )
+    template_fields = ("body_request",)
 
     @apply_defaults
     def __init__(
@@ -528,15 +503,11 @@ class GoogleDisplayVideo360CreateSDFDownloadTaskOperator(BaseOperator):
 
     def execute(self, context: Dict):
         hook = GoogleDisplayVideo360Hook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            api_version=self.api_version,
+            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, api_version=self.api_version,
         )
 
         self.log.info("Creating operation for SDF download task...")
-        operation = hook.create_sdf_download_operation(
-            body_request=self.body_request
-        )
+        operation = hook.create_sdf_download_operation(body_request=self.body_request)
 
         return operation
 
@@ -598,9 +569,7 @@ class GoogleDisplayVideo360SDFtoGCSOperator(BaseOperator):
 
     def execute(self, context: Dict):
         hook = GoogleDisplayVideo360Hook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            api_version=self.api_version,
+            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, api_version=self.api_version,
         )
         gcs_hook = GCSHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
 
@@ -612,9 +581,7 @@ class GoogleDisplayVideo360SDFtoGCSOperator(BaseOperator):
 
         self.log.info("Sending file to the Google Cloud Storage...")
         with tempfile.NamedTemporaryFile() as temp_file:
-            hook.download_content_from_request(
-                temp_file, media, chunk_size=1024 * 1024
-            )
+            hook.download_content_from_request(temp_file, media, chunk_size=1024 * 1024)
             temp_file.flush()
             gcs_hook.upload(
                 bucket_name=self.bucket_name,

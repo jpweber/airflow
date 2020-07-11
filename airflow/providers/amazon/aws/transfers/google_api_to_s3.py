@@ -101,7 +101,7 @@ class GoogleApiToS3Operator(BaseOperator):
         gcp_conn_id='google_cloud_default',
         delegate_to=None,
         aws_conn_id='aws_default',
-        **kwargs
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.google_api_service_name = google_api_service_name
@@ -143,28 +143,26 @@ class GoogleApiToS3Operator(BaseOperator):
             gcp_conn_id=self.gcp_conn_id,
             delegate_to=self.delegate_to,
             api_service_name=self.google_api_service_name,
-            api_version=self.google_api_service_version
+            api_version=self.google_api_service_version,
         )
         google_api_response = google_discovery_api_hook.query(
             endpoint=self.google_api_endpoint_path,
             data=self.google_api_endpoint_params,
             paginate=self.google_api_pagination,
-            num_retries=self.google_api_num_retries
+            num_retries=self.google_api_num_retries,
         )
         return google_api_response
 
     def _load_data_to_s3(self, data):
         s3_hook = S3Hook(aws_conn_id=self.aws_conn_id)
         s3_hook.load_string(
-            string_data=json.dumps(data),
-            key=self.s3_destination_key,
-            replace=self.s3_overwrite
+            string_data=json.dumps(data), key=self.s3_destination_key, replace=self.s3_overwrite
         )
 
     def _update_google_api_endpoint_params_via_xcom(self, task_instance):
         google_api_endpoint_params = task_instance.xcom_pull(
             task_ids=self.google_api_endpoint_params_via_xcom_task_ids,
-            key=self.google_api_endpoint_params_via_xcom
+            key=self.google_api_endpoint_params_via_xcom,
         )
         self.google_api_endpoint_params.update(google_api_endpoint_params)
 

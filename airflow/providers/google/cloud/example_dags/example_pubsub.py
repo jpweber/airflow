@@ -24,8 +24,12 @@ import os
 from airflow import models
 from airflow.operators.bash import BashOperator
 from airflow.providers.google.cloud.operators.pubsub import (
-    PubSubCreateSubscriptionOperator, PubSubCreateTopicOperator, PubSubDeleteSubscriptionOperator,
-    PubSubDeleteTopicOperator, PubSubPublishMessageOperator, PubSubPullOperator,
+    PubSubCreateSubscriptionOperator,
+    PubSubCreateTopicOperator,
+    PubSubDeleteSubscriptionOperator,
+    PubSubDeleteTopicOperator,
+    PubSubPublishMessageOperator,
+    PubSubPullOperator,
 )
 from airflow.providers.google.cloud.sensors.pubsub import PubSubPullSensor
 from airflow.utils.dates import days_ago
@@ -66,17 +70,12 @@ with models.DAG(
     subscription = "{{ task_instance.xcom_pull('subscribe_task') }}"
 
     pull_messages = PubSubPullSensor(
-        task_id="pull_messages",
-        ack_messages=True,
-        project_id=GCP_PROJECT_ID,
-        subscription=subscription,
+        task_id="pull_messages", ack_messages=True, project_id=GCP_PROJECT_ID, subscription=subscription,
     )
     # [END howto_operator_gcp_pubsub_pull_message_with_sensor]
 
     # [START howto_operator_gcp_pubsub_pull_messages_result]
-    pull_messages_result = BashOperator(
-        task_id="pull_messages_result", bash_command=echo_cmd
-    )
+    pull_messages_result = BashOperator(task_id="pull_messages_result", bash_command=echo_cmd)
     # [END howto_operator_gcp_pubsub_pull_messages_result]
 
     # [START howto_operator_gcp_pubsub_publish]
@@ -127,17 +126,12 @@ with models.DAG(
     subscription = "{{ task_instance.xcom_pull('subscribe_task') }}"
 
     pull_messages = PubSubPullOperator(
-        task_id="pull_messages",
-        ack_messages=True,
-        project_id=GCP_PROJECT_ID,
-        subscription=subscription,
+        task_id="pull_messages", ack_messages=True, project_id=GCP_PROJECT_ID, subscription=subscription,
     )
     # [END howto_operator_gcp_pubsub_pull_message_with_operator]
 
     # [START howto_operator_gcp_pubsub_pull_messages_result]
-    pull_messages_result = BashOperator(
-        task_id="pull_messages_result", bash_command=echo_cmd
-    )
+    pull_messages_result = BashOperator(task_id="pull_messages_result", bash_command=echo_cmd)
     # [END howto_operator_gcp_pubsub_pull_messages_result]
 
     # [START howto_operator_gcp_pubsub_publish]
@@ -164,6 +158,11 @@ with models.DAG(
     # [END howto_operator_gcp_pubsub_delete_topic]
 
     (
-        create_topic >> subscribe_task >> publish_task
-        >> pull_messages >> pull_messages_result >> unsubscribe_task >> delete_topic
+        create_topic
+        >> subscribe_task
+        >> publish_task
+        >> pull_messages
+        >> pull_messages_result
+        >> unsubscribe_task
+        >> delete_topic
     )

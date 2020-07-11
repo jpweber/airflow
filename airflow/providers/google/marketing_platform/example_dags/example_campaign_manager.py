@@ -23,9 +23,12 @@ import time
 
 from airflow import models
 from airflow.providers.google.marketing_platform.operators.campaign_manager import (
-    GoogleCampaignManagerBatchInsertConversionsOperator, GoogleCampaignManagerBatchUpdateConversionsOperator,
-    GoogleCampaignManagerDeleteReportOperator, GoogleCampaignManagerDownloadReportOperator,
-    GoogleCampaignManagerInsertReportOperator, GoogleCampaignManagerRunReportOperator,
+    GoogleCampaignManagerBatchInsertConversionsOperator,
+    GoogleCampaignManagerBatchUpdateConversionsOperator,
+    GoogleCampaignManagerDeleteReportOperator,
+    GoogleCampaignManagerDownloadReportOperator,
+    GoogleCampaignManagerInsertReportOperator,
+    GoogleCampaignManagerRunReportOperator,
 )
 from airflow.providers.google.marketing_platform.sensors.campaign_manager import (
     GoogleCampaignManagerReportSensor,
@@ -43,13 +46,8 @@ REPORT = {
     "type": "STANDARD",
     "name": REPORT_NAME,
     "criteria": {
-        "dateRange": {
-            "kind": "dfareporting#dateRange",
-            "relativeDateRange": "LAST_365_DAYS",
-        },
-        "dimensions": [
-            {"kind": "dfareporting#sortedDimension", "name": "dfa:advertiser"}
-        ],
+        "dateRange": {"kind": "dfareporting#dateRange", "relativeDateRange": "LAST_365_DAYS",},
+        "dimensions": [{"kind": "dfareporting#sortedDimension", "name": "dfa:advertiser"}],
         "metricNames": ["dfa:activeViewImpressionDistributionViewable"],
     },
 }
@@ -63,13 +61,7 @@ CONVERSION = {
     "quantity": 42,
     "value": 123.4,
     "timestampMicros": int(time.time()) * 1000000,
-    "customVariables": [
-        {
-            "kind": "dfareporting#customFloodlightVariable",
-            "type": "U4",
-            "value": "value",
-        }
-    ],
+    "customVariables": [{"kind": "dfareporting#customFloodlightVariable", "type": "U4", "value": "value",}],
 }
 
 CONVERSION_UPDATE = {
@@ -105,10 +97,7 @@ with models.DAG(
 
     # [START howto_campaign_manager_wait_for_operation]
     wait_for_report = GoogleCampaignManagerReportSensor(
-        task_id="wait_for_report",
-        profile_id=PROFILE_ID,
-        report_id=report_id,
-        file_id=file_id,
+        task_id="wait_for_report", profile_id=PROFILE_ID, report_id=report_id, file_id=file_id,
     )
     # [END howto_campaign_manager_wait_for_operation]
 

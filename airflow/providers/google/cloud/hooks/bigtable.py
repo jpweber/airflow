@@ -49,7 +49,7 @@ class BigtableHook(GoogleBaseHook):
                 project=project_id,
                 credentials=self._get_credentials(),
                 client_info=self.client_info,
-                admin=True
+                admin=True,
             )
         return self._client
 
@@ -89,8 +89,9 @@ class BigtableHook(GoogleBaseHook):
         if instance:
             instance.delete()
         else:
-            self.log.warning("The instance '%s' does not exist in project '%s'. Exiting",
-                             instance_id, project_id)
+            self.log.warning(
+                "The instance '%s' does not exist in project '%s'. Exiting", instance_id, project_id
+            )
 
     @GoogleBaseHook.fallback_to_default_project_id
     def create_instance(
@@ -106,7 +107,7 @@ class BigtableHook(GoogleBaseHook):
         instance_labels: Optional[Dict] = None,
         cluster_nodes: Optional[int] = None,
         cluster_storage_type: enums.StorageType = enums.StorageType.STORAGE_TYPE_UNSPECIFIED,
-        timeout: Optional[float] = None
+        timeout: Optional[float] = None,
     ) -> Instance:
         """
         Creates new instance.
@@ -154,24 +155,14 @@ class BigtableHook(GoogleBaseHook):
             instance_labels,
         )
 
-        clusters = [
-            instance.cluster(
-                main_cluster_id,
-                main_cluster_zone,
-                cluster_nodes,
-                cluster_storage_type
-            )
-        ]
+        clusters = [instance.cluster(main_cluster_id, main_cluster_zone, cluster_nodes, cluster_storage_type)]
         if replica_cluster_id and replica_cluster_zone:
-            clusters.append(instance.cluster(
-                replica_cluster_id,
-                replica_cluster_zone,
-                cluster_nodes,
-                cluster_storage_type
-            ))
-        operation = instance.create(
-            clusters=clusters
-        )
+            clusters.append(
+                instance.cluster(
+                    replica_cluster_id, replica_cluster_zone, cluster_nodes, cluster_storage_type
+                )
+            )
+        operation = instance.create(clusters=clusters)
         operation.result(timeout)
         return instance
 
@@ -180,7 +171,7 @@ class BigtableHook(GoogleBaseHook):
         instance: Instance,
         table_id: str,
         initial_split_keys: Optional[List] = None,
-        column_families: Optional[Dict[str, GarbageCollectionRule]] = None
+        column_families: Optional[Dict[str, GarbageCollectionRule]] = None,
     ) -> None:
         """
         Creates the specified Cloud Bigtable table.

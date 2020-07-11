@@ -96,12 +96,7 @@ class DockerSwarmOperator(DockerOperator):
     """
 
     @apply_defaults
-    def __init__(
-            self,
-            image,
-            enable_logging=True,
-            *args,
-            **kwargs):
+    def __init__(self, image, enable_logging=True, *args, **kwargs):
         super().__init__(image=image, *args, **kwargs)
 
         self.enable_logging = enable_logging
@@ -127,10 +122,10 @@ class DockerSwarmOperator(DockerOperator):
                     tty=self.tty,
                 ),
                 restart_policy=types.RestartPolicy(condition='none'),
-                resources=types.Resources(mem_limit=self.mem_limit)
+                resources=types.Resources(mem_limit=self.mem_limit),
             ),
             name='airflow-%s' % get_random_string(),
-            labels={'name': 'airflow__%s__%s' % (self.dag_id, self.task_id)}
+            labels={'name': 'airflow__%s__%s' % (self.dag_id, self.task_id)},
         )
 
         self.log.info('Service started: %s', str(self.service))
@@ -153,13 +148,11 @@ class DockerSwarmOperator(DockerOperator):
             raise AirflowException('Service failed: ' + repr(self.service))
 
     def _service_status(self):
-        return self.cli.tasks(
-            filters={'service': self.service['ID']}
-        )[0]['Status']['State']
+        return self.cli.tasks(filters={'service': self.service['ID']})[0]['Status']['State']
 
     def _has_service_terminated(self):
         status = self._service_status()
-        return (status in ['failed', 'complete'])
+        return status in ['failed', 'complete']
 
     def _stream_logs_to_output(self):
         logs = self.cli.service_logs(

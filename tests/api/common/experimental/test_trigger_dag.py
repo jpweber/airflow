@@ -27,7 +27,6 @@ from airflow.utils import timezone
 
 
 class TestTriggerDag(unittest.TestCase):
-
     @mock.patch('airflow.models.DagRun')
     @mock.patch('airflow.models.DagBag')
     def test_trigger_dag_dag_not_found(self, dag_bag_mock, dag_run_mock):
@@ -85,7 +84,8 @@ class TestTriggerDag(unittest.TestCase):
             run_id=None,
             conf=None,
             execution_date=None,
-            replace_microseconds=True)
+            replace_microseconds=True,
+        )
 
         self.assertEqual(3, len(triggers))
 
@@ -110,7 +110,8 @@ class TestTriggerDag(unittest.TestCase):
             run_id=None,
             conf=None,
             execution_date=None,
-            replace_microseconds=True)
+            replace_microseconds=True,
+        )
 
         self.assertEqual(3, len(triggers))
 
@@ -129,7 +130,8 @@ class TestTriggerDag(unittest.TestCase):
             run_id=None,
             conf=conf,
             execution_date=None,
-            replace_microseconds=True)
+            replace_microseconds=True,
+        )
 
         self.assertEqual(triggers[0].conf, json.loads(conf))
 
@@ -188,6 +190,7 @@ class TestTriggerDag(unittest.TestCase):
             run_id=None,
             conf=conf,
             execution_date=None,
-            replace_microseconds=True)
+            replace_microseconds=True,
+        )
 
         self.assertEqual(triggers[0].conf, conf)

@@ -24,20 +24,18 @@ class WebHdfsSensor(BaseSensorOperator):
     """
     Waits for a file or folder to land in HDFS
     """
+
     template_fields = ('filepath',)
 
     @apply_defaults
-    def __init__(self,
-                 filepath,
-                 webhdfs_conn_id='webhdfs_default',
-                 *args,
-                 **kwargs):
+    def __init__(self, filepath, webhdfs_conn_id='webhdfs_default', *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.filepath = filepath
         self.webhdfs_conn_id = webhdfs_conn_id
 
     def poke(self, context):
         from airflow.providers.apache.hdfs.hooks.webhdfs import WebHDFSHook
+
         hook = WebHDFSHook(self.webhdfs_conn_id)
         self.log.info('Poking for file %s', self.filepath)
         return hook.check_for_path(hdfs_path=self.filepath)

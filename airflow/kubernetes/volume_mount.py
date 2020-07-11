@@ -38,6 +38,7 @@ class VolumeMount(K8SModel):
     :param read_only: whether to access pod with read-only mode
     :type read_only: bool
     """
+
     def __init__(self, name, mount_path, sub_path, read_only):
         self.name = name
         self.mount_path = mount_path
@@ -52,10 +53,7 @@ class VolumeMount(K8SModel):
 
         """
         return k8s.V1VolumeMount(
-            name=self.name,
-            mount_path=self.mount_path,
-            sub_path=self.sub_path,
-            read_only=self.read_only
+            name=self.name, mount_path=self.mount_path, sub_path=self.sub_path, read_only=self.read_only
         )
 
     def attach_to_pod(self, pod: k8s.V1Pod) -> k8s.V1Pod:

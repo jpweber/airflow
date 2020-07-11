@@ -69,31 +69,36 @@ class BigQueryToBigQueryOperator(BaseOperator):
     :param location: The location used for the operation.
     :type location: str
     """
-    template_fields = ('source_project_dataset_tables',
-                       'destination_project_dataset_table', 'labels')
+
+    template_fields = ('source_project_dataset_tables', 'destination_project_dataset_table', 'labels')
     template_ext = ('.sql',)
     ui_color = '#e6f0e4'
 
     @apply_defaults
-    def __init__(self,  # pylint: disable=too-many-arguments
-                 source_project_dataset_tables: Union[List[str], str],
-                 destination_project_dataset_table: str,
-                 write_disposition: str = 'WRITE_EMPTY',
-                 create_disposition: str = 'CREATE_IF_NEEDED',
-                 gcp_conn_id: str = 'google_cloud_default',
-                 bigquery_conn_id: Optional[str] = None,
-                 delegate_to: Optional[str] = None,
-                 labels: Optional[Dict] = None,
-                 encryption_configuration: Optional[Dict] = None,
-                 location: Optional[str] = None,
-                 *args,
-                 **kwargs) -> None:
+    def __init__(
+        self,  # pylint: disable=too-many-arguments
+        source_project_dataset_tables: Union[List[str], str],
+        destination_project_dataset_table: str,
+        write_disposition: str = 'WRITE_EMPTY',
+        create_disposition: str = 'CREATE_IF_NEEDED',
+        gcp_conn_id: str = 'google_cloud_default',
+        bigquery_conn_id: Optional[str] = None,
+        delegate_to: Optional[str] = None,
+        labels: Optional[Dict] = None,
+        encryption_configuration: Optional[Dict] = None,
+        location: Optional[str] = None,
+        *args,
+        **kwargs,
+    ) -> None:
         super().__init__(*args, **kwargs)
 
         if bigquery_conn_id:
             warnings.warn(
                 "The bigquery_conn_id parameter has been deprecated. You should pass "
-                "the gcp_conn_id parameter.", DeprecationWarning, stacklevel=3)
+                "the gcp_conn_id parameter.",
+                DeprecationWarning,
+                stacklevel=3,
+            )
             gcp_conn_id = bigquery_conn_id
 
         self.source_project_dataset_tables = source_project_dataset_tables
@@ -109,11 +114,12 @@ class BigQueryToBigQueryOperator(BaseOperator):
     def execute(self, context):
         self.log.info(
             'Executing copy of %s into: %s',
-            self.source_project_dataset_tables, self.destination_project_dataset_table
+            self.source_project_dataset_tables,
+            self.destination_project_dataset_table,
         )
-        hook = BigQueryHook(bigquery_conn_id=self.gcp_conn_id,
-                            delegate_to=self.delegate_to,
-                            location=self.location)
+        hook = BigQueryHook(
+            bigquery_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, location=self.location
+        )
         conn = hook.get_conn()
         cursor = conn.cursor()
         cursor.run_copy(
@@ -122,4 +128,5 @@ class BigQueryToBigQueryOperator(BaseOperator):
             write_disposition=self.write_disposition,
             create_disposition=self.create_disposition,
             labels=self.labels,
-            encryption_configuration=self.encryption_configuration)
+            encryption_configuration=self.encryption_configuration,
+        )

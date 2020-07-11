@@ -49,12 +49,7 @@ class GoogleCampaignManagerHook(GoogleBaseHook):
         """
         if not self._conn:
             http_authorized = self._authorize()
-            self._conn = build(
-                "dfareporting",
-                self.api_version,
-                http=http_authorized,
-                cache_discovery=False,
-            )
+            self._conn = build("dfareporting", self.api_version, http=http_authorized, cache_discovery=False,)
         return self._conn
 
     def delete_report(self, profile_id: str, report_id: str) -> Any:
@@ -151,9 +146,7 @@ class GoogleCampaignManagerHook(GoogleBaseHook):
         )
         return response
 
-    def run_report(
-        self, profile_id: str, report_id: str, synchronous: Optional[bool] = None
-    ) -> Any:
+    def run_report(self, profile_id: str, report_id: str, synchronous: Optional[bool] = None) -> Any:
         """
         Runs a report.
 
@@ -209,9 +202,7 @@ class GoogleCampaignManagerHook(GoogleBaseHook):
         )
         return response
 
-    def get_report_file(
-        self, file_id: str, profile_id: str, report_id: str
-    ) -> http.HttpRequest:
+    def get_report_file(self, file_id: str, profile_id: str, report_id: str) -> http.HttpRequest:
         """
         Retrieves a media part of report file.
 

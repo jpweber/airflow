@@ -74,22 +74,16 @@ class GCSToGoogleSheetsOperator(BaseOperator):
         self.delegate_to = delegate_to
 
     def execute(self, context: Any):
-        sheet_hook = GSheetsHook(
-            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to
-        )
+        sheet_hook = GSheetsHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
         gcs_hook = GCSHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
         with NamedTemporaryFile("w+") as temp_file:
             # Download data
             gcs_hook.download(
-                bucket_name=self.bucket_name,
-                object_name=self.object_name,
-                filename=temp_file.name,
+                bucket_name=self.bucket_name, object_name=self.object_name, filename=temp_file.name,
             )
 
             # Upload data
             values = list(csv.reader(temp_file))
             sheet_hook.update_values(
-                spreadsheet_id=self.spreadsheet_id,
-                range_=self.spreadsheet_range,
-                values=values,
+                spreadsheet_id=self.spreadsheet_id, range_=self.spreadsheet_range, values=values,
             )

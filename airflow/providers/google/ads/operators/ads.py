@@ -82,10 +82,7 @@ class GoogleAdsListAccountsOperator(BaseOperator):
     def execute(self, context: Dict):
         uri = f"gs://{self.bucket}/{self.object_name}"
 
-        ads_hook = GoogleAdsHook(
-            gcp_conn_id=self.gcp_conn_id,
-            google_ads_conn_id=self.google_ads_conn_id
-        )
+        ads_hook = GoogleAdsHook(gcp_conn_id=self.gcp_conn_id, google_ads_conn_id=self.google_ads_conn_id)
 
         gcs_hook = GCSHook(gcp_conn_id=self.gcp_conn_id)
 
@@ -98,10 +95,7 @@ class GoogleAdsListAccountsOperator(BaseOperator):
 
             # Upload to GCS
             gcs_hook.upload(
-                bucket_name=self.bucket,
-                object_name=self.object_name,
-                gzip=self.gzip,
-                filename=temp_file.name
+                bucket_name=self.bucket, object_name=self.object_name, gzip=self.gzip, filename=temp_file.name
             )
             self.log.info("Uploaded %s to %s", len(accounts), uri)
 

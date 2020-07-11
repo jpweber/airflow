@@ -78,15 +78,13 @@ class GoogleCampaignManagerDeleteReportOperator(BaseOperator):
         gcp_conn_id: str = "google_cloud_default",
         delegate_to: Optional[str] = None,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         if not (report_name or report_id):
             raise AirflowException("Please provide `report_name` or `report_id`.")
         if report_name and report_id:
-            raise AirflowException(
-                "Please provide only one parameter `report_name` or `report_id`."
-            )
+            raise AirflowException("Please provide only one parameter `report_name` or `report_id`.")
 
         self.profile_id = profile_id
         self.report_name = report_name
@@ -97,9 +95,7 @@ class GoogleCampaignManagerDeleteReportOperator(BaseOperator):
 
     def execute(self, context: Dict):
         hook = GoogleCampaignManagerHook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            api_version=self.api_version,
+            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, api_version=self.api_version,
         )
         if self.report_name:
             reports = hook.list_reports(profile_id=self.profile_id)
@@ -176,7 +172,7 @@ class GoogleCampaignManagerDownloadReportOperator(BaseOperator):
         gcp_conn_id: str = "google_cloud_default",
         delegate_to: Optional[str] = None,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.profile_id = profile_id
@@ -206,17 +202,11 @@ class GoogleCampaignManagerDownloadReportOperator(BaseOperator):
 
     def execute(self, context: Dict):
         hook = GoogleCampaignManagerHook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            api_version=self.api_version,
+            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, api_version=self.api_version,
         )
-        gcs_hook = GCSHook(
-            google_cloud_storage_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to
-        )
+        gcs_hook = GCSHook(google_cloud_storage_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
         # Get name of the report
-        report = hook.get_report(
-            file_id=self.file_id, profile_id=self.profile_id, report_id=self.report_id
-        )
+        report = hook.get_report(file_id=self.file_id, profile_id=self.profile_id, report_id=self.report_id)
         report_name = self.report_name or report.get("fileName", str(uuid.uuid4()))
         report_name = self._resolve_file_name(report_name)
 
@@ -226,9 +216,7 @@ class GoogleCampaignManagerDownloadReportOperator(BaseOperator):
             profile_id=self.profile_id, report_id=self.report_id, file_id=self.file_id
         )
         with tempfile.NamedTemporaryFile() as temp_file:
-            downloader = http.MediaIoBaseDownload(
-                fd=temp_file, request=request, chunksize=self.chunk_size
-            )
+            downloader = http.MediaIoBaseDownload(fd=temp_file, request=request, chunksize=self.chunk_size)
             download_finished = False
             while not download_finished:
                 _, download_finished = downloader.next_chunk()
@@ -290,7 +278,7 @@ class GoogleCampaignManagerInsertReportOperator(BaseOperator):
         gcp_conn_id: str = "google_cloud_default",
         delegate_to: Optional[str] = None,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.profile_id = profile_id
@@ -307,14 +295,10 @@ class GoogleCampaignManagerInsertReportOperator(BaseOperator):
 
     def execute(self, context: Dict):
         hook = GoogleCampaignManagerHook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            api_version=self.api_version,
+            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, api_version=self.api_version,
         )
         self.log.info("Inserting Campaign Manager report.")
-        response = hook.insert_report(
-            profile_id=self.profile_id, report=self.report
-        )  # type: ignore
+        response = hook.insert_report(profile_id=self.profile_id, report=self.report)  # type: ignore
         report_id = response.get("id")
         self.xcom_push(context, key="report_id", value=report_id)
         self.log.info("Report successfully inserted. Report id: %s", report_id)
@@ -367,7 +351,7 @@ class GoogleCampaignManagerRunReportOperator(BaseOperator):
         gcp_conn_id: str = "google_cloud_default",
         delegate_to: Optional[str] = None,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.profile_id = profile_id
@@ -379,15 +363,11 @@ class GoogleCampaignManagerRunReportOperator(BaseOperator):
 
     def execute(self, context: Dict):
         hook = GoogleCampaignManagerHook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            api_version=self.api_version,
+            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, api_version=self.api_version,
         )
         self.log.info("Running report %s", self.report_id)
         response = hook.run_report(
-            profile_id=self.profile_id,
-            report_id=self.report_id,
-            synchronous=self.synchronous,
+            profile_id=self.profile_id, report_id=self.report_id, synchronous=self.synchronous,
         )
         file_id = response.get("id")
         self.xcom_push(context, key="file_id", value=file_id)
@@ -453,7 +433,7 @@ class GoogleCampaignManagerBatchInsertConversionsOperator(BaseOperator):
         gcp_conn_id: str = "google_cloud_default",
         delegate_to: Optional[str] = None,
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.profile_id = profile_id
@@ -468,9 +448,7 @@ class GoogleCampaignManagerBatchInsertConversionsOperator(BaseOperator):
 
     def execute(self, context: Dict):
         hook = GoogleCampaignManagerHook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            api_version=self.api_version,
+            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, api_version=self.api_version,
         )
         response = hook.conversions_batch_insert(
             profile_id=self.profile_id,
@@ -478,7 +456,7 @@ class GoogleCampaignManagerBatchInsertConversionsOperator(BaseOperator):
             encryption_entity_type=self.encryption_entity_type,
             encryption_entity_id=self.encryption_entity_id,
             encryption_source=self.encryption_source,
-            max_failed_inserts=self.max_failed_inserts
+            max_failed_inserts=self.max_failed_inserts,
         )
         return response
 
@@ -541,7 +519,7 @@ class GoogleCampaignManagerBatchUpdateConversionsOperator(BaseOperator):
         gcp_conn_id: str = "google_cloud_default",
         delegate_to: Optional[str] = None,
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.profile_id = profile_id
@@ -556,9 +534,7 @@ class GoogleCampaignManagerBatchUpdateConversionsOperator(BaseOperator):
 
     def execute(self, context: Dict):
         hook = GoogleCampaignManagerHook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            api_version=self.api_version,
+            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, api_version=self.api_version,
         )
         response = hook.conversions_batch_update(
             profile_id=self.profile_id,
@@ -566,6 +542,6 @@ class GoogleCampaignManagerBatchUpdateConversionsOperator(BaseOperator):
             encryption_entity_type=self.encryption_entity_type,
             encryption_entity_id=self.encryption_entity_id,
             encryption_source=self.encryption_source,
-            max_failed_updates=self.max_failed_updates
+            max_failed_updates=self.max_failed_updates,
         )
         return response

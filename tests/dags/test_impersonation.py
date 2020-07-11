@@ -39,11 +39,11 @@ test_command = dedent(
         echo current user is not {user}!
         exit 1
     fi
-    """.format(user=run_as_user))
+    """.format(
+        user=run_as_user
+    )
+)
 
 task = BashOperator(
-    task_id='test_impersonated_user',
-    bash_command=test_command,
-    dag=dag,
-    run_as_user=run_as_user,
+    task_id='test_impersonated_user', bash_command=test_command, dag=dag, run_as_user=run_as_user,
 )

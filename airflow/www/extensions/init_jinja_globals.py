@@ -51,7 +51,7 @@ def init_jinja_globals(app):
             'log_fetch_delay_sec': conf.getint('webserver', 'log_fetch_delay_sec', fallback=2),
             'log_auto_tailing_offset': conf.getint('webserver', 'log_auto_tailing_offset', fallback=30),
             'log_animation_speed': conf.getint('webserver', 'log_animation_speed', fallback=1000),
-            'state_color_mapping': STATE_COLORS
+            'state_color_mapping': STATE_COLORS,
         }
 
         if 'analytics_tool' in conf.getsection('webserver'):

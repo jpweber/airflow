@@ -26,7 +26,8 @@ from google.cloud.datacatalog_v1beta1.types import Tag
 from airflow import AirflowException
 from airflow.providers.google.cloud.hooks.datacatalog import CloudDataCatalogHook
 from tests.providers.google.cloud.utils.base_gcp_mock import (
-    mock_base_gcp_hook_default_project_id, mock_base_gcp_hook_no_default_project_id,
+    mock_base_gcp_hook_default_project_id,
+    mock_base_gcp_hook_no_default_project_id,
 )
 
 TEST_GCP_CONN_ID: str = "test-gcp-conn-id"

@@ -48,13 +48,15 @@ class MySqlOperator(BaseOperator):
 
     @apply_defaults
     def __init__(
-            self,
-            sql: str,
-            mysql_conn_id: str = 'mysql_default',
-            parameters: Optional[Union[Mapping, Iterable]] = None,
-            autocommit: bool = False,
-            database: Optional[str] = None,
-            *args, **kwargs):
+        self,
+        sql: str,
+        mysql_conn_id: str = 'mysql_default',
+        parameters: Optional[Union[Mapping, Iterable]] = None,
+        autocommit: bool = False,
+        database: Optional[str] = None,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.mysql_conn_id = mysql_conn_id
         self.sql = sql
@@ -64,9 +66,5 @@ class MySqlOperator(BaseOperator):
 
     def execute(self, context):
         self.log.info('Executing: %s', self.sql)
-        hook = MySqlHook(mysql_conn_id=self.mysql_conn_id,
-                         schema=self.database)
-        hook.run(
-            self.sql,
-            autocommit=self.autocommit,
-            parameters=self.parameters)
+        hook = MySqlHook(mysql_conn_id=self.mysql_conn_id, schema=self.database)
+        hook.run(self.sql, autocommit=self.autocommit, parameters=self.parameters)

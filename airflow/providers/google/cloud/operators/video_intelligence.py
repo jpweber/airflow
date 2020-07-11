@@ -64,6 +64,7 @@ class CloudVideoIntelligenceDetectVideoLabelsOperator(BaseOperator):
         Platform. Defaults to ``google_cloud_default``.
     :type gcp_conn_id: str
     """
+
     # [START gcp_video_intelligence_detect_labels_template_fields]
     template_fields = ("input_uri", "output_uri", "gcp_conn_id")
     # [END gcp_video_intelligence_detect_labels_template_fields]
@@ -79,7 +80,7 @@ class CloudVideoIntelligenceDetectVideoLabelsOperator(BaseOperator):
         timeout: Optional[float] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.input_uri = input_uri
@@ -100,7 +101,7 @@ class CloudVideoIntelligenceDetectVideoLabelsOperator(BaseOperator):
             location=self.location,
             retry=self.retry,
             features=[enums.Feature.LABEL_DETECTION],
-            timeout=self.timeout
+            timeout=self.timeout,
         )
         self.log.info("Processing video for label annotations")
         result = MessageToDict(operation.result())
@@ -143,6 +144,7 @@ class CloudVideoIntelligenceDetectVideoExplicitContentOperator(BaseOperator):
         Platform. Defaults to ``google_cloud_default``.
     :type gcp_conn_id: str
     """
+
     # [START gcp_video_intelligence_detect_explicit_content_template_fields]
     template_fields = ("input_uri", "output_uri", "gcp_conn_id")
     # [END gcp_video_intelligence_detect_explicit_content_template_fields]
@@ -158,7 +160,7 @@ class CloudVideoIntelligenceDetectVideoExplicitContentOperator(BaseOperator):
         timeout: Optional[float] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.input_uri = input_uri
@@ -179,7 +181,7 @@ class CloudVideoIntelligenceDetectVideoExplicitContentOperator(BaseOperator):
             location=self.location,
             retry=self.retry,
             features=[enums.Feature.EXPLICIT_CONTENT_DETECTION],
-            timeout=self.timeout
+            timeout=self.timeout,
         )
         self.log.info("Processing video for explicit content annotations")
         result = MessageToDict(operation.result())
@@ -222,6 +224,7 @@ class CloudVideoIntelligenceDetectVideoShotsOperator(BaseOperator):
         Platform. Defaults to ``google_cloud_default``.
     :type gcp_conn_id: str
     """
+
     # [START gcp_video_intelligence_detect_video_shots_template_fields]
     template_fields = ("input_uri", "output_uri", "gcp_conn_id")
     # [END gcp_video_intelligence_detect_video_shots_template_fields]
@@ -237,7 +240,7 @@ class CloudVideoIntelligenceDetectVideoShotsOperator(BaseOperator):
         timeout: Optional[float] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.input_uri = input_uri
@@ -258,7 +261,7 @@ class CloudVideoIntelligenceDetectVideoShotsOperator(BaseOperator):
             location=self.location,
             retry=self.retry,
             features=[enums.Feature.SHOT_CHANGE_DETECTION],
-            timeout=self.timeout
+            timeout=self.timeout,
         )
         self.log.info("Processing video for video shots annotations")
         result = MessageToDict(operation.result())

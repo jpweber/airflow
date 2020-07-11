@@ -49,10 +49,7 @@ class TestSqlAlchemyUtils(unittest.TestCase):
         iso_date = start_date.isoformat()
         execution_date = start_date + datetime.timedelta(hours=1, days=1)
 
-        dag = DAG(
-            dag_id=dag_id,
-            start_date=start_date,
-        )
+        dag = DAG(dag_id=dag_id, start_date=start_date,)
         dag.clear()
 
         run = dag.create_dagrun(
@@ -91,7 +88,7 @@ class TestSqlAlchemyUtils(unittest.TestCase):
                 state=State.NONE,
                 execution_date=start_date,
                 start_date=start_date,
-                session=self.session
+                session=self.session,
             )
         dag.clear()
 

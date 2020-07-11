@@ -86,15 +86,9 @@ class TestGetPoolsPagination(TestBasePoolEndpoints):
             ("/api/v1/pools?limit=2", ["default_pool", "test_pool1"]),
             ("/api/v1/pools?limit=1", ["default_pool"]),
             # Limit and offset test data
-            (
-                "/api/v1/pools?limit=100&offset=1",
-                [f"test_pool{i}" for i in range(1, 101)],
-            ),
+            ("/api/v1/pools?limit=100&offset=1", [f"test_pool{i}" for i in range(1, 101)],),
             ("/api/v1/pools?limit=2&offset=1", ["test_pool1", "test_pool2"]),
-            (
-                "/api/v1/pools?limit=3&offset=2",
-                ["test_pool2", "test_pool3", "test_pool4"],
-            ),
+            ("/api/v1/pools?limit=3&offset=2", ["test_pool2", "test_pool3", "test_pool4"],),
         ]
     )
     @provide_session
@@ -197,9 +191,7 @@ class TestDeletePool(TestBasePoolEndpoints):
 
 class TestPostPool(TestBasePoolEndpoints):
     def test_response_200(self):
-        response = self.client.post(
-            "api/v1/pools", json={"name": "test_pool_a", "slots": 3}
-        )
+        response = self.client.post("api/v1/pools", json={"name": "test_pool_a", "slots": 3})
         assert response.status_code == 200
         self.assertEqual(
             {
@@ -219,9 +211,7 @@ class TestPostPool(TestBasePoolEndpoints):
         pool_instance = Pool(pool=pool_name, slots=3)
         session.add(pool_instance)
         session.commit()
-        response = self.client.post(
-            "api/v1/pools", json={"name": "test_pool_a", "slots": 3}
-        )
+        response = self.client.post("api/v1/pools", json={"name": "test_pool_a", "slots": 3})
         assert response.status_code == 409
         self.assertEqual(
             {
@@ -236,11 +226,7 @@ class TestPostPool(TestBasePoolEndpoints):
     @parameterized.expand(
         [
             ("for missing pool name", {"slots": 3}, "'name' is a required property",),
-            (
-                "for missing slots",
-                {"name": "invalid_pool"},
-                "'slots' is a required property",
-            ),
+            ("for missing slots", {"name": "invalid_pool"}, "'slots' is a required property",),
             (
                 "for extra fields",
                 {"name": "invalid_pool", "slots": 3, "extra_field_1": "extra"},
@@ -253,12 +239,7 @@ class TestPostPool(TestBasePoolEndpoints):
         response = self.client.post("api/v1/pools", json=request_json)
         assert response.status_code == 400
         self.assertDictEqual(
-            {
-                "detail": error_detail,
-                "status": 400,
-                "title": "Bad request",
-                "type": "about:blank",
-            },
+            {"detail": error_detail, "status": 400, "title": "Bad request", "type": "about:blank",},
             response.json,
         )
 
@@ -269,9 +250,7 @@ class TestPatchPool(TestBasePoolEndpoints):
         pool = Pool(pool="test_pool", slots=2)
         session.add(pool)
         session.commit()
-        response = self.client.patch(
-            "api/v1/pools/test_pool", json={"name": "test_pool_a", "slots": 3}
-        )
+        response = self.client.patch("api/v1/pools/test_pool", json={"name": "test_pool_a", "slots": 3})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             {
@@ -305,12 +284,7 @@ class TestPatchPool(TestBasePoolEndpoints):
         response = self.client.patch("api/v1/pools/test_pool", json=request_json)
         assert response.status_code == 400
         self.assertEqual(
-            {
-                "detail": error_detail,
-                "status": 400,
-                "title": "Bad request",
-                "type": "about:blank",
-            },
+            {"detail": error_detail, "status": 400, "title": "Bad request", "type": "about:blank",},
             response.json,
         )
 
@@ -427,18 +401,11 @@ class TestPatchPoolWithUpdateMask(TestBasePoolEndpoints):
                 "test_pool",
                 2,
             ),
-            (
-                "api/v1/pools/test_pool?update_mask=slots",
-                {"slots": 2},
-                "test_pool",
-                2,
-            ),
+            ("api/v1/pools/test_pool?update_mask=slots", {"slots": 2}, "test_pool", 2,),
         ]
     )
     @provide_session
-    def test_response_200(
-        self, url, patch_json, expected_name, expected_slots, session
-    ):
+    def test_response_200(self, url, patch_json, expected_name, expected_slots, session):
         pool = Pool(pool="test_pool", slots=3)
         session.add(pool)
         session.commit()
@@ -494,11 +461,6 @@ class TestPatchPoolWithUpdateMask(TestBasePoolEndpoints):
         assert response.status_code == 400
         self.assertEqual
         (
-            {
-                "detail": error_detail,
-                "status": 400,
-                "title": "Bad Request",
-                "type": "about:blank",
-            },
+            {"detail": error_detail, "status": 400, "title": "Bad Request", "type": "about:blank",},
             response.json,
         )

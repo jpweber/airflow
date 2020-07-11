@@ -238,14 +238,18 @@ def get_package_release_version(provider_package_id: str, version_suffix: str = 
     :param version_suffix: optional suffix (rc1, rc2 etc).
     :return:
     """
-    return get_latest_release(
-        get_package_path(provider_package_id=provider_package_id)).release_version + version_suffix
+    return (
+        get_latest_release(get_package_path(provider_package_id=provider_package_id)).release_version
+        + version_suffix
+    )
 
 
-def do_setup_package_providers(provider_package_id: str,
-                               version_suffix: str,
-                               package_dependencies: Iterable[str],
-                               extras: Dict[str, List[str]]) -> None:
+def do_setup_package_providers(
+    provider_package_id: str,
+    version_suffix: str,
+    package_dependencies: Iterable[str],
+    extras: Dict[str, List[str]],
+) -> None:
     """
     The main setup method for package.
 
@@ -270,8 +274,8 @@ def do_setup_package_providers(provider_package_id: str,
         long_description_content_type='text/markdown',
         license='Apache License 2.0',
         version=get_package_release_version(
-            provider_package_id=provider_package_id,
-            version_suffix=version_suffix),
+            provider_package_id=provider_package_id, version_suffix=version_suffix
+        ),
         packages=found_packages,
         zip_safe=False,
         install_requires=install_requires,
@@ -286,13 +290,7 @@ def do_setup_package_providers(provider_package_id: str,
             'Programming Language :: Python :: 3.7',
             'Topic :: System :: Monitoring',
         ],
-        setup_requires=[
-            'bowler',
-            'docutils',
-            'gitpython',
-            'setuptools',
-            'wheel',
-        ],
+        setup_requires=['bowler', 'docutils', 'gitpython', 'setuptools', 'wheel',],
         python_requires='>=3.6',
     )
 
@@ -306,9 +304,11 @@ def find_package_extras(package: str) -> Dict[str, List[str]]:
         return {}
     with open(DEPENDENCIES_JSON_FILE, "rt") as dependencies_file:
         cross_provider_dependencies: Dict[str, List[str]] = json.load(dependencies_file)
-    extras_dict = {module: [get_pip_package_name(module)]
-                   for module in cross_provider_dependencies[package]} \
-        if cross_provider_dependencies.get(package) else {}
+    extras_dict = (
+        {module: [get_pip_package_name(module)] for module in cross_provider_dependencies[package]}
+        if cross_provider_dependencies.get(package)
+        else {}
+    )
     return extras_dict
 
 
@@ -387,6 +387,7 @@ def inherits_from(the_class: Type, expected_ancestor: Type) -> bool:
     if expected_ancestor is None:
         return False
     import inspect
+
     mro = inspect.getmro(the_class)
     return the_class is not expected_ancestor and expected_ancestor in mro
 
@@ -398,6 +399,7 @@ def is_class(the_class: Type) -> bool:
     :return: true if it is a class
     """
     import inspect
+
     return inspect.isclass(the_class)
 
 
@@ -413,14 +415,15 @@ def package_name_matches(the_class: Type, expected_pattern: Optional[str]) -> bo
 
 
 def find_all_entities(
-        imported_classes: List[str],
-        base_package: str,
-        ancestor_match: Type,
-        sub_package_pattern_match: str,
-        expected_class_name_pattern: str,
-        unexpected_class_name_patterns: Set[str],
-        exclude_class_type: Type = None,
-        false_positive_class_names: Optional[Set[str]] = None) -> VerifiedEntities:
+    imported_classes: List[str],
+    base_package: str,
+    ancestor_match: Type,
+    sub_package_pattern_match: str,
+    expected_class_name_pattern: str,
+    unexpected_class_name_patterns: Set[str],
+    exclude_class_type: Type = None,
+    false_positive_class_names: Optional[Set[str]] = None,
+) -> VerifiedEntities:
     """
     Returns set of entities containing all subclasses in package specified.
 
@@ -439,35 +442,44 @@ def find_all_entities(
     for imported_name in imported_classes:
         module, class_name = imported_name.rsplit(".", maxsplit=1)
         the_class = getattr(importlib.import_module(module), class_name)
-        if is_class(the_class=the_class) \
-            and not is_example_dag(imported_name=imported_name) \
-            and is_from_the_expected_base_package(the_class=the_class, expected_package=base_package) \
-            and is_imported_from_same_module(the_class=the_class, imported_name=imported_name) \
-            and inherits_from(the_class=the_class, expected_ancestor=ancestor_match) \
-            and not inherits_from(the_class=the_class, expected_ancestor=exclude_class_type) \
-                and package_name_matches(the_class=the_class, expected_pattern=sub_package_pattern_match):
+        if (
+            is_class(the_class=the_class)
+            and not is_example_dag(imported_name=imported_name)
+            and is_from_the_expected_base_package(the_class=the_class, expected_package=base_package)
+            and is_imported_from_same_module(the_class=the_class, imported_name=imported_name)
+            and inherits_from(the_class=the_class, expected_ancestor=ancestor_match)
+            and not inherits_from(the_class=the_class, expected_ancestor=exclude_class_type)
+            and package_name_matches(the_class=the_class, expected_pattern=sub_package_pattern_match)
+        ):
 
             if not false_positive_class_names or class_name not in false_positive_class_names:
                 if not re.match(expected_class_name_pattern, class_name):
                     wrong_entities.append(
-                        (the_class, f"The class name {class_name} is wrong. "
-                                    f"It should match {expected_class_name_pattern}"))
+                        (
+                            the_class,
+                            f"The class name {class_name} is wrong. "
+                            f"It should match {expected_class_name_pattern}",
+                        )
+                    )
                     continue
                 if unexpected_class_name_patterns:
                     for unexpected_class_name_pattern in unexpected_class_name_patterns:
                         if re.match(unexpected_class_name_pattern, class_name):
                             wrong_entities.append(
-                                (the_class,
-                                 f"The class name {class_name} is wrong. "
-                                 f"It should not match {unexpected_class_name_pattern}"))
+                                (
+                                    the_class,
+                                    f"The class name {class_name} is wrong. "
+                                    f"It should not match {unexpected_class_name_pattern}",
+                                )
+                            )
                         continue
             found_entities.add(imported_name)
     return VerifiedEntities(all_entities=found_entities, wrong_entities=wrong_entities)
 
 
-def convert_new_classes_to_table(entity_type: EntityType,
-                                 new_entities: List[str],
-                                 full_package_name: str) -> str:
+def convert_new_classes_to_table(
+    entity_type: EntityType, new_entities: List[str], full_package_name: str
+) -> str:
     """
     Converts new entities tp a markdown table.
 
@@ -477,15 +489,15 @@ def convert_new_classes_to_table(entity_type: EntityType,
     :return: table of new classes
     """
     from tabulate import tabulate
+
     headers = [f"New Airflow 2.0 {entity_type.value.lower()}: `{full_package_name}` package"]
-    table = [(get_class_code_link(full_package_name, class_name, "master"),)
-             for class_name in new_entities]
+    table = [(get_class_code_link(full_package_name, class_name, "master"),) for class_name in new_entities]
     return tabulate(table, headers=headers, tablefmt="pipe")
 
 
-def convert_moved_classes_to_table(entity_type: EntityType,
-                                   moved_entities: Dict[str, str],
-                                   full_package_name: str) -> str:
+def convert_moved_classes_to_table(
+    entity_type: EntityType, moved_entities: Dict[str, str], full_package_name: str
+) -> str:
     """
     Converts moved entities to a markdown table
     :param entity_type: type of entities -> operators, sensors etc.
@@ -494,21 +506,27 @@ def convert_moved_classes_to_table(entity_type: EntityType,
     :return: table of moved classes
     """
     from tabulate import tabulate
-    headers = [f"Airflow 2.0 {entity_type.value.lower()}: `{full_package_name}` package",
-               "Airflow 1.10.* previous location (usually `airflow.contrib`)"]
+
+    headers = [
+        f"Airflow 2.0 {entity_type.value.lower()}: `{full_package_name}` package",
+        "Airflow 1.10.* previous location (usually `airflow.contrib`)",
+    ]
     table = [
-        (get_class_code_link(full_package_name, to_class, "master"),
-         get_class_code_link("airflow", moved_entities[to_class], "v1-10-stable"))
+        (
+            get_class_code_link(full_package_name, to_class, "master"),
+            get_class_code_link("airflow", moved_entities[to_class], "v1-10-stable"),
+        )
         for to_class in sorted(moved_entities.keys())
     ]
     return tabulate(table, headers=headers, tablefmt="pipe")
 
 
 def get_details_about_classes(
-        entity_type: EntityType,
-        entities: Set[str],
-        wrong_entities: List[Tuple[type, str]],
-        full_package_name: str) -> EntityTypeSummary:
+    entity_type: EntityType,
+    entities: Set[str],
+    wrong_entities: List[Tuple[type, str]],
+    full_package_name: str,
+) -> EntityTypeSummary:
     """
     Splits the set of entities into new and moved, depending on their presence in the dict of objects
     retrieved from the test_contrib_to_core. Updates all_entities with the split class.
@@ -536,16 +554,12 @@ def get_details_about_classes(
         new_entities=new_entities,
         moved_entities=moved_entities,
         new_entities_table=convert_new_classes_to_table(
-            entity_type=entity_type,
-            new_entities=new_entities,
-            full_package_name=full_package_name,
+            entity_type=entity_type, new_entities=new_entities, full_package_name=full_package_name,
         ),
         moved_entities_table=convert_moved_classes_to_table(
-            entity_type=entity_type,
-            moved_entities=moved_entities,
-            full_package_name=full_package_name,
+            entity_type=entity_type, moved_entities=moved_entities, full_package_name=full_package_name,
         ),
-        wrong_entities=wrong_entities
+        wrong_entities=wrong_entities,
     )
 
 
@@ -554,7 +568,7 @@ def strip_package_from_class(base_package: str, class_name: str) -> str:
     Strips base package name from the class (if it starts with the package name).
     """
     if class_name.startswith(base_package):
-        return class_name[len(base_package) + 1:]
+        return class_name[len(base_package) + 1 :]
     else:
         return class_name
 
@@ -580,8 +594,10 @@ def get_class_code_link(base_package: str, class_name: str, git_tag: str) -> str
     :return: URL to the class
     """
     url_prefix = f'https://github.com/apache/airflow/blob/{git_tag}/'
-    return f'[{strip_package_from_class(base_package, class_name)}]' \
-           f'({convert_class_name_to_url(url_prefix, class_name)})'
+    return (
+        f'[{strip_package_from_class(base_package, class_name)}]'
+        f'({convert_class_name_to_url(url_prefix, class_name)})'
+    )
 
 
 def print_wrong_naming(entity_type: EntityType, wrong_classes: List[Tuple[type, str]]):
@@ -596,8 +612,9 @@ def print_wrong_naming(entity_type: EntityType, wrong_classes: List[Tuple[type, 
             print(f"{entity_type}: {message}", file=sys.stderr)
 
 
-def get_package_class_summary(full_package_name: str, imported_classes: List[str]) \
-        -> Dict[EntityType, EntityTypeSummary]:
+def get_package_class_summary(
+    full_package_name: str, imported_classes: List[str]
+) -> Dict[EntityType, EntityTypeSummary]:
     """
     Gets summary of the package in the form of dictionary containing all types of entities
     :param full_package_name: full package name
@@ -609,62 +626,69 @@ def get_package_class_summary(full_package_name: str, imported_classes: List[str
     from airflow.secrets import BaseSecretsBackend
     from airflow.sensors.base_sensor_operator import BaseSensorOperator
 
-    all_verified_entities: Dict[EntityType, VerifiedEntities] = {EntityType.Operators: find_all_entities(
-        imported_classes=imported_classes,
-        base_package=full_package_name,
-        sub_package_pattern_match=r".*\.operators\..*",
-        ancestor_match=BaseOperator,
-        expected_class_name_pattern=OPERATORS_PATTERN,
-        unexpected_class_name_patterns=ALL_PATTERNS - {OPERATORS_PATTERN},
-        exclude_class_type=BaseSensorOperator,
-        false_positive_class_names={
-            'CloudVisionAddProductToProductSetOperator',
-            'CloudDataTransferServiceGCSToGCSOperator',
-            'CloudDataTransferServiceS3ToGCSOperator',
-            'BigQueryCreateDataTransferOperator',
-            'CloudTextToSpeechSynthesizeOperator',
-            'CloudSpeechToTextRecognizeSpeechOperator',
-        }
-    ), EntityType.Sensors: find_all_entities(
-        imported_classes=imported_classes,
-        base_package=full_package_name,
-        sub_package_pattern_match=r".*\.sensors\..*",
-        ancestor_match=BaseSensorOperator,
-        expected_class_name_pattern=SENSORS_PATTERN,
-        unexpected_class_name_patterns=ALL_PATTERNS - {OPERATORS_PATTERN, SENSORS_PATTERN}
-    ), EntityType.Hooks: find_all_entities(
-        imported_classes=imported_classes,
-        base_package=full_package_name,
-        sub_package_pattern_match=r".*\.hooks\..*",
-        ancestor_match=BaseHook,
-        expected_class_name_pattern=HOOKS_PATTERN,
-        unexpected_class_name_patterns=ALL_PATTERNS - {HOOKS_PATTERN}
-    ), EntityType.Secrets: find_all_entities(
-        imported_classes=imported_classes,
-        sub_package_pattern_match=r".*\.secrets\..*",
-        base_package=full_package_name,
-        ancestor_match=BaseSecretsBackend,
-        expected_class_name_pattern=SECRETS_PATTERN,
-        unexpected_class_name_patterns=ALL_PATTERNS - {SECRETS_PATTERN},
-    ), EntityType.Transfers: find_all_entities(
-        imported_classes=imported_classes,
-        base_package=full_package_name,
-        sub_package_pattern_match=r".*\.transfers\..*",
-        ancestor_match=BaseOperator,
-        expected_class_name_pattern=TRANSFERS_PATTERN,
-        unexpected_class_name_patterns=ALL_PATTERNS - {OPERATORS_PATTERN, TRANSFERS_PATTERN},
-    )}
+    all_verified_entities: Dict[EntityType, VerifiedEntities] = {
+        EntityType.Operators: find_all_entities(
+            imported_classes=imported_classes,
+            base_package=full_package_name,
+            sub_package_pattern_match=r".*\.operators\..*",
+            ancestor_match=BaseOperator,
+            expected_class_name_pattern=OPERATORS_PATTERN,
+            unexpected_class_name_patterns=ALL_PATTERNS - {OPERATORS_PATTERN},
+            exclude_class_type=BaseSensorOperator,
+            false_positive_class_names={
+                'CloudVisionAddProductToProductSetOperator',
+                'CloudDataTransferServiceGCSToGCSOperator',
+                'CloudDataTransferServiceS3ToGCSOperator',
+                'BigQueryCreateDataTransferOperator',
+                'CloudTextToSpeechSynthesizeOperator',
+                'CloudSpeechToTextRecognizeSpeechOperator',
+            },
+        ),
+        EntityType.Sensors: find_all_entities(
+            imported_classes=imported_classes,
+            base_package=full_package_name,
+            sub_package_pattern_match=r".*\.sensors\..*",
+            ancestor_match=BaseSensorOperator,
+            expected_class_name_pattern=SENSORS_PATTERN,
+            unexpected_class_name_patterns=ALL_PATTERNS - {OPERATORS_PATTERN, SENSORS_PATTERN},
+        ),
+        EntityType.Hooks: find_all_entities(
+            imported_classes=imported_classes,
+            base_package=full_package_name,
+            sub_package_pattern_match=r".*\.hooks\..*",
+            ancestor_match=BaseHook,
+            expected_class_name_pattern=HOOKS_PATTERN,
+            unexpected_class_name_patterns=ALL_PATTERNS - {HOOKS_PATTERN},
+        ),
+        EntityType.Secrets: find_all_entities(
+            imported_classes=imported_classes,
+            sub_package_pattern_match=r".*\.secrets\..*",
+            base_package=full_package_name,
+            ancestor_match=BaseSecretsBackend,
+            expected_class_name_pattern=SECRETS_PATTERN,
+            unexpected_class_name_patterns=ALL_PATTERNS - {SECRETS_PATTERN},
+        ),
+        EntityType.Transfers: find_all_entities(
+            imported_classes=imported_classes,
+            base_package=full_package_name,
+            sub_package_pattern_match=r".*\.transfers\..*",
+            ancestor_match=BaseOperator,
+            expected_class_name_pattern=TRANSFERS_PATTERN,
+            unexpected_class_name_patterns=ALL_PATTERNS - {OPERATORS_PATTERN, TRANSFERS_PATTERN},
+        ),
+    }
     for entity in EntityType:
         print_wrong_naming(entity, all_verified_entities[entity].wrong_entities)
 
-    entities_summary: Dict[EntityType, EntityTypeSummary] = {} # noqa
+    entities_summary: Dict[EntityType, EntityTypeSummary] = {}  # noqa
 
     for entity_type in EntityType:
         entities_summary[entity_type] = get_details_about_classes(
             entity_type,
             all_verified_entities[entity_type].all_entities,
             all_verified_entities[entity_type].wrong_entities,
-            full_package_name)
+            full_package_name,
+        )
 
     return entities_summary
 
@@ -677,11 +701,10 @@ def render_template(template_name: str, context: Dict[str, Any]) -> str:
     :return: rendered template
     """
     import jinja2
+
     template_loader = jinja2.FileSystemLoader(searchpath=MY_DIR_PATH)
     template_env = jinja2.Environment(
-        loader=template_loader,
-        undefined=jinja2.StrictUndefined,
-        autoescape=True
+        loader=template_loader, undefined=jinja2.StrictUndefined, autoescape=True
     )
     template = template_env.get_template(f"{template_name}_TEMPLATE.md.jinja2")
     content: str = template.render(context)
@@ -702,6 +725,7 @@ def convert_git_changes_to_table(changes: str, base_url: str) -> str:
     :return: markdown-formatted table
     """
     from tabulate import tabulate
+
     lines = changes.split("\n")
     headers = ["Commit", "Committed", "Subject"]
     table_data = []
@@ -720,6 +744,7 @@ def convert_pip_requirements_to_table(requirements: Iterable[str]) -> str:
     :return: markdown-formatted table
     """
     from tabulate import tabulate
+
     headers = ["PIP package", "Version required"]
     table_data = []
     for dependency in requirements:
@@ -733,8 +758,7 @@ def convert_pip_requirements_to_table(requirements: Iterable[str]) -> str:
     return tabulate(table_data, headers=headers, tablefmt="pipe")
 
 
-def convert_cross_package_dependencies_to_table(
-        cross_package_dependencies: List[str], base_url: str) -> str:
+def convert_cross_package_dependencies_to_table(cross_package_dependencies: List[str], base_url: str) -> str:
     """
     Converts cross-package dependencies to a markdown table
     :param cross_package_dependencies: list of cross-package dependencies
@@ -742,6 +766,7 @@ def convert_cross_package_dependencies_to_table(
     :return: markdown-formatted table
     """
     from tabulate import tabulate
+
     headers = ["Dependent package", "Extra"]
     table_data = []
     for dependency in cross_package_dependencies:
@@ -777,8 +802,8 @@ PROVIDERS_CHANGES_PREFIX = "PROVIDERS_CHANGES_"
 Keeps information about historical releases.
 """
 ReleaseInfo = collections.namedtuple(
-    "ReleaseInfo",
-    "release_version release_version_no_leading_zeros last_commit_hash content file_name")
+    "ReleaseInfo", "release_version release_version_no_leading_zeros last_commit_hash content file_name"
+)
 
 
 def strip_leading_zeros(release_version: str) -> str:
@@ -804,13 +829,16 @@ def get_all_releases(provider_package_path: str) -> List[ReleaseInfo]:
                 print("No commit found. This seems to be first time you run it", file=sys.stderr)
             else:
                 last_commit_hash = found.group(1)
-                release_version = file_name[len(PROVIDERS_CHANGES_PREFIX):][:-3]
+                release_version = file_name[len(PROVIDERS_CHANGES_PREFIX) :][:-3]
                 past_releases.append(
-                    ReleaseInfo(release_version=release_version,
-                                release_version_no_leading_zeros=strip_leading_zeros(release_version),
-                                last_commit_hash=last_commit_hash,
-                                content=content,
-                                file_name=file_name))
+                    ReleaseInfo(
+                        release_version=release_version,
+                        release_version_no_leading_zeros=strip_leading_zeros(release_version),
+                        last_commit_hash=last_commit_hash,
+                        content=content,
+                        file_name=file_name,
+                    )
+                )
     return past_releases
 
 
@@ -823,18 +851,20 @@ def get_latest_release(provider_package_path: str) -> ReleaseInfo:
     """
     releases = get_all_releases(provider_package_path=provider_package_path)
     if len(releases) == 0:
-        return ReleaseInfo(release_version="0.0.0",
-                           release_version_no_leading_zeros="0.0.0",
-                           last_commit_hash="no_hash",
-                           content="empty",
-                           file_name="no_file")
+        return ReleaseInfo(
+            release_version="0.0.0",
+            release_version_no_leading_zeros="0.0.0",
+            last_commit_hash="no_hash",
+            content="empty",
+            file_name="no_file",
+        )
     else:
         return releases[0]
 
 
-def get_previous_release_info(previous_release_version: str,
-                              past_releases: List[ReleaseInfo],
-                              current_release_version: str) -> Optional[str]:
+def get_previous_release_info(
+    previous_release_version: str, past_releases: List[ReleaseInfo], current_release_version: str
+) -> Optional[str]:
     """
     Find previous release. In case we are re-running current release we assume that last release was
     the previous one. This is needed so that we can generate list of changes since the previous release.
@@ -854,8 +884,8 @@ def get_previous_release_info(previous_release_version: str,
 
 
 def check_if_release_version_ok(
-        past_releases: List[ReleaseInfo],
-        current_release_version: str) -> Tuple[str, Optional[str]]:
+    past_releases: List[ReleaseInfo], current_release_version: str
+) -> Tuple[str, Optional[str]]:
     """
     Check if the release version passed is not later than the last release version
     :param past_releases: all past releases (if there are any)
@@ -869,8 +899,11 @@ def check_if_release_version_ok(
         else:
             current_release_version = (datetime.today() + timedelta(days=5)).strftime('%Y.%m.%d')
     if previous_release_version and previous_release_version > current_release_version:
-        print(f"The release {current_release_version} must be not less than "
-              f"{previous_release_version} - last release for the package", file=sys.stderr)
+        print(
+            f"The release {current_release_version} must be not less than "
+            f"{previous_release_version} - last release for the package",
+            file=sys.stderr,
+        )
         sys.exit(2)
     return current_release_version, previous_release_version
 
@@ -896,16 +929,21 @@ def make_sure_remote_apache_exists_and_fetch():
     :return:
     """
     try:
-        subprocess.check_call(["git", "remote", "add", "apache", "https://github.com/apache/airflow.git"],
-                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.check_call(
+            ["git", "remote", "add", "apache", "https://github.com/apache/airflow.git"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
     except subprocess.CalledProcessError as e:
         if e.returncode == 128:
-            print("The remote `apache` already exists. If you have trouble running "
-                  "git log delete the remote", file=sys.stderr)
+            print(
+                "The remote `apache` already exists. If you have trouble running "
+                "git log delete the remote",
+                file=sys.stderr,
+            )
         else:
             raise
-    subprocess.check_call(["git", "fetch", "apache"],
-                          stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    subprocess.check_call(["git", "fetch", "apache"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 def get_git_command(base_commit: Optional[str]) -> List[str]:
@@ -921,8 +959,9 @@ def get_git_command(base_commit: Optional[str]) -> List[str]:
     return git_cmd
 
 
-def store_current_changes(provider_package_path: str,
-                          current_release_version: str, current_changes: str) -> None:
+def store_current_changes(
+    provider_package_path: str, current_release_version: str, current_changes: str
+) -> None:
     """
     Stores current changes in the PROVIDERS_CHANGES_YYYY.MM.DD.md file.
 
@@ -930,8 +969,9 @@ def store_current_changes(provider_package_path: str,
     :param current_release_version: release version to build
     :param current_changes: list of changes formatted in markdown format
     """
-    current_changes_file_path = os.path.join(provider_package_path,
-                                             PROVIDERS_CHANGES_PREFIX + current_release_version + ".md")
+    current_changes_file_path = os.path.join(
+        provider_package_path, PROVIDERS_CHANGES_PREFIX + current_release_version + ".md"
+    )
     with open(current_changes_file_path, "wt") as current_changes_file:
         current_changes_file.write(current_changes)
         current_changes_file.write("\n")
@@ -982,7 +1022,8 @@ def is_camel_case_with_acronyms(s: str):
 
 
 def check_if_classes_are_properly_named(
-        entity_summary: Dict[EntityType, EntityTypeSummary]) -> Tuple[int, int]:
+    entity_summary: Dict[EntityType, EntityTypeSummary]
+) -> Tuple[int, int]:
     """
     Check if all entities in the dictionary are named properly. It prints names at the output
     and returns the status of class names.
@@ -997,12 +1038,16 @@ def check_if_classes_are_properly_named(
             _, class_name = class_full_name.rsplit(".", maxsplit=1)
             error_encountered = False
             if not is_camel_case_with_acronyms(class_name):
-                print(f"The class {class_full_name} is wrongly named. The "
-                      f"class name should be CamelCaseWithACRONYMS !")
+                print(
+                    f"The class {class_full_name} is wrongly named. The "
+                    f"class name should be CamelCaseWithACRONYMS !"
+                )
                 error_encountered = True
             if not class_name.endswith(class_suffix):
-                print(f"The class {class_full_name} is wrongly named. It is one of the {entity_type.value}"
-                      f" so it should end with {class_suffix}")
+                print(
+                    f"The class {class_full_name} is wrongly named. It is one of the {entity_type.value}"
+                    f" so it should end with {class_suffix}"
+                )
                 error_encountered = True
             total_class_number += 1
             if error_encountered:
@@ -1010,8 +1055,9 @@ def check_if_classes_are_properly_named(
     return total_class_number, badly_named_class_number
 
 
-def update_release_notes_for_package(provider_package_id: str, current_release_version: str,
-                                     imported_classes: List[str]) -> Tuple[int, int]:
+def update_release_notes_for_package(
+    provider_package_id: str, current_release_version: str, imported_classes: List[str]
+) -> Tuple[int, int]:
     """
     Updates release notes (README.md) for the package. returns Tuple of total number of entities
     and badly named entities.
@@ -1027,22 +1073,26 @@ def update_release_notes_for_package(provider_package_id: str, current_release_v
     entity_summaries = get_package_class_summary(full_package_name, imported_classes)
     past_releases = get_all_releases(provider_package_path=provider_package_path)
     current_release_version, previous_release = check_if_release_version_ok(
-        past_releases, current_release_version)
-    cross_providers_dependencies = \
-        get_cross_provider_dependent_packages(provider_package_id=provider_package_id)
-    previous_release = get_previous_release_info(previous_release_version=previous_release,
-                                                 past_releases=past_releases,
-                                                 current_release_version=current_release_version)
+        past_releases, current_release_version
+    )
+    cross_providers_dependencies = get_cross_provider_dependent_packages(
+        provider_package_id=provider_package_id
+    )
+    previous_release = get_previous_release_info(
+        previous_release_version=previous_release,
+        past_releases=past_releases,
+        current_release_version=current_release_version,
+    )
     git_cmd = get_git_command(previous_release)
     changes = subprocess.check_output(git_cmd, cwd=provider_package_path, universal_newlines=True)
     changes_table = convert_git_changes_to_table(
-        changes,
-        base_url="https://github.com/apache/airflow/commit/")
+        changes, base_url="https://github.com/apache/airflow/commit/"
+    )
     pip_requirements_table = convert_pip_requirements_to_table(PROVIDERS_REQUIREMENTS[provider_package_id])
-    cross_providers_dependencies_table = \
-        convert_cross_package_dependencies_to_table(
-            cross_providers_dependencies,
-            base_url="https://github.com/apache/airflow/tree/master/airflow/providers/")
+    cross_providers_dependencies_table = convert_cross_package_dependencies_to_table(
+        cross_providers_dependencies,
+        base_url="https://github.com/apache/airflow/tree/master/airflow/providers/",
+    )
     context: Dict[str, Any] = {
         "ENTITY_TYPES": [entity_type for entity_type in EntityType],
         "PROVIDER_PACKAGE_ID": provider_package_id,
@@ -1055,12 +1105,14 @@ def update_release_notes_for_package(provider_package_id: str, current_release_v
         "CROSS_PROVIDERS_DEPENDENCIES": cross_providers_dependencies,
         "CROSS_PROVIDERS_DEPENDENCIES_TABLE": cross_providers_dependencies_table,
         "PIP_REQUIREMENTS": PROVIDERS_REQUIREMENTS[provider_package_id],
-        "PIP_REQUIREMENTS_TABLE": pip_requirements_table
+        "PIP_REQUIREMENTS_TABLE": pip_requirements_table,
     }
     current_changes = render_template(template_name="PROVIDERS_CHANGES", context=context)
-    store_current_changes(provider_package_path=provider_package_path,
-                          current_release_version=current_release_version,
-                          current_changes=current_changes)
+    store_current_changes(
+        provider_package_path=provider_package_path,
+        current_release_version=current_release_version,
+        current_changes=current_changes,
+    )
     context['ENTITIES'] = entity_summaries
     context['ENTITY_NAMES'] = ENTITY_NAMES
     all_releases = get_all_releases(provider_package_path)
@@ -1106,7 +1158,8 @@ def update_release_notes_for_packages(provider_ids: List[str], release_version: 
     :return:
     """
     imported_classes = import_all_provider_classes(
-        source_path=SOURCE_DIR_PATH, provider_ids=provider_ids, print_imports=False)
+        source_path=SOURCE_DIR_PATH, provider_ids=provider_ids, print_imports=False
+    )
     make_sure_remote_apache_exists_and_fetch()
     if len(provider_ids) == 0:
         provider_ids = get_all_backportable_providers()
@@ -1170,16 +1223,22 @@ if __name__ == "__main__":
     possible_first_params.append(LIST_BACKPORTABLE_PACKAGES)
     possible_first_params.append(UPDATE_PACKAGE_RELEASE_NOTES)
     if len(sys.argv) == 1:
-        print("""
+        print(
+            """
 ERROR! Missing first param"
-""", file=sys.stderr)
+""",
+            file=sys.stderr,
+        )
         usage()
         exit(1)
     if sys.argv[1] == "--version-suffix":
         if len(sys.argv) < 3:
-            print("""
+            print(
+                """
 ERROR! --version-suffix needs parameter!
-""", file=sys.stderr)
+""",
+                file=sys.stderr,
+            )
             usage()
             exit(1)
         suffix = sys.argv[2]
@@ -1189,9 +1248,12 @@ ERROR! --version-suffix needs parameter!
         exit(0)
 
     if sys.argv[1] not in possible_first_params:
-        print(f"""
+        print(
+            f"""
 ERROR! Wrong first param: {sys.argv[1]}
-""", file=sys.stderr)
+""",
+            file=sys.stderr,
+        )
         usage()
         print()
         exit(1)
@@ -1225,12 +1287,16 @@ ERROR! Wrong first param: {sys.argv[1]}
 
     provider_package = sys.argv[1]
     if provider_package not in get_provider_packages():
-        raise Exception(f"The package {provider_package} is not a backport package. "
-                        f"Use one of {get_provider_packages()}")
+        raise Exception(
+            f"The package {provider_package} is not a backport package. "
+            f"Use one of {get_provider_packages()}"
+        )
     del sys.argv[1]
     print(f"Building backport package: {provider_package}")
     dependencies = PROVIDERS_REQUIREMENTS[provider_package]
-    do_setup_package_providers(provider_package_id=provider_package,
-                               package_dependencies=dependencies,
-                               extras=find_package_extras(provider_package),
-                               version_suffix=suffix)
+    do_setup_package_providers(
+        provider_package_id=provider_package,
+        package_dependencies=dependencies,
+        extras=find_package_extras(provider_package),
+        version_suffix=suffix,
+    )

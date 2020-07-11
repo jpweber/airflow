@@ -24,6 +24,7 @@ class DagTISlotsAvailableDep(BaseTIDep):
     """
     Determines whether a DAG maximum number of running tasks has been reached.
     """
+
     NAME = "Task Instance Slots Available"
     IGNOREABLE = True
 
@@ -32,5 +33,5 @@ class DagTISlotsAvailableDep(BaseTIDep):
         if ti.task.dag.get_concurrency_reached(session):
             yield self._failing_status(
                 reason="The maximum number of running tasks ({0}) for this task's DAG "
-                       "'{1}' has been reached.".format(ti.task.dag.concurrency,
-                                                        ti.dag_id))
+                "'{1}' has been reached.".format(ti.task.dag.concurrency, ti.dag_id)
+            )

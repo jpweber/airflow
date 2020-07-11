@@ -112,38 +112,39 @@ class SparkJDBCHook(SparkSubmitHook):
     """
 
     # pylint: disable=too-many-arguments,too-many-locals
-    def __init__(self,
-                 spark_app_name='airflow-spark-jdbc',
-                 spark_conn_id='spark-default',
-                 spark_conf=None,
-                 spark_py_files=None,
-                 spark_files=None,
-                 spark_jars=None,
-                 num_executors=None,
-                 executor_cores=None,
-                 executor_memory=None,
-                 driver_memory=None,
-                 verbose=False,
-                 principal=None,
-                 keytab=None,
-                 cmd_type='spark_to_jdbc',
-                 jdbc_table=None,
-                 jdbc_conn_id='jdbc-default',
-                 jdbc_driver=None,
-                 metastore_table=None,
-                 jdbc_truncate=False,
-                 save_mode=None,
-                 save_format=None,
-                 batch_size=None,
-                 fetch_size=None,
-                 num_partitions=None,
-                 partition_column=None,
-                 lower_bound=None,
-                 upper_bound=None,
-                 create_table_column_types=None,
-                 *args,
-                 **kwargs
-                 ):
+    def __init__(
+        self,
+        spark_app_name='airflow-spark-jdbc',
+        spark_conn_id='spark-default',
+        spark_conf=None,
+        spark_py_files=None,
+        spark_files=None,
+        spark_jars=None,
+        num_executors=None,
+        executor_cores=None,
+        executor_memory=None,
+        driver_memory=None,
+        verbose=False,
+        principal=None,
+        keytab=None,
+        cmd_type='spark_to_jdbc',
+        jdbc_table=None,
+        jdbc_conn_id='jdbc-default',
+        jdbc_driver=None,
+        metastore_table=None,
+        jdbc_truncate=False,
+        save_mode=None,
+        save_format=None,
+        batch_size=None,
+        fetch_size=None,
+        num_partitions=None,
+        partition_column=None,
+        lower_bound=None,
+        upper_bound=None,
+        create_table_column_types=None,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self._name = spark_app_name
         self._conn_id = spark_conn_id
@@ -176,12 +177,7 @@ class SparkJDBCHook(SparkSubmitHook):
         self._jdbc_connection = self._resolve_jdbc_connection()
 
     def _resolve_jdbc_connection(self):
-        conn_data = {'url': '',
-                     'schema': '',
-                     'conn_prefix': '',
-                     'user': '',
-                     'password': ''
-                     }
+        conn_data = {'url': '', 'schema': '', 'conn_prefix': '', 'user': '', 'password': ''}
         try:
             conn = self.get_connection(self._jdbc_conn_id)
             if conn.port:
@@ -195,8 +191,7 @@ class SparkJDBCHook(SparkSubmitHook):
             conn_data['conn_prefix'] = extra.get('conn_prefix', '')
         except AirflowException:
             self.log.debug(
-                "Could not load jdbc connection string %s, defaulting to %s",
-                self._jdbc_conn_id, ""
+                "Could not load jdbc connection string %s, defaulting to %s", self._jdbc_conn_id, ""
             )
         return conn_data
 
@@ -204,9 +199,10 @@ class SparkJDBCHook(SparkSubmitHook):
         arguments = []
         arguments += ["-cmdType", self._cmd_type]
         if self._jdbc_connection['url']:
-            arguments += ['-url', "{0}{1}/{2}".format(
-                jdbc_conn['conn_prefix'], jdbc_conn['url'], jdbc_conn['schema']
-            )]
+            arguments += [
+                '-url',
+                "{0}{1}/{2}".format(jdbc_conn['conn_prefix'], jdbc_conn['url'], jdbc_conn['schema']),
+            ]
         if self._jdbc_connection['user']:
             arguments += ['-user', self._jdbc_connection['user']]
         if self._jdbc_connection['password']:
@@ -225,12 +221,16 @@ class SparkJDBCHook(SparkSubmitHook):
             arguments += ['-fetchsize', str(self._fetch_size)]
         if self._num_partitions:
             arguments += ['-numPartitions', str(self._num_partitions)]
-        if (self._partition_column and self._lower_bound and
-                self._upper_bound and self._num_partitions):
+        if self._partition_column and self._lower_bound and self._upper_bound and self._num_partitions:
             # these 3 parameters need to be used all together to take effect.
-            arguments += ['-partitionColumn', self._partition_column,
-                          '-lowerBound', self._lower_bound,
-                          '-upperBound', self._upper_bound]
+            arguments += [
+                '-partitionColumn',
+                self._partition_column,
+                '-lowerBound',
+                self._lower_bound,
+                '-upperBound',
+                self._upper_bound,
+            ]
         if self._save_mode:
             arguments += ['-saveMode', self._save_mode]
         if self._save_format:
@@ -243,10 +243,8 @@ class SparkJDBCHook(SparkSubmitHook):
         """
         Submit Spark JDBC job
         """
-        self._application_args = \
-            self._build_jdbc_application_arguments(self._jdbc_connection)
-        self.submit(application=os.path.dirname(os.path.abspath(__file__)) +
-                    "/spark_jdbc_script.py")
+        self._application_args = self._build_jdbc_application_arguments(self._jdbc_connection)
+        self.submit(application=os.path.dirname(os.path.abspath(__file__)) + "/spark_jdbc_script.py")
 
     def get_conn(self):
         pass

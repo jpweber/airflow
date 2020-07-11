@@ -46,6 +46,7 @@ from functools import wraps
 from socket import getfqdn
 
 import kerberos
+
 # noinspection PyProtectedMember
 from flask import Response, _request_ctx_stack as stack, g, make_response, request  # type: ignore
 from requests_kerberos import HTTPKerberosAuth
@@ -60,6 +61,7 @@ CLIENT_AUTH = HTTPKerberosAuth(service='airflow')
 
 class KerberosService:  # pylint: disable=too-few-public-methods
     """Class to keep information about the Kerberos Service initialized """
+
     def __init__(self):
         self.service_name = None
 
@@ -128,6 +130,7 @@ def _gssapi_authenticate(token):
 
 def requires_authentication(function):
     """Decorator for functions that require authentication with Kerberos"""
+
     @wraps(function)
     def decorated(*args, **kwargs):
         header = request.headers.get("Authorization")
@@ -140,11 +143,11 @@ def requires_authentication(function):
                 response = function(*args, **kwargs)
                 response = make_response(response)
                 if ctx.kerberos_token is not None:
-                    response.headers['WWW-Authenticate'] = ' '.join(['negotiate',
-                                                                     ctx.kerberos_token])
+                    response.headers['WWW-Authenticate'] = ' '.join(['negotiate', ctx.kerberos_token])
 
                 return response
             if return_code != kerberos.AUTH_GSS_CONTINUE:
                 return _forbidden()
         return _unauthorized()
+
     return decorated

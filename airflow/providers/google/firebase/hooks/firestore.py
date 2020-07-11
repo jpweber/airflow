@@ -74,8 +74,7 @@ class CloudFirestoreHook(GoogleBaseHook):
             # At the same time, the Non-Authorized Client has no problems.
             non_authorized_conn = build("firestore", self.api_version, cache_discovery=False)
             self._conn = build_from_document(
-                non_authorized_conn._rootDesc,  # pylint: disable=protected-access
-                http=http_authorized
+                non_authorized_conn._rootDesc, http=http_authorized  # pylint: disable=protected-access
             )
         return self._conn
 

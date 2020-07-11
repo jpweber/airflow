@@ -34,15 +34,13 @@ send_email_test = mock.Mock()
 
 
 class TestEmailOperator(unittest.TestCase):
-
     def setUp(self):
         super().setUp()
         self.dag = DAG(
             'test_dag',
-            default_args={
-                'owner': 'airflow',
-                'start_date': DEFAULT_DATE},
-            schedule_interval=INTERVAL)
+            default_args={'owner': 'airflow', 'start_date': DEFAULT_DATE},
+            schedule_interval=INTERVAL,
+        )
         self.addCleanup(self.dag.clear)
 
     def _run_as_operator(self, **kwargs):
@@ -52,7 +50,8 @@ class TestEmailOperator(unittest.TestCase):
             html_content='The quick brown fox jumps over the lazy dog',
             task_id='task',
             dag=self.dag,
-            **kwargs)
+            **kwargs,
+        )
         task.run(start_date=DEFAULT_DATE, end_date=DEFAULT_DATE)
 
     def test_execute(self):

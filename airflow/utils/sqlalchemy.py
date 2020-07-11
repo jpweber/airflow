@@ -55,8 +55,7 @@ class UtcDateTime(TypeDecorator):
     def process_bind_param(self, value, dialect):
         if value is not None:
             if not isinstance(value, datetime.datetime):
-                raise TypeError('expected datetime.datetime, not ' +
-                                repr(value))
+                raise TypeError('expected datetime.datetime, not ' + repr(value))
             elif value.tzinfo is None:
                 raise ValueError('naive datetime is disallowed')
             # For mysql we should store timestamps as naive values
@@ -66,6 +65,7 @@ class UtcDateTime(TypeDecorator):
             # See https://issues.apache.org/jira/browse/AIRFLOW-7001
             if using_mysql:
                 from airflow.utils.timezone import make_naive
+
                 return make_naive(value, timezone=utc)
             return value.astimezone(utc)
         return None
@@ -91,22 +91,33 @@ class Interval(TypeDecorator):
     """
     Base class representing a time interval.
     """
+
     impl = Text
 
     attr_keys = {
         datetime.timedelta: ('days', 'seconds', 'microseconds'),
         relativedelta.relativedelta: (
-            'years', 'months', 'days', 'leapdays', 'hours', 'minutes', 'seconds', 'microseconds',
-            'year', 'month', 'day', 'hour', 'minute', 'second', 'microsecond',
+            'years',
+            'months',
+            'days',
+            'leapdays',
+            'hours',
+            'minutes',
+            'seconds',
+            'microseconds',
+            'year',
+            'month',
+            'day',
+            'hour',
+            'minute',
+            'second',
+            'microsecond',
         ),
     }
 
     def process_bind_param(self, value, dialect):
         if isinstance(value, tuple(self.attr_keys)):
-            attrs = {
-                key: getattr(value, key)
-                for key in self.attr_keys[type(value)]
-            }
+            attrs = {key: getattr(value, key) for key in self.attr_keys[type(value)]}
             return json.dumps({'type': type(value).__name__, 'attrs': attrs})
         return json.dumps(value)
 

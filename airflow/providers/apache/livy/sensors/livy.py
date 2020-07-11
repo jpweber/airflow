@@ -37,13 +37,7 @@ class LivySensor(BaseSensorOperator):
     template_fields = ('batch_id',)
 
     @apply_defaults
-    def __init__(
-        self,
-        livy_conn_id='livy_default',
-        batch_id=None,
-        *vargs,
-        **kwargs
-    ):
+    def __init__(self, livy_conn_id='livy_default', batch_id=None, *vargs, **kwargs):
         super().__init__(*vargs, **kwargs)
         self._livy_conn_id = livy_conn_id
         self._batch_id = batch_id

@@ -22,11 +22,16 @@ Example Airflow DAG that shows how to use DataFusion.
 from airflow import models
 from airflow.operators.bash import BashOperator
 from airflow.providers.google.cloud.operators.datafusion import (
-    CloudDataFusionCreateInstanceOperator, CloudDataFusionCreatePipelineOperator,
-    CloudDataFusionDeleteInstanceOperator, CloudDataFusionDeletePipelineOperator,
-    CloudDataFusionGetInstanceOperator, CloudDataFusionListPipelinesOperator,
-    CloudDataFusionRestartInstanceOperator, CloudDataFusionStartPipelineOperator,
-    CloudDataFusionStopPipelineOperator, CloudDataFusionUpdateInstanceOperator,
+    CloudDataFusionCreateInstanceOperator,
+    CloudDataFusionCreatePipelineOperator,
+    CloudDataFusionDeleteInstanceOperator,
+    CloudDataFusionDeletePipelineOperator,
+    CloudDataFusionGetInstanceOperator,
+    CloudDataFusionListPipelinesOperator,
+    CloudDataFusionRestartInstanceOperator,
+    CloudDataFusionStartPipelineOperator,
+    CloudDataFusionStopPipelineOperator,
+    CloudDataFusionUpdateInstanceOperator,
 )
 from airflow.utils import dates
 
@@ -58,11 +63,7 @@ PIPELINE = {
                     "name": "GCSFile",
                     "type": "batchsource",
                     "label": "GCS",
-                    "artifact": {
-                        "name": "google-cloud",
-                        "version": "0.14.2",
-                        "scope": "SYSTEM",
-                    },
+                    "artifact": {"name": "google-cloud", "version": "0.14.2", "scope": "SYSTEM",},
                     "properties": {
                         "project": "auto-detect",
                         "format": "text",
@@ -72,7 +73,7 @@ PIPELINE = {
                         "recursive": "false",
                         "encrypted": "false",
                         "schema": '{"type":"record","name":"etlSchemaBody","fields":'
-                                  '[{"name":"offset","type":"long"},{"name":"body","type":"string"}]}',
+                        '[{"name":"offset","type":"long"},{"name":"body","type":"string"}]}',
                         "path": BUCKET1,
                         "referenceName": "foo_bucket",
                     },
@@ -81,7 +82,7 @@ PIPELINE = {
                     {
                         "name": "etlSchemaBody",
                         "schema": '{"type":"record","name":"etlSchemaBody","fields":'
-                                  '[{"name":"offset","type":"long"},{"name":"body","type":"string"}]}',
+                        '[{"name":"offset","type":"long"},{"name":"body","type":"string"}]}',
                     }
                 ],
             },
@@ -91,11 +92,7 @@ PIPELINE = {
                     "name": "GCS",
                     "type": "batchsink",
                     "label": "GCS2",
-                    "artifact": {
-                        "name": "google-cloud",
-                        "version": "0.14.2",
-                        "scope": "SYSTEM",
-                    },
+                    "artifact": {"name": "google-cloud", "version": "0.14.2", "scope": "SYSTEM",},
                     "properties": {
                         "project": "auto-detect",
                         "suffix": "yyyy-MM-dd-HH-mm",
@@ -103,7 +100,7 @@ PIPELINE = {
                         "serviceFilePath": "auto-detect",
                         "location": "us",
                         "schema": '{"type":"record","name":"etlSchemaBody","fields":'
-                                  '[{"name":"offset","type":"long"},{"name":"body","type":"string"}]}',
+                        '[{"name":"offset","type":"long"},{"name":"body","type":"string"}]}',
                         "referenceName": "bar",
                         "path": BUCKET2,
                     },
@@ -112,14 +109,14 @@ PIPELINE = {
                     {
                         "name": "etlSchemaBody",
                         "schema": '{"type":"record","name":"etlSchemaBody","fields":'
-                                  '[{"name":"offset","type":"long"},{"name":"body","type":"string"}]}',
+                        '[{"name":"offset","type":"long"},{"name":"body","type":"string"}]}',
                     }
                 ],
                 "inputSchema": [
                     {
                         "name": "GCS",
                         "schema": '{"type":"record","name":"etlSchemaBody","fields":'
-                                  '[{"name":"offset","type":"long"},{"name":"body","type":"string"}]}',
+                        '[{"name":"offset","type":"long"},{"name":"body","type":"string"}]}',
                     }
                 ],
             },
@@ -135,16 +132,11 @@ PIPELINE = {
 default_args = {"start_date": dates.days_ago(1)}
 
 with models.DAG(
-    "example_data_fusion",
-    default_args=default_args,
-    schedule_interval=None,  # Override to match your needs
+    "example_data_fusion", default_args=default_args, schedule_interval=None,  # Override to match your needs
 ) as dag:
     # [START howto_cloud_data_fusion_create_instance_operator]
     create_instance = CloudDataFusionCreateInstanceOperator(
-        location=LOCATION,
-        instance_name=INSTANCE_NAME,
-        instance=INSTANCE,
-        task_id="create_instance",
+        location=LOCATION, instance_name=INSTANCE_NAME, instance=INSTANCE, task_id="create_instance",
     )
     # [END howto_cloud_data_fusion_create_instance_operator]
 
@@ -188,19 +180,13 @@ with models.DAG(
 
     # [START howto_cloud_data_fusion_start_pipeline]
     start_pipeline = CloudDataFusionStartPipelineOperator(
-        location=LOCATION,
-        pipeline_name=PIPELINE_NAME,
-        instance_name=INSTANCE_NAME,
-        task_id="start_pipeline",
+        location=LOCATION, pipeline_name=PIPELINE_NAME, instance_name=INSTANCE_NAME, task_id="start_pipeline",
     )
     # [END howto_cloud_data_fusion_start_pipeline]
 
     # [START howto_cloud_data_fusion_stop_pipeline]
     stop_pipeline = CloudDataFusionStopPipelineOperator(
-        location=LOCATION,
-        pipeline_name=PIPELINE_NAME,
-        instance_name=INSTANCE_NAME,
-        task_id="stop_pipeline",
+        location=LOCATION, pipeline_name=PIPELINE_NAME, instance_name=INSTANCE_NAME, task_id="stop_pipeline",
     )
     # [END howto_cloud_data_fusion_stop_pipeline]
 

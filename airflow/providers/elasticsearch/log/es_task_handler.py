@@ -55,24 +55,29 @@ class ElasticsearchTaskHandler(FileTaskHandler, LoggingMixin):
     MAX_LINE_PER_PAGE = 1000
     LOG_NAME = 'Elasticsearch'
 
-    def __init__(self, base_log_folder, filename_template,  # pylint: disable=too-many-arguments
-                 log_id_template, end_of_log_mark,
-                 write_stdout, json_format, json_fields,
-                 host='localhost:9200',
-                 frontend='localhost:5601',
-                 es_kwargs=conf.getsection("elasticsearch_configs")):
+    def __init__(
+        self,
+        base_log_folder,
+        filename_template,  # pylint: disable=too-many-arguments
+        log_id_template,
+        end_of_log_mark,
+        write_stdout,
+        json_format,
+        json_fields,
+        host='localhost:9200',
+        frontend='localhost:5601',
+        es_kwargs=conf.getsection("elasticsearch_configs"),
+    ):
         """
         :param base_log_folder: base folder to store logs locally
         :param log_id_template: log id template
         :param host: Elasticsearch host name
         """
         es_kwargs = es_kwargs or {}
-        super().__init__(
-            base_log_folder, filename_template)
+        super().__init__(base_log_folder, filename_template)
         self.closed = False
 
-        self.log_id_template, self.log_id_jinja_template = \
-            parse_template_string(log_id_template)
+        self.log_id_template, self.log_id_jinja_template = parse_template_string(log_id_template)
 
         self.client = elasticsearch.Elasticsearch([host], **es_kwargs)
 
@@ -95,10 +100,9 @@ class ElasticsearchTaskHandler(FileTaskHandler, LoggingMixin):
             execution_date = self._clean_execution_date(ti.execution_date)
         else:
             execution_date = ti.execution_date.isoformat()
-        return self.log_id_template.format(dag_id=ti.dag_id,
-                                           task_id=ti.task_id,
-                                           execution_date=execution_date,
-                                           try_number=try_number)
+        return self.log_id_template.format(
+            dag_id=ti.dag_id, task_id=ti.task_id, execution_date=execution_date, try_number=try_number
+        )
 
     @staticmethod
     def _clean_execution_date(execution_date):
@@ -140,8 +144,7 @@ class ElasticsearchTaskHandler(FileTaskHandler, LoggingMixin):
 
         # end_of_log_mark may contain characters like '\n' which is needed to
         # have the log uploaded but will not be stored in elasticsearch.
-        metadata['end_of_log'] = False if not logs \
-            else logs[-1].message == self.end_of_log_mark.strip()
+        metadata['end_of_log'] = False if not logs else logs[-1].message == self.end_of_log_mark.strip()
 
         cur_ts = pendulum.now()
         # Assume end of log after not receiving new log for 5 min,
@@ -149,8 +152,11 @@ class ElasticsearchTaskHandler(FileTaskHandler, LoggingMixin):
         # delay before Elasticsearch makes the log available.
         if 'last_log_timestamp' in metadata:
             last_log_ts = timezone.parse(metadata['last_log_timestamp'])
-            if cur_ts.diff(last_log_ts).in_minutes() >= 5 or 'max_offset' in metadata \
-                    and offset >= metadata['max_offset']:
+            if (
+                cur_ts.diff(last_log_ts).in_minutes() >= 5
+                or 'max_offset' in metadata
+                and offset >= metadata['max_offset']
+            ):
                 metadata['end_of_log'] = True
 
         if offset != next_offset or 'last_log_timestamp' not in metadata:
@@ -177,9 +183,7 @@ class ElasticsearchTaskHandler(FileTaskHandler, LoggingMixin):
         """
 
         # Offset is the unique key for sorting logs given log_id.
-        search = Search(using=self.client) \
-            .query('match_phrase', log_id=log_id) \
-            .sort('offset')
+        search = Search(using=self.client).query('match_phrase', log_id=log_id).sort('offset')
 
         search = search.filter('range', offset={'gt': int(offset)})
         max_log_line = search.count()
@@ -196,8 +200,7 @@ class ElasticsearchTaskHandler(FileTaskHandler, LoggingMixin):
         if max_log_line != 0:
             try:
 
-                logs = search[self.MAX_LINE_PER_PAGE * self.PAGE:self.MAX_LINE_PER_PAGE] \
-                    .execute()
+                logs = search[self.MAX_LINE_PER_PAGE * self.PAGE : self.MAX_LINE_PER_PAGE].execute()
             except Exception as e:  # pylint: disable=broad-except
                 self.log.exception('Could not read log with log_id: %s, error: %s', log_id, str(e))
 
@@ -218,8 +221,9 @@ class ElasticsearchTaskHandler(FileTaskHandler, LoggingMixin):
                     'dag_id': str(ti.dag_id),
                     'task_id': str(ti.task_id),
                     'execution_date': self._clean_execution_date(ti.execution_date),
-                    'try_number': str(ti.try_number)
-                })
+                    'try_number': str(ti.try_number),
+                },
+            )
 
         if self.write_stdout:
             if self.context_set:
@@ -288,6 +292,7 @@ class ElasticsearchTaskHandler(FileTaskHandler, LoggingMixin):
             dag_id=task_instance.dag_id,
             task_id=task_instance.task_id,
             execution_date=task_instance.execution_date,
-            try_number=try_number)
+            try_number=try_number,
+        )
         url = 'https://' + self.frontend.format(log_id=quote(log_id))
         return url

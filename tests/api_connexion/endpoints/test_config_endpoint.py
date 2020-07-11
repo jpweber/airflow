@@ -22,20 +22,12 @@ from mock import patch
 from airflow.www import app
 
 MOCK_CONF = {
-    'core': {
-        'parallelism': '1024',
-    },
-    'smtp': {
-        'smtp_host': 'localhost',
-        'smtp_mail_from': 'airflow@example.com',
-    },
+    'core': {'parallelism': '1024',},
+    'smtp': {'smtp_host': 'localhost', 'smtp_mail_from': 'airflow@example.com',},
 }
 
 
-@patch(
-    "airflow.api_connexion.endpoints.config_endpoint.conf.as_dict",
-    return_value=MOCK_CONF
-)
+@patch("airflow.api_connexion.endpoints.config_endpoint.conf.as_dict", return_value=MOCK_CONF)
 class TestGetConfig:
     @classmethod
     def setup_class(cls) -> None:
@@ -48,14 +40,16 @@ class TestGetConfig:
     def test_should_response_200_text_plain(self, mock_as_dict):
         response = self.client.get("/api/v1/config", headers={'Accept': 'text/plain'})
         assert response.status_code == 200
-        expected = textwrap.dedent("""\
+        expected = textwrap.dedent(
+            """\
         [core]
         parallelism = 1024
 
         [smtp]
         smtp_host = localhost
         smtp_mail_from = airflow@example.com
-        """)
+        """
+        )
         assert expected == response.data.decode()
 
     def test_should_response_200_application_json(self, mock_as_dict):
@@ -63,18 +57,13 @@ class TestGetConfig:
         assert response.status_code == 200
         expected = {
             'sections': [
-                {
-                    'name': 'core',
-                    'options': [
-                        {'key': 'parallelism', 'value': '1024'},
-                    ]
-                },
+                {'name': 'core', 'options': [{'key': 'parallelism', 'value': '1024'},]},
                 {
                     'name': 'smtp',
                     'options': [
                         {'key': 'smtp_host', 'value': 'localhost'},
                         {'key': 'smtp_mail_from', 'value': 'airflow@example.com'},
-                    ]
+                    ],
                 },
             ]
         }

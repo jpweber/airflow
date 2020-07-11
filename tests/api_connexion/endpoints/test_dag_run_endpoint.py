@@ -84,18 +84,14 @@ class TestDeleteDagRun(TestDagRunEndpoint):
     def test_should_response_204(self, session):
         session.add_all(self._create_test_dag_run())
         session.commit()
-        response = self.client.delete(
-            "api/v1/dags/TEST_DAG_ID/dagRuns/TEST_DAG_RUN_ID_1"
-        )
+        response = self.client.delete("api/v1/dags/TEST_DAG_ID/dagRuns/TEST_DAG_RUN_ID_1")
         self.assertEqual(response.status_code, 204)
         # Check if the Dag Run is deleted from the database
         response = self.client.get("api/v1/dags/TEST_DAG_ID/dagRuns/TEST_DAG_RUN_ID_1")
         self.assertEqual(response.status_code, 404)
 
     def test_should_response_404(self):
-        response = self.client.delete(
-            "api/v1/dags/INVALID_DAG_RUN/dagRuns/INVALID_DAG_RUN"
-        )
+        response = self.client.delete("api/v1/dags/INVALID_DAG_RUN/dagRuns/INVALID_DAG_RUN")
         self.assertEqual(response.status_code, 404)
         self.assertEqual(
             response.json,
@@ -143,12 +139,7 @@ class TestGetDagRun(TestDagRunEndpoint):
         response = self.client.get("api/v1/dags/invalid-id/dagRuns/invalid-id")
         assert response.status_code == 404
         self.assertEqual(
-            {
-                "detail": None,
-                "status": 404,
-                "title": "DAGRun not found",
-                "type": "about:blank",
-            },
+            {"detail": None, "status": 404, "title": "DAGRun not found", "type": "about:blank",},
             response.json,
         )
 
@@ -215,10 +206,7 @@ class TestGetDagRunsPagination(TestDagRunEndpoint):
     @parameterized.expand(
         [
             ("api/v1/dags/TEST_DAG_ID/dagRuns?limit=1", ["TEST_DAG_RUN_ID1"]),
-            (
-                "api/v1/dags/TEST_DAG_ID/dagRuns?limit=2",
-                ["TEST_DAG_RUN_ID1", "TEST_DAG_RUN_ID2"],
-            ),
+            ("api/v1/dags/TEST_DAG_ID/dagRuns?limit=2", ["TEST_DAG_RUN_ID1", "TEST_DAG_RUN_ID2"],),
             (
                 "api/v1/dags/TEST_DAG_ID/dagRuns?offset=5",
                 [
@@ -246,10 +234,7 @@ class TestGetDagRunsPagination(TestDagRunEndpoint):
             ),
             ("api/v1/dags/TEST_DAG_ID/dagRuns?limit=1&offset=5", ["TEST_DAG_RUN_ID6"]),
             ("api/v1/dags/TEST_DAG_ID/dagRuns?limit=1&offset=1", ["TEST_DAG_RUN_ID2"]),
-            (
-                "api/v1/dags/TEST_DAG_ID/dagRuns?limit=2&offset=2",
-                ["TEST_DAG_RUN_ID3", "TEST_DAG_RUN_ID4"],
-            ),
+            ("api/v1/dags/TEST_DAG_ID/dagRuns?limit=2&offset=2", ["TEST_DAG_RUN_ID3", "TEST_DAG_RUN_ID4"],),
         ]
     )
     @provide_session
@@ -400,18 +385,14 @@ class TestGetDagRunsEndDateFilters(TestDagRunEndpoint):
     )
     @provide_session
     def test_end_date_gte_lte(self, url, expected_dag_run_ids, session):
-        dagruns = self._create_test_dag_run(
-            "success"
-        )  # state==success, then end date is today
+        dagruns = self._create_test_dag_run("success")  # state==success, then end date is today
         session.add_all(dagruns)
         session.commit()
 
         response = self.client.get(url)
         assert response.status_code == 200
         self.assertEqual(response.json["total_entries"], 2)
-        dag_run_ids = [
-            dag_run["dag_run_id"] for dag_run in response.json["dag_runs"] if dag_run
-        ]
+        dag_run_ids = [dag_run["dag_run_id"] for dag_run in response.json["dag_runs"] if dag_run]
         self.assertEqual(dag_run_ids, expected_dag_run_ids)
 
 
@@ -420,10 +401,7 @@ class TestPostDagRun(TestDagRunEndpoint):
         [
             (
                 "All fields present",
-                {
-                    "dag_run_id": "TEST_DAG_RUN",
-                    "execution_date": "2020-06-11T18:00:00+00:00",
-                },
+                {"dag_run_id": "TEST_DAG_RUN", "execution_date": "2020-06-11T18:00:00+00:00",},
             ),
             ("dag_run_id missing", {"execution_date": "2020-06-11T18:00:00+00:00"}),
             ("dag_run_id and execution_date missing", {}),
@@ -435,9 +413,7 @@ class TestPostDagRun(TestDagRunEndpoint):
         dag_instance = DagModel(dag_id="TEST_DAG_ID")
         session.add(dag_instance)
         session.commit()
-        response = self.client.post(
-            "api/v1/dags/TEST_DAG_ID/dagRuns", json=request_json
-        )
+        response = self.client.post("api/v1/dags/TEST_DAG_ID/dagRuns", json=request_json)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
             {
@@ -474,10 +450,7 @@ class TestPostDagRun(TestDagRunEndpoint):
             (
                 "start_date in request json",
                 "api/v1/dags/TEST_DAG_ID/dagRuns",
-                {
-                    "start_date": "2020-06-11T18:00:00+00:00",
-                    "execution_date": "2020-06-12T18:00:00+00:00",
-                },
+                {"start_date": "2020-06-11T18:00:00+00:00", "execution_date": "2020-06-12T18:00:00+00:00",},
                 {
                     "detail": "Property is read-only - 'start_date'",
                     "status": 400,
@@ -516,10 +489,7 @@ class TestPostDagRun(TestDagRunEndpoint):
         session.commit()
         response = self.client.post(
             "api/v1/dags/TEST_DAG_ID/dagRuns",
-            json={
-                "dag_run_id": "TEST_DAG_RUN_ID_1",
-                "execution_date": self.default_time,
-            },
+            json={"dag_run_id": "TEST_DAG_RUN_ID_1", "execution_date": self.default_time,},
         )
         self.assertEqual(response.status_code, 409, response.data)
         self.assertEqual(

@@ -42,10 +42,7 @@ def _generate_pip_install_cmd(tmp_dir: str, requirements: List[str]) -> Optional
 
 
 def prepare_virtualenv(
-    venv_directory: str,
-    python_bin: str,
-    system_site_packages: bool,
-    requirements: List[str]
+    venv_directory: str, python_bin: str, system_site_packages: bool, requirements: List[str]
 ) -> str:
     """
     Creates a virtual environment and installs the additional python packages

@@ -41,12 +41,14 @@ from airflow.utils.decorators import apply_defaults
 
 BIGQUERY_JOB_DETAILS_LINK_FMT = "https://console.cloud.google.com/bigquery?j={job_id}"
 
-_DEPRECATION_MSG = "The bigquery_conn_id parameter has been deprecated. " \
-                   "You should pass the gcp_conn_id parameter."
+_DEPRECATION_MSG = (
+    "The bigquery_conn_id parameter has been deprecated. " "You should pass the gcp_conn_id parameter."
+)
 
 
 class BigQueryUIColors(enum.Enum):
     """Hex colors for BigQuery operators"""
+
     CHECK = "#C0D7FF"
     QUERY = "#A1BBFF"
     TABLE = "#81A0FF"
@@ -57,6 +59,7 @@ class BigQueryConsoleLink(BaseOperatorLink):
     """
     Helper class for constructing BigQuery link.
     """
+
     name = 'BigQuery Console'
 
     def get_link(self, operator, dttm):
@@ -135,7 +138,10 @@ class BigQueryCheckOperator(CheckOperator):
     :type location: str
     """
 
-    template_fields = ('sql', 'gcp_conn_id',)
+    template_fields = (
+        'sql',
+        'gcp_conn_id',
+    )
     template_ext = ('.sql',)
     ui_color = BigQueryUIColors.CHECK.value
 
@@ -162,9 +168,7 @@ class BigQueryCheckOperator(CheckOperator):
 
     def get_db_hook(self) -> BigQueryHook:
         return BigQueryHook(
-            gcp_conn_id=self.gcp_conn_id,
-            use_legacy_sql=self.use_legacy_sql,
-            location=self.location
+            gcp_conn_id=self.gcp_conn_id, use_legacy_sql=self.use_legacy_sql, location=self.location
         )
 
 
@@ -191,7 +195,11 @@ class BigQueryValueCheckOperator(ValueCheckOperator):
     :type location: str
     """
 
-    template_fields = ('sql', 'gcp_conn_id', 'pass_value',)
+    template_fields = (
+        'sql',
+        'gcp_conn_id',
+        'pass_value',
+    )
     template_ext = ('.sql',)
     ui_color = BigQueryUIColors.CHECK.value
 
@@ -208,12 +216,7 @@ class BigQueryValueCheckOperator(ValueCheckOperator):
         *args,
         **kwargs,
     ) -> None:
-        super().__init__(
-            sql=sql,
-            pass_value=pass_value,
-            tolerance=tolerance,
-            *args, **kwargs
-        )
+        super().__init__(sql=sql, pass_value=pass_value, tolerance=tolerance, *args, **kwargs)
 
         if bigquery_conn_id:
             warnings.warn(_DEPRECATION_MSG, DeprecationWarning, stacklevel=3)
@@ -225,9 +228,7 @@ class BigQueryValueCheckOperator(ValueCheckOperator):
 
     def get_db_hook(self) -> BigQueryHook:
         return BigQueryHook(
-            gcp_conn_id=self.gcp_conn_id,
-            use_legacy_sql=self.use_legacy_sql,
-            location=self.location
+            gcp_conn_id=self.gcp_conn_id, use_legacy_sql=self.use_legacy_sql, location=self.location
         )
 
 
@@ -289,7 +290,8 @@ class BigQueryIntervalCheckOperator(IntervalCheckOperator):
             metrics_thresholds=metrics_thresholds,
             date_filter_column=date_filter_column,
             days_back=days_back,
-            *args, **kwargs
+            *args,
+            **kwargs,
         )
 
         if bigquery_conn_id:
@@ -302,9 +304,7 @@ class BigQueryIntervalCheckOperator(IntervalCheckOperator):
 
     def get_db_hook(self) -> BigQueryHook:
         return BigQueryHook(
-            gcp_conn_id=self.gcp_conn_id,
-            use_legacy_sql=self.use_legacy_sql,
-            location=self.location,
+            gcp_conn_id=self.gcp_conn_id, use_legacy_sql=self.use_legacy_sql, location=self.location,
         )
 
 
@@ -362,6 +362,7 @@ class BigQueryGetDataOperator(BaseOperator):
     :param location: The location used for the operation.
     :type location: str
     """
+
     template_fields = ('dataset_id', 'table_id', 'max_results', 'selected_fields')
     ui_color = BigQueryUIColors.QUERY.value
 
@@ -377,14 +378,17 @@ class BigQueryGetDataOperator(BaseOperator):
         delegate_to: Optional[str] = None,
         location: Optional[str] = None,
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
 
         if bigquery_conn_id:
             warnings.warn(
                 "The bigquery_conn_id parameter has been deprecated. You should pass "
-                "the gcp_conn_id parameter.", DeprecationWarning, stacklevel=3)
+                "the gcp_conn_id parameter.",
+                DeprecationWarning,
+                stacklevel=3,
+            )
             gcp_conn_id = bigquery_conn_id
 
         self.dataset_id = dataset_id
@@ -396,20 +400,18 @@ class BigQueryGetDataOperator(BaseOperator):
         self.location = location
 
     def execute(self, context):
-        self.log.info('Fetching Data from %s.%s max results: %s',
-                      self.dataset_id, self.table_id, self.max_results)
-
-        hook = BigQueryHook(
-            bigquery_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to
+        self.log.info(
+            'Fetching Data from %s.%s max results: %s', self.dataset_id, self.table_id, self.max_results
         )
+
+        hook = BigQueryHook(bigquery_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
 
         rows = hook.list_rows(
             dataset_id=self.dataset_id,
             table_id=self.table_id,
             max_results=self.max_results,
             selected_fields=self.selected_fields,
-            location=self.location
+            location=self.location,
         )
 
         self.log.info('Total extracted rows: %s', len(rows))
@@ -513,7 +515,7 @@ class BigQueryExecuteQueryOperator(BaseOperator):
     """
 
     template_fields = ('sql', 'destination_dataset_table', 'labels', 'query_params')
-    template_ext = ('.sql', )
+    template_ext = ('.sql',)
     ui_color = BigQueryUIColors.QUERY.value
 
     @property
@@ -522,51 +524,50 @@ class BigQueryExecuteQueryOperator(BaseOperator):
         Return operator extra links
         """
         if isinstance(self.sql, str):
-            return (
-                BigQueryConsoleLink(),
-            )
-        return (
-            BigQueryConsoleIndexableLink(i) for i, _ in enumerate(self.sql)
-        )
+            return (BigQueryConsoleLink(),)
+        return (BigQueryConsoleIndexableLink(i) for i, _ in enumerate(self.sql))
 
     # pylint: disable=too-many-arguments, too-many-locals
     @apply_defaults
-    def __init__(self,
-                 sql: Union[str, Iterable],
-                 destination_dataset_table: Optional[str] = None,
-                 write_disposition: Optional[str] = 'WRITE_EMPTY',
-                 allow_large_results: Optional[bool] = False,
-                 flatten_results: Optional[bool] = None,
-                 gcp_conn_id: Optional[str] = 'google_cloud_default',
-                 bigquery_conn_id: Optional[str] = None,
-                 delegate_to: Optional[str] = None,
-                 udf_config: Optional[list] = None,
-                 use_legacy_sql: Optional[bool] = True,
-                 maximum_billing_tier: Optional[int] = None,
-                 maximum_bytes_billed: Optional[float] = None,
-                 create_disposition: Optional[str] = 'CREATE_IF_NEEDED',
-                 schema_update_options: Optional[Union[list, tuple, set]] = None,
-                 query_params: Optional[list] = None,
-                 labels: Optional[dict] = None,
-                 priority: Optional[str] = 'INTERACTIVE',
-                 time_partitioning: Optional[dict] = None,
-                 api_resource_configs: Optional[dict] = None,
-                 cluster_fields: Optional[List[str]] = None,
-                 location: Optional[str] = None,
-                 encryption_configuration: Optional[dict] = None,
-                 *args,
-                 **kwargs) -> None:
+    def __init__(
+        self,
+        sql: Union[str, Iterable],
+        destination_dataset_table: Optional[str] = None,
+        write_disposition: Optional[str] = 'WRITE_EMPTY',
+        allow_large_results: Optional[bool] = False,
+        flatten_results: Optional[bool] = None,
+        gcp_conn_id: Optional[str] = 'google_cloud_default',
+        bigquery_conn_id: Optional[str] = None,
+        delegate_to: Optional[str] = None,
+        udf_config: Optional[list] = None,
+        use_legacy_sql: Optional[bool] = True,
+        maximum_billing_tier: Optional[int] = None,
+        maximum_bytes_billed: Optional[float] = None,
+        create_disposition: Optional[str] = 'CREATE_IF_NEEDED',
+        schema_update_options: Optional[Union[list, tuple, set]] = None,
+        query_params: Optional[list] = None,
+        labels: Optional[dict] = None,
+        priority: Optional[str] = 'INTERACTIVE',
+        time_partitioning: Optional[dict] = None,
+        api_resource_configs: Optional[dict] = None,
+        cluster_fields: Optional[List[str]] = None,
+        location: Optional[str] = None,
+        encryption_configuration: Optional[dict] = None,
+        *args,
+        **kwargs,
+    ) -> None:
         super().__init__(*args, **kwargs)
 
         if bigquery_conn_id:
             warnings.warn(
                 "The bigquery_conn_id parameter has been deprecated. You should pass "
-                "the gcp_conn_id parameter.", DeprecationWarning)
+                "the gcp_conn_id parameter.",
+                DeprecationWarning,
+            )
             gcp_conn_id = bigquery_conn_id
 
         warnings.warn(
-            "This operator is deprecated. Please use `BigQueryInsertJobOperator`.",
-            DeprecationWarning,
+            "This operator is deprecated. Please use `BigQueryInsertJobOperator`.", DeprecationWarning,
         )
 
         self.sql = sql
@@ -619,7 +620,7 @@ class BigQueryExecuteQueryOperator(BaseOperator):
                 time_partitioning=self.time_partitioning,
                 api_resource_configs=self.api_resource_configs,
                 cluster_fields=self.cluster_fields,
-                encryption_configuration=self.encryption_configuration
+                encryption_configuration=self.encryption_configuration,
             )
         elif isinstance(self.sql, Iterable):
             job_id = [
@@ -640,12 +641,14 @@ class BigQueryExecuteQueryOperator(BaseOperator):
                     time_partitioning=self.time_partitioning,
                     api_resource_configs=self.api_resource_configs,
                     cluster_fields=self.cluster_fields,
-                    encryption_configuration=self.encryption_configuration
+                    encryption_configuration=self.encryption_configuration,
                 )
-                for s in self.sql]
+                for s in self.sql
+            ]
         else:
             raise AirflowException(
-                "argument 'sql' of type {} is neither a string nor an iterable".format(type(str)))
+                "argument 'sql' of type {} is neither a string nor an iterable".format(type(str))
+            )
         context['task_instance'].xcom_push(key='job_id', value=job_id)
 
     def on_kill(self):
@@ -774,14 +777,8 @@ class BigQueryCreateEmptyTableOperator(BaseOperator):
                 https://cloud.google.com/bigquery/docs/reference/rest/v2/tables#clustering.fields
     :type cluster_fields: list
     """
-    template_fields = (
-        'dataset_id',
-        'table_id',
-        'project_id',
-        'gcs_schema_object',
-        'labels',
-        'view'
-    )
+
+    template_fields = ('dataset_id', 'table_id', 'project_id', 'gcs_schema_object', 'labels', 'view')
 
     ui_color = BigQueryUIColors.TABLE.value
 
@@ -804,7 +801,8 @@ class BigQueryCreateEmptyTableOperator(BaseOperator):
         encryption_configuration: Optional[Dict] = None,
         location: Optional[str] = None,
         cluster_fields: Optional[List[str]] = None,
-        *args, **kwargs
+        *args,
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
 
@@ -826,19 +824,15 @@ class BigQueryCreateEmptyTableOperator(BaseOperator):
 
     def execute(self, context):
         bq_hook = BigQueryHook(
-            gcp_conn_id=self.bigquery_conn_id,
-            delegate_to=self.delegate_to,
-            location=self.location
+            gcp_conn_id=self.bigquery_conn_id, delegate_to=self.delegate_to, location=self.location
         )
 
         if not self.schema_fields and self.gcs_schema_object:
             gcs_bucket, gcs_object = _parse_gcs_url(self.gcs_schema_object)
             gcs_hook = GCSHook(
-                google_cloud_storage_conn_id=self.google_cloud_storage_conn_id,
-                delegate_to=self.delegate_to)
-            schema_fields = json.loads(gcs_hook.download(
-                gcs_bucket,
-                gcs_object).decode("utf-8"))
+                google_cloud_storage_conn_id=self.google_cloud_storage_conn_id, delegate_to=self.delegate_to
+            )
+            schema_fields = json.loads(gcs_hook.download(gcs_bucket, gcs_object).decode("utf-8"))
         else:
             schema_fields = self.schema_fields
 
@@ -857,8 +851,9 @@ class BigQueryCreateEmptyTableOperator(BaseOperator):
                 table_resource=self.table_resource,
                 exists_ok=False,
             )
-            self.log.info('Table %s.%s.%s created successfully',
-                          table.project, table.dataset_id, table.table_id)
+            self.log.info(
+                'Table %s.%s.%s created successfully', table.project, table.dataset_id, table.table_id
+            )
         except Conflict:
             self.log.info('Table %s.%s already exists.', self.dataset_id, self.table_id)
 
@@ -954,6 +949,7 @@ class BigQueryCreateExternalTableOperator(BaseOperator):
     :param location: The location used for the operation.
     :type location: str
     """
+
     template_fields = (
         'bucket',
         'source_objects',
@@ -989,7 +985,8 @@ class BigQueryCreateExternalTableOperator(BaseOperator):
         labels: Optional[Dict] = None,
         encryption_configuration: Optional[Dict] = None,
         location: Optional[str] = None,
-        *args, **kwargs
+        *args,
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
 
@@ -999,28 +996,31 @@ class BigQueryCreateExternalTableOperator(BaseOperator):
         self.schema_object = schema_object
 
         # BQ config
-        kwargs_passed = any([
-            destination_project_dataset_table,
-            schema_fields,
-            source_format,
-            compression,
-            skip_leading_rows,
-            field_delimiter,
-            max_bad_records,
-            quote_character,
-            allow_quoted_newlines,
-            allow_jagged_rows,
-            src_fmt_configs,
-            labels,
-            encryption_configuration,
-        ])
+        kwargs_passed = any(
+            [
+                destination_project_dataset_table,
+                schema_fields,
+                source_format,
+                compression,
+                skip_leading_rows,
+                field_delimiter,
+                max_bad_records,
+                quote_character,
+                allow_quoted_newlines,
+                allow_jagged_rows,
+                src_fmt_configs,
+                labels,
+                encryption_configuration,
+            ]
+        )
 
         if not table_resource:
             warnings.warn(
                 "Passing table parameters via keywords arguments will be deprecated. "
                 "Please use provide table definition using `table_resource` parameter."
                 "You can still use external `schema_object`. ",
-                DeprecationWarning, stacklevel=2
+                DeprecationWarning,
+                stacklevel=2,
             )
 
         if table_resource and kwargs_passed:
@@ -1049,15 +1049,13 @@ class BigQueryCreateExternalTableOperator(BaseOperator):
 
     def execute(self, context):
         bq_hook = BigQueryHook(
-            gcp_conn_id=self.bigquery_conn_id,
-            delegate_to=self.delegate_to,
-            location=self.location
+            gcp_conn_id=self.bigquery_conn_id, delegate_to=self.delegate_to, location=self.location
         )
 
         if not self.schema_fields and self.schema_object and self.source_format != 'DATASTORE_BACKUP':
             gcs_hook = GCSHook(
-                google_cloud_storage_conn_id=self.google_cloud_storage_conn_id,
-                delegate_to=self.delegate_to)
+                google_cloud_storage_conn_id=self.google_cloud_storage_conn_id, delegate_to=self.delegate_to
+            )
             schema_object = gcs_hook.download(self.bucket, self.schema_object)
             schema_fields = json.loads(schema_object.decode("utf-8"))
         else:
@@ -1091,7 +1089,7 @@ class BigQueryCreateExternalTableOperator(BaseOperator):
                 allow_jagged_rows=self.allow_jagged_rows,
                 src_fmt_configs=self.src_fmt_configs,
                 labels=self.labels,
-                encryption_configuration=self.encryption_configuration
+                encryption_configuration=self.encryption_configuration,
             )
 
 
@@ -1142,12 +1140,16 @@ class BigQueryDeleteDatasetOperator(BaseOperator):
         gcp_conn_id: str = 'google_cloud_default',
         bigquery_conn_id: Optional[str] = None,
         delegate_to: Optional[str] = None,
-        *args, **kwargs
+        *args,
+        **kwargs,
     ) -> None:
         if bigquery_conn_id:
             warnings.warn(
                 "The bigquery_conn_id parameter has been deprecated. You should pass "
-                "the gcp_conn_id parameter.", DeprecationWarning, stacklevel=3)
+                "the gcp_conn_id parameter.",
+                DeprecationWarning,
+                stacklevel=3,
+            )
             gcp_conn_id = bigquery_conn_id
 
         self.dataset_id = dataset_id
@@ -1161,15 +1163,10 @@ class BigQueryDeleteDatasetOperator(BaseOperator):
     def execute(self, context):
         self.log.info('Dataset id: %s Project id: %s', self.dataset_id, self.project_id)
 
-        bq_hook = BigQueryHook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to
-        )
+        bq_hook = BigQueryHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
 
         bq_hook.delete_dataset(
-            project_id=self.project_id,
-            dataset_id=self.dataset_id,
-            delete_contents=self.delete_contents
+            project_id=self.project_id, dataset_id=self.dataset_id, delete_contents=self.delete_contents
         )
 
 
@@ -1214,20 +1211,26 @@ class BigQueryCreateEmptyDatasetOperator(BaseOperator):
     ui_color = BigQueryUIColors.DATASET.value
 
     @apply_defaults
-    def __init__(self,
-                 dataset_id: Optional[str] = None,
-                 project_id: Optional[str] = None,
-                 dataset_reference: Optional[Dict] = None,
-                 location: Optional[str] = None,
-                 gcp_conn_id: str = 'google_cloud_default',
-                 bigquery_conn_id: Optional[str] = None,
-                 delegate_to: Optional[str] = None,
-                 *args, **kwargs) -> None:
+    def __init__(
+        self,
+        dataset_id: Optional[str] = None,
+        project_id: Optional[str] = None,
+        dataset_reference: Optional[Dict] = None,
+        location: Optional[str] = None,
+        gcp_conn_id: str = 'google_cloud_default',
+        bigquery_conn_id: Optional[str] = None,
+        delegate_to: Optional[str] = None,
+        *args,
+        **kwargs,
+    ) -> None:
 
         if bigquery_conn_id:
             warnings.warn(
                 "The bigquery_conn_id parameter has been deprecated. You should pass "
-                "the gcp_conn_id parameter.", DeprecationWarning, stacklevel=3)
+                "the gcp_conn_id parameter.",
+                DeprecationWarning,
+                stacklevel=3,
+            )
             gcp_conn_id = bigquery_conn_id
 
         self.dataset_id = dataset_id
@@ -1241,9 +1244,7 @@ class BigQueryCreateEmptyDatasetOperator(BaseOperator):
 
     def execute(self, context):
         bq_hook = BigQueryHook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            location=self.location
+            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, location=self.location
         )
 
         try:
@@ -1283,12 +1284,15 @@ class BigQueryGetDatasetOperator(BaseOperator):
     ui_color = BigQueryUIColors.DATASET.value
 
     @apply_defaults
-    def __init__(self,
-                 dataset_id: str,
-                 project_id: Optional[str] = None,
-                 gcp_conn_id: str = 'google_cloud_default',
-                 delegate_to: Optional[str] = None,
-                 *args, **kwargs) -> None:
+    def __init__(
+        self,
+        dataset_id: str,
+        project_id: Optional[str] = None,
+        gcp_conn_id: str = 'google_cloud_default',
+        delegate_to: Optional[str] = None,
+        *args,
+        **kwargs,
+    ) -> None:
         self.dataset_id = dataset_id
         self.project_id = project_id
         self.gcp_conn_id = gcp_conn_id
@@ -1296,14 +1300,11 @@ class BigQueryGetDatasetOperator(BaseOperator):
         super().__init__(*args, **kwargs)
 
     def execute(self, context):
-        bq_hook = BigQueryHook(gcp_conn_id=self.gcp_conn_id,
-                               delegate_to=self.delegate_to)
+        bq_hook = BigQueryHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
 
         self.log.info('Start getting dataset: %s:%s', self.project_id, self.dataset_id)
 
-        dataset = bq_hook.get_dataset(
-            dataset_id=self.dataset_id,
-            project_id=self.project_id)
+        dataset = bq_hook.get_dataset(dataset_id=self.dataset_id, project_id=self.project_id)
         return dataset.to_api_repr()
 
 
@@ -1329,6 +1330,7 @@ class BigQueryGetDatasetTablesOperator(BaseOperator):
         delegation enabled.
     :type delegate_to: str
     """
+
     template_fields = ('dataset_id', 'project_id')
     ui_color = BigQueryUIColors.DATASET.value
 
@@ -1340,7 +1342,8 @@ class BigQueryGetDatasetTablesOperator(BaseOperator):
         max_results: Optional[int] = None,
         gcp_conn_id: Optional[str] = 'google_cloud_default',
         delegate_to: Optional[str] = None,
-        *args, **kwargs
+        *args,
+        **kwargs,
     ) -> None:
         self.dataset_id = dataset_id
         self.project_id = project_id
@@ -1350,15 +1353,10 @@ class BigQueryGetDatasetTablesOperator(BaseOperator):
         super().__init__(*args, **kwargs)
 
     def execute(self, context):
-        bq_hook = BigQueryHook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-        )
+        bq_hook = BigQueryHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to,)
 
         return bq_hook.get_dataset_tables(
-            dataset_id=self.dataset_id,
-            project_id=self.project_id,
-            max_results=self.max_results,
+            dataset_id=self.dataset_id, project_id=self.project_id, max_results=self.max_results,
         )
 
 
@@ -1397,12 +1395,14 @@ class BigQueryPatchDatasetOperator(BaseOperator):
         project_id: Optional[str] = None,
         gcp_conn_id: str = 'google_cloud_default',
         delegate_to: Optional[str] = None,
-        *args, **kwargs,
+        *args,
+        **kwargs,
     ) -> None:
 
         warnings.warn(
             "This operator is deprecated. Please use BigQueryUpdateDatasetOperator.",
-            DeprecationWarning, stacklevel=3
+            DeprecationWarning,
+            stacklevel=3,
         )
         self.dataset_id = dataset_id
         self.project_id = project_id
@@ -1412,15 +1412,10 @@ class BigQueryPatchDatasetOperator(BaseOperator):
         super().__init__(*args, **kwargs)
 
     def execute(self, context):
-        bq_hook = BigQueryHook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-        )
+        bq_hook = BigQueryHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to,)
 
         return bq_hook.patch_dataset(
-            dataset_id=self.dataset_id,
-            dataset_resource=self.dataset_resource,
-            project_id=self.project_id,
+            dataset_id=self.dataset_id, dataset_resource=self.dataset_resource, project_id=self.project_id,
         )
 
 
@@ -1465,7 +1460,8 @@ class BigQueryUpdateDatasetOperator(BaseOperator):
         project_id: Optional[str] = None,
         gcp_conn_id: str = 'google_cloud_default',
         delegate_to: Optional[str] = None,
-        *args, **kwargs
+        *args,
+        **kwargs,
     ) -> None:
         self.dataset_id = dataset_id
         self.project_id = project_id
@@ -1476,10 +1472,7 @@ class BigQueryUpdateDatasetOperator(BaseOperator):
         super().__init__(*args, **kwargs)
 
     def execute(self, context):
-        bq_hook = BigQueryHook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-        )
+        bq_hook = BigQueryHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to,)
         fields = self.fields or list(self.dataset_resource.keys())
 
         dataset = bq_hook.update_dataset(
@@ -1518,6 +1511,7 @@ class BigQueryDeleteTableOperator(BaseOperator):
     :param location: The location used for the operation.
     :type location: str
     """
+
     template_fields = ('deletion_dataset_table',)
     ui_color = BigQueryUIColors.TABLE.value
 
@@ -1538,7 +1532,10 @@ class BigQueryDeleteTableOperator(BaseOperator):
         if bigquery_conn_id:
             warnings.warn(
                 "The bigquery_conn_id parameter has been deprecated. You should pass "
-                "the gcp_conn_id parameter.", DeprecationWarning, stacklevel=3)
+                "the gcp_conn_id parameter.",
+                DeprecationWarning,
+                stacklevel=3,
+            )
             gcp_conn_id = bigquery_conn_id
 
         self.deletion_dataset_table = deletion_dataset_table
@@ -1550,14 +1547,9 @@ class BigQueryDeleteTableOperator(BaseOperator):
     def execute(self, context):
         self.log.info('Deleting: %s', self.deletion_dataset_table)
         hook = BigQueryHook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            location=self.location
+            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, location=self.location
         )
-        hook.delete_table(
-            table_id=self.deletion_dataset_table,
-            not_found_ok=self.ignore_if_missing
-        )
+        hook.delete_table(table_id=self.deletion_dataset_table, not_found_ok=self.ignore_if_missing)
 
 
 class BigQueryUpsertTableOperator(BaseOperator):
@@ -1590,6 +1582,7 @@ class BigQueryUpsertTableOperator(BaseOperator):
     :param location: The location used for the operation.
     :type location: str
     """
+
     template_fields = ('dataset_id', 'table_resource')
     ui_color = BigQueryUIColors.TABLE.value
 
@@ -1611,7 +1604,10 @@ class BigQueryUpsertTableOperator(BaseOperator):
         if bigquery_conn_id:
             warnings.warn(
                 "The bigquery_conn_id parameter has been deprecated. You should pass "
-                "the gcp_conn_id parameter.", DeprecationWarning, stacklevel=3)
+                "the gcp_conn_id parameter.",
+                DeprecationWarning,
+                stacklevel=3,
+            )
             gcp_conn_id = bigquery_conn_id
 
         self.dataset_id = dataset_id
@@ -1624,14 +1620,10 @@ class BigQueryUpsertTableOperator(BaseOperator):
     def execute(self, context):
         self.log.info('Upserting Dataset: %s with table_resource: %s', self.dataset_id, self.table_resource)
         hook = BigQueryHook(
-            bigquery_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            location=self.location,
+            bigquery_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, location=self.location,
         )
         hook.run_table_upsert(
-            dataset_id=self.dataset_id,
-            table_resource=self.table_resource,
-            project_id=self.project_id,
+            dataset_id=self.dataset_id, table_resource=self.table_resource, project_id=self.project_id,
         )
 
 
@@ -1664,7 +1656,7 @@ class BigQueryInsertJobOperator(BaseOperator):
     """
 
     template_fields = ("configuration", "job_id")
-    template_ext = (".json", )
+    template_ext = (".json",)
     ui_color = BigQueryUIColors.QUERY.value
 
     def __init__(
@@ -1693,10 +1685,7 @@ class BigQueryInsertJobOperator(BaseOperator):
                 self.configuration = json.loads(file.read())
 
     def execute(self, context: Any):
-        hook = BigQueryHook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-        )
+        hook = BigQueryHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to,)
 
         job_id = self.job_id or f"airflow_{self.task_id}_{int(time())}"
         try:
@@ -1709,11 +1698,7 @@ class BigQueryInsertJobOperator(BaseOperator):
             # Start the job and wait for it to complete and get the result.
             job.result()
         except Conflict:
-            job = hook.get_job(
-                project_id=self.project_id,
-                location=self.location,
-                job_id=job_id,
-            )
+            job = hook.get_job(project_id=self.project_id, location=self.location, job_id=job_id,)
             # Get existing job and wait for it to be ready
             for time_to_wait in exponential_sleep_generator(initial=10, maximum=120):
                 sleep(time_to_wait)

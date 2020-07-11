@@ -39,9 +39,9 @@ class WasbBlobSensor(BaseSensorOperator):
     template_fields = ('container_name', 'blob_name')
 
     @apply_defaults
-    def __init__(self, container_name, blob_name,
-                 wasb_conn_id='wasb_default', check_options=None, *args,
-                 **kwargs):
+    def __init__(
+        self, container_name, blob_name, wasb_conn_id='wasb_default', check_options=None, *args, **kwargs
+    ):
         super().__init__(*args, **kwargs)
         if check_options is None:
             check_options = {}
@@ -51,12 +51,9 @@ class WasbBlobSensor(BaseSensorOperator):
         self.check_options = check_options
 
     def poke(self, context):
-        self.log.info(
-            'Poking for blob: %s\nin wasb://%s', self.blob_name, self.container_name
-        )
+        self.log.info('Poking for blob: %s\nin wasb://%s', self.blob_name, self.container_name)
         hook = WasbHook(wasb_conn_id=self.wasb_conn_id)
-        return hook.check_for_blob(self.container_name, self.blob_name,
-                                   **self.check_options)
+        return hook.check_for_blob(self.container_name, self.blob_name, **self.check_options)
 
 
 class WasbPrefixSensor(BaseSensorOperator):
@@ -77,8 +74,9 @@ class WasbPrefixSensor(BaseSensorOperator):
     template_fields = ('container_name', 'prefix')
 
     @apply_defaults
-    def __init__(self, container_name, prefix, wasb_conn_id='wasb_default',
-                 check_options=None, *args, **kwargs):
+    def __init__(
+        self, container_name, prefix, wasb_conn_id='wasb_default', check_options=None, *args, **kwargs
+    ):
         super().__init__(*args, **kwargs)
         if check_options is None:
             check_options = {}
@@ -90,5 +88,4 @@ class WasbPrefixSensor(BaseSensorOperator):
     def poke(self, context):
         self.log.info('Poking for prefix: %s in wasb://%s', self.prefix, self.container_name)
         hook = WasbHook(wasb_conn_id=self.wasb_conn_id)
-        return hook.check_for_prefix(self.container_name, self.prefix,
-                                     **self.check_options)
+        return hook.check_for_prefix(self.container_name, self.prefix, **self.check_options)

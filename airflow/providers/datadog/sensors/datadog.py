@@ -34,20 +34,22 @@ class DatadogSensor(BaseSensorOperator):
     :param datadog_conn_id: The connection to datadog, containing metadata for api keys.
     :param datadog_conn_id: str
     """
+
     ui_color = '#66c3dd'
 
     @apply_defaults
     def __init__(
-            self,
-            datadog_conn_id='datadog_default',
-            from_seconds_ago=3600,
-            up_to_seconds_from_now=0,
-            priority=None,
-            sources=None,
-            tags=None,
-            response_check=None,
-            *args,
-            **kwargs):
+        self,
+        datadog_conn_id='datadog_default',
+        from_seconds_ago=3600,
+        up_to_seconds_from_now=0,
+        priority=None,
+        sources=None,
+        tags=None,
+        response_check=None,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.datadog_conn_id = datadog_conn_id
         self.from_seconds_ago = from_seconds_ago
@@ -69,7 +71,8 @@ class DatadogSensor(BaseSensorOperator):
             end=self.up_to_seconds_from_now,
             priority=self.priority,
             sources=self.sources,
-            tags=self.tags)
+            tags=self.tags,
+        )
 
         if isinstance(response, dict) and response.get('status', 'ok') != 'ok':
             self.log.error("Unexpected Datadog result: %s", response)

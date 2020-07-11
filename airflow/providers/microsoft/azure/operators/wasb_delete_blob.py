@@ -43,11 +43,17 @@ class WasbDeleteBlobOperator(BaseOperator):
     template_fields = ('container_name', 'blob_name')
 
     @apply_defaults
-    def __init__(self, container_name, blob_name,
-                 wasb_conn_id='wasb_default', check_options=None,
-                 is_prefix=False, ignore_if_missing=False,
-                 *args,
-                 **kwargs):
+    def __init__(
+        self,
+        container_name,
+        blob_name,
+        wasb_conn_id='wasb_default',
+        check_options=None,
+        is_prefix=False,
+        ignore_if_missing=False,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         if check_options is None:
             check_options = {}
@@ -59,11 +65,9 @@ class WasbDeleteBlobOperator(BaseOperator):
         self.ignore_if_missing = ignore_if_missing
 
     def execute(self, context):
-        self.log.info(
-            'Deleting blob: %s\nin wasb://%s', self.blob_name, self.container_name
-        )
+        self.log.info('Deleting blob: %s\nin wasb://%s', self.blob_name, self.container_name)
         hook = WasbHook(wasb_conn_id=self.wasb_conn_id)
 
-        hook.delete_file(self.container_name, self.blob_name,
-                         self.is_prefix, self.ignore_if_missing,
-                         **self.check_options)
+        hook.delete_file(
+            self.container_name, self.blob_name, self.is_prefix, self.ignore_if_missing, **self.check_options
+        )

@@ -44,23 +44,21 @@ class TestEventLogEndpoint(unittest.TestCase):
         clear_db_logs()
 
     def _create_task_instance(self):
-        dag = DAG('TEST_DAG_ID', start_date=timezone.parse(self.default_time),
-                  end_date=timezone.parse(self.default_time))
-        op1 = DummyOperator(task_id="TEST_TASK_ID", owner="airflow",
-                            )
+        dag = DAG(
+            'TEST_DAG_ID',
+            start_date=timezone.parse(self.default_time),
+            end_date=timezone.parse(self.default_time),
+        )
+        op1 = DummyOperator(task_id="TEST_TASK_ID", owner="airflow",)
         dag.add_task(op1)
         ti = TaskInstance(task=op1, execution_date=timezone.parse(self.default_time))
         return ti
 
 
 class TestGetEventLog(TestEventLogEndpoint):
-
     @provide_session
     def test_should_response_200(self, session):
-        log_model = Log(
-            event='TEST_EVENT',
-            task_instance=self._create_task_instance(),
-        )
+        log_model = Log(event='TEST_EVENT', task_instance=self._create_task_instance(),)
         log_model.dttm = timezone.parse(self.default_time)
         session.add(log_model)
         session.commit()
@@ -77,8 +75,8 @@ class TestGetEventLog(TestEventLogEndpoint):
                 "execution_date": self.default_time,
                 "owner": 'airflow',
                 "when": self.default_time,
-                "extra": None
-            }
+                "extra": None,
+            },
         )
 
     def test_should_response_404(self):
@@ -86,22 +84,15 @@ class TestGetEventLog(TestEventLogEndpoint):
         assert response.status_code == 404
         self.assertEqual(
             {'detail': None, 'status': 404, 'title': 'Event Log not found', 'type': 'about:blank'},
-            response.json
+            response.json,
         )
 
 
 class TestGetEventLogs(TestEventLogEndpoint):
-
     @provide_session
     def test_should_response_200(self, session):
-        log_model_1 = Log(
-            event='TEST_EVENT_1',
-            task_instance=self._create_task_instance(),
-        )
-        log_model_2 = Log(
-            event='TEST_EVENT_2',
-            task_instance=self._create_task_instance(),
-        )
+        log_model_1 = Log(event='TEST_EVENT_1', task_instance=self._create_task_instance(),)
+        log_model_2 = Log(event='TEST_EVENT_2', task_instance=self._create_task_instance(),)
         log_model_1.dttm = timezone.parse(self.default_time)
         log_model_2.dttm = timezone.parse(self.default_time_2)
         session.add_all([log_model_1, log_model_2])
@@ -113,7 +104,6 @@ class TestGetEventLogs(TestEventLogEndpoint):
             {
                 "event_logs": [
                     {
-
                         "event_log_id": log_model_1.id,
                         "event": "TEST_EVENT_1",
                         "dag_id": "TEST_DAG_ID",
@@ -121,8 +111,7 @@ class TestGetEventLogs(TestEventLogEndpoint):
                         "execution_date": self.default_time,
                         "owner": 'airflow',
                         "when": self.default_time,
-                        "extra": None
-
+                        "extra": None,
                     },
                     {
                         "event_log_id": log_model_2.id,
@@ -132,11 +121,11 @@ class TestGetEventLogs(TestEventLogEndpoint):
                         "execution_date": self.default_time,
                         "owner": 'airflow',
                         "when": self.default_time_2,
-                        "extra": None
-                    }
+                        "extra": None,
+                    },
                 ],
-                "total_entries": 2
-            }
+                "total_entries": 2,
+            },
         )
 
 
@@ -147,13 +136,7 @@ class TestGetEventLogPagination(TestEventLogEndpoint):
             ("api/v1/eventLogs?limit=2", ["TEST_EVENT_1", "TEST_EVENT_2"]),
             (
                 "api/v1/eventLogs?offset=5",
-                [
-                    "TEST_EVENT_6",
-                    "TEST_EVENT_7",
-                    "TEST_EVENT_8",
-                    "TEST_EVENT_9",
-                    "TEST_EVENT_10",
-                ],
+                ["TEST_EVENT_6", "TEST_EVENT_7", "TEST_EVENT_8", "TEST_EVENT_9", "TEST_EVENT_10",],
             ),
             (
                 "api/v1/eventLogs?offset=0",
@@ -213,9 +196,6 @@ class TestGetEventLogPagination(TestEventLogEndpoint):
 
     def _create_event_logs(self, count):
         return [
-            Log(
-                event="TEST_EVENT_" + str(i),
-                task_instance=self._create_task_instance()
-            )
+            Log(event="TEST_EVENT_" + str(i), task_instance=self._create_task_instance())
             for i in range(1, count + 1)
         ]

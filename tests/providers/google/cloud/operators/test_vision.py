@@ -23,13 +23,22 @@ from google.api_core.exceptions import AlreadyExists
 from google.cloud.vision_v1.types import Product, ProductSet, ReferenceImage
 
 from airflow.providers.google.cloud.operators.vision import (
-    CloudVisionAddProductToProductSetOperator, CloudVisionCreateProductOperator,
-    CloudVisionCreateProductSetOperator, CloudVisionCreateReferenceImageOperator,
-    CloudVisionDeleteProductOperator, CloudVisionDeleteProductSetOperator,
-    CloudVisionDetectImageLabelsOperator, CloudVisionDetectImageSafeSearchOperator,
-    CloudVisionDetectTextOperator, CloudVisionGetProductOperator, CloudVisionGetProductSetOperator,
-    CloudVisionImageAnnotateOperator, CloudVisionRemoveProductFromProductSetOperator,
-    CloudVisionTextDetectOperator, CloudVisionUpdateProductOperator, CloudVisionUpdateProductSetOperator,
+    CloudVisionAddProductToProductSetOperator,
+    CloudVisionCreateProductOperator,
+    CloudVisionCreateProductSetOperator,
+    CloudVisionCreateReferenceImageOperator,
+    CloudVisionDeleteProductOperator,
+    CloudVisionDeleteProductSetOperator,
+    CloudVisionDetectImageLabelsOperator,
+    CloudVisionDetectImageSafeSearchOperator,
+    CloudVisionDetectTextOperator,
+    CloudVisionGetProductOperator,
+    CloudVisionGetProductSetOperator,
+    CloudVisionImageAnnotateOperator,
+    CloudVisionRemoveProductFromProductSetOperator,
+    CloudVisionTextDetectOperator,
+    CloudVisionUpdateProductOperator,
+    CloudVisionUpdateProductSetOperator,
 )
 
 PRODUCTSET_TEST = ProductSet(display_name='Test Product Set')
@@ -41,7 +50,7 @@ REFERENCE_IMAGE_ID_TEST = 'my-reference-image'
 ANNOTATE_REQUEST_TEST = {'image': {'source': {'image_uri': 'https://foo.com/image.jpg'}}}
 ANNOTATE_REQUEST_BATCH_TEST = [
     {'image': {'source': {'image_uri': 'https://foo.com/image1.jpg'}}},
-    {'image': {'source': {'image_uri': 'https://foo.com/image2.jpg'}}}
+    {'image': {'source': {'image_uri': 'https://foo.com/image2.jpg'}}},
 ]
 LOCATION_TEST = 'europe-west1'
 GCP_CONN_ID = 'google_cloud_default'
@@ -229,9 +238,7 @@ class TestCloudVisionProductDelete(unittest.TestCase):
 
 
 class TestCloudVisionReferenceImageCreate(unittest.TestCase):
-    @mock.patch(
-        'airflow.providers.google.cloud.operators.vision.CloudVisionHook',
-    )
+    @mock.patch('airflow.providers.google.cloud.operators.vision.CloudVisionHook',)
     def test_minimal_green_path(self, mock_hook):
         mock_hook.return_value.create_reference_image.return_value = {}
         op = CloudVisionCreateReferenceImageOperator(
@@ -255,7 +262,7 @@ class TestCloudVisionReferenceImageCreate(unittest.TestCase):
 
     @mock.patch(
         'airflow.providers.google.cloud.operators.vision.CloudVisionHook',
-        **{'return_value.create_reference_image.side_effect': AlreadyExists("MESSAGe")}
+        **{'return_value.create_reference_image.side_effect': AlreadyExists("MESSAGe")},
     )
     def test_already_exists(self, mock_hook):
         # Exception AlreadyExists not raised, caught in the operator's execute() - idempotence
@@ -361,11 +368,9 @@ class TestCloudVisionDetectTextOperator(unittest.TestCase):
             language_hints="pl",
             web_detection_params={'param': 'test'},
             additional_properties={
-                'image_context': {
-                    'additional_property_1': 'add_1'
-                },
-                'additional_property_2': 'add_2'
-            }
+                'image_context': {'additional_property_1': 'add_1'},
+                'additional_property_2': 'add_2',
+            },
         )
         op.execute(context=None)
         mock_hook.assert_called_once_with(gcp_conn_id=GCP_CONN_ID)
@@ -379,11 +384,9 @@ class TestCloudVisionDetectTextOperator(unittest.TestCase):
                 'image_context': {
                     'language_hints': 'pl',
                     'additional_property_1': 'add_1',
-                    'web_detection_params': {
-                        'param': 'test'
-                    }
-                }
-            }
+                    'web_detection_params': {'param': 'test'},
+                },
+            },
         )
 
 

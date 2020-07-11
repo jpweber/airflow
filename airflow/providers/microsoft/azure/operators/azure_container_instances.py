@@ -22,7 +22,12 @@ from time import sleep
 from typing import Dict, Sequence
 
 from azure.mgmt.containerinstance.models import (
-    Container, ContainerGroup, EnvironmentVariable, ResourceRequests, ResourceRequirements, VolumeMount,
+    Container,
+    ContainerGroup,
+    EnvironmentVariable,
+    ResourceRequests,
+    ResourceRequirements,
+    VolumeMount,
 )
 from msrestazure.azure_exceptions import CloudError
 
@@ -33,10 +38,7 @@ from airflow.providers.microsoft.azure.hooks.azure_container_registry import Azu
 from airflow.providers.microsoft.azure.hooks.azure_container_volume import AzureContainerVolumeHook
 from airflow.utils.decorators import apply_defaults
 
-Volume = namedtuple(
-    'Volume',
-    ['conn_id', 'account_name', 'share_name', 'mount_path', 'read_only'],
-)
+Volume = namedtuple('Volume', ['conn_id', 'account_name', 'share_name', 'mount_path', 'read_only'],)
 
 
 DEFAULT_ENVIRONMENT_VARIABLES = {}  # type: Dict[str, str]
@@ -122,25 +124,27 @@ class AzureContainerInstancesOperator(BaseOperator):
 
     # pylint: disable=too-many-arguments
     @apply_defaults
-    def __init__(self,
-                 ci_conn_id,
-                 registry_conn_id,
-                 resource_group,
-                 name,
-                 image,
-                 region,
-                 environment_variables=None,
-                 secured_variables=None,
-                 volumes=None,
-                 memory_in_gb=None,
-                 cpu=None,
-                 gpu=None,
-                 command=None,
-                 remove_on_error=True,
-                 fail_if_exists=True,
-                 tags=None,
-                 *args,
-                 **kwargs):
+    def __init__(
+        self,
+        ci_conn_id,
+        registry_conn_id,
+        resource_group,
+        name,
+        image,
+        region,
+        environment_variables=None,
+        secured_variables=None,
+        volumes=None,
+        memory_in_gb=None,
+        cpu=None,
+        gpu=None,
+        command=None,
+        remove_on_error=True,
+        fail_if_exists=True,
+        tags=None,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
 
         self.ci_conn_id = ci_conn_id
@@ -174,7 +178,9 @@ class AzureContainerInstancesOperator(BaseOperator):
 
         if self.registry_conn_id:
             registry_hook = AzureContainerRegistryHook(self.registry_conn_id)
-            image_registry_credentials = [registry_hook.connection, ]
+            image_registry_credentials = [
+                registry_hook.connection,
+            ]
         else:
             image_registry_credentials = None
 
@@ -192,26 +198,18 @@ class AzureContainerInstancesOperator(BaseOperator):
             hook = AzureContainerVolumeHook(conn_id)
 
             mount_name = "mount-%d" % len(volumes)
-            volumes.append(hook.get_file_volume(mount_name,
-                                                share_name,
-                                                account_name,
-                                                read_only))
-            volume_mounts.append(VolumeMount(name=mount_name,
-                                             mount_path=mount_path,
-                                             read_only=read_only))
+            volumes.append(hook.get_file_volume(mount_name, share_name, account_name, read_only))
+            volume_mounts.append(VolumeMount(name=mount_name, mount_path=mount_path, read_only=read_only))
 
         exit_code = 1
         try:
-            self.log.info("Starting container group with %.1f cpu %.1f mem",
-                          self.cpu, self.memory_in_gb)
+            self.log.info("Starting container group with %.1f cpu %.1f mem", self.cpu, self.memory_in_gb)
             if self.gpu:
-                self.log.info("GPU count: %.1f, GPU SKU: %s",
-                              self.gpu.count, self.gpu.sku)
+                self.log.info("GPU count: %.1f, GPU SKU: %s", self.gpu.count, self.gpu.sku)
 
-            resources = ResourceRequirements(requests=ResourceRequests(
-                memory_in_gb=self.memory_in_gb,
-                cpu=self.cpu,
-                gpu=self.gpu))
+            resources = ResourceRequirements(
+                requests=ResourceRequests(memory_in_gb=self.memory_in_gb, cpu=self.cpu, gpu=self.gpu)
+            )
 
             container = Container(
                 name=self.name,
@@ -219,16 +217,18 @@ class AzureContainerInstancesOperator(BaseOperator):
                 resources=resources,
                 command=self.command,
                 environment_variables=environment_variables,
-                volume_mounts=volume_mounts)
+                volume_mounts=volume_mounts,
+            )
 
             container_group = ContainerGroup(
                 location=self.region,
-                containers=[container, ],
+                containers=[container,],
                 image_registry_credentials=image_registry_credentials,
                 volumes=volumes,
                 restart_policy='Never',
                 os_type='Linux',
-                tags=self.tags)
+                tags=self.tags,
+            )
 
             self._ci_hook.create_or_update(self.resource_group, self.name, container_group)
 
@@ -238,8 +238,7 @@ class AzureContainerInstancesOperator(BaseOperator):
 
             self.log.info("Container had exit code: %s", exit_code)
             if exit_code != 0:
-                raise AirflowException("Container had a non-zero exit code, %s"
-                                       % exit_code)
+                raise AirflowException("Container had a non-zero exit code, %s" % exit_code)
             return exit_code
 
         except CloudError:
@@ -272,9 +271,11 @@ class AzureContainerInstancesOperator(BaseOperator):
                 # If there is no instance view, we show the provisioning state
                 if instance_view is not None:
                     c_state = instance_view.current_state
-                    state, exit_code, detail_status = (c_state.state,
-                                                       c_state.exit_code,
-                                                       c_state.detail_status)
+                    state, exit_code, detail_status = (
+                        c_state.state,
+                        c_state.exit_code,
+                        c_state.detail_status,
+                    )
 
                     messages = [event.message for event in instance_view.events]
                     last_message_logged = self._log_last(messages, last_message_logged)
@@ -292,8 +293,9 @@ class AzureContainerInstancesOperator(BaseOperator):
                         logs = self._ci_hook.get_logs(resource_group, name)
                         last_line_logged = self._log_last(logs, last_line_logged)
                     except CloudError:
-                        self.log.exception("Exception while getting logs from "
-                                           "container instance, retrying...")
+                        self.log.exception(
+                            "Exception while getting logs from " "container instance, retrying..."
+                        )
 
                 if state == "Terminated":
                     self.log.error("Container exited with detail_status %s", detail_status)
@@ -307,9 +309,11 @@ class AzureContainerInstancesOperator(BaseOperator):
                 raise
             except CloudError as err:
                 if 'ResourceNotFound' in str(err):
-                    self.log.warning("ResourceNotFound, container is probably removed "
-                                     "by another process "
-                                     "(make sure that the name is unique).")
+                    self.log.warning(
+                        "ResourceNotFound, container is probably removed "
+                        "by another process "
+                        "(make sure that the name is unique)."
+                    )
                     return 1
                 else:
                     self.log.exception("Exception while getting container groups")

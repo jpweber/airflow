@@ -55,6 +55,7 @@ class CloudNaturalLanguageAnalyzeEntitiesOperator(BaseOperator):
     :param gcp_conn_id: The connection ID to use connecting to Google Cloud Platform.
     :type gcp_conn_id: str
     """
+
     # [START natural_language_analyze_entities_template_fields]
     template_fields = ("document", "gcp_conn_id")
     # [END natural_language_analyze_entities_template_fields]
@@ -68,7 +69,7 @@ class CloudNaturalLanguageAnalyzeEntitiesOperator(BaseOperator):
         metadata: Optional[MetaData] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.document = document
@@ -115,6 +116,7 @@ class CloudNaturalLanguageAnalyzeEntitySentimentOperator(BaseOperator):
     :type gcp_conn_id: str
     :rtype: google.cloud.language_v1.types.AnalyzeEntitiesResponse
     """
+
     # [START natural_language_analyze_entity_sentiment_template_fields]
     template_fields = ("document", "gcp_conn_id")
     # [END natural_language_analyze_entity_sentiment_template_fields]
@@ -128,7 +130,7 @@ class CloudNaturalLanguageAnalyzeEntitySentimentOperator(BaseOperator):
         metadata: Optional[MetaData] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.document = document
@@ -178,6 +180,7 @@ class CloudNaturalLanguageAnalyzeSentimentOperator(BaseOperator):
     :type gcp_conn_id: str
     :rtype: google.cloud.language_v1.types.AnalyzeEntitiesResponse
     """
+
     # [START natural_language_analyze_sentiment_template_fields]
     template_fields = ("document", "gcp_conn_id")
     # [END natural_language_analyze_sentiment_template_fields]
@@ -191,7 +194,7 @@ class CloudNaturalLanguageAnalyzeSentimentOperator(BaseOperator):
         metadata: Optional[MetaData] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.document = document
@@ -234,6 +237,7 @@ class CloudNaturalLanguageClassifyTextOperator(BaseOperator):
     :param gcp_conn_id: The connection ID to use connecting to Google Cloud Platform.
     :type gcp_conn_id: str
     """
+
     # [START natural_language_classify_text_template_fields]
     template_fields = ("document", "gcp_conn_id")
     # [END natural_language_classify_text_template_fields]
@@ -246,7 +250,7 @@ class CloudNaturalLanguageClassifyTextOperator(BaseOperator):
         metadata: Optional[MetaData] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.document = document

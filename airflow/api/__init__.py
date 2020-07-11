@@ -27,6 +27,7 @@ log = logging.getLogger(__name__)
 
 class ApiAuth:  # pylint: disable=too-few-public-methods
     """Class to keep module of Authentication API  """
+
     def __init__(self):
         self.api_auth = None
 
@@ -45,8 +46,5 @@ def load_auth():
     try:
         API_AUTH.api_auth = import_module(auth_backend)
     except ImportError as err:
-        log.critical(
-            "Cannot import %s for API authentication due to: %s",
-            auth_backend, err
-        )
+        log.critical("Cannot import %s for API authentication due to: %s", auth_backend, err)
         raise AirflowException(err)

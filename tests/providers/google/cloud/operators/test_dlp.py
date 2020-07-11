@@ -26,18 +26,36 @@ import unittest
 import mock
 
 from airflow.providers.google.cloud.operators.dlp import (
-    CloudDLPCancelDLPJobOperator, CloudDLPCreateDeidentifyTemplateOperator, CloudDLPCreateDLPJobOperator,
-    CloudDLPCreateInspectTemplateOperator, CloudDLPCreateJobTriggerOperator,
-    CloudDLPCreateStoredInfoTypeOperator, CloudDLPDeidentifyContentOperator,
-    CloudDLPDeleteDeidentifyTemplateOperator, CloudDLPDeleteDLPJobOperator,
-    CloudDLPDeleteInspectTemplateOperator, CloudDLPDeleteJobTriggerOperator,
-    CloudDLPDeleteStoredInfoTypeOperator, CloudDLPGetDeidentifyTemplateOperator, CloudDLPGetDLPJobOperator,
-    CloudDLPGetDLPJobTriggerOperator, CloudDLPGetInspectTemplateOperator, CloudDLPGetStoredInfoTypeOperator,
-    CloudDLPInspectContentOperator, CloudDLPListDeidentifyTemplatesOperator, CloudDLPListDLPJobsOperator,
-    CloudDLPListInfoTypesOperator, CloudDLPListInspectTemplatesOperator, CloudDLPListJobTriggersOperator,
-    CloudDLPListStoredInfoTypesOperator, CloudDLPRedactImageOperator, CloudDLPReidentifyContentOperator,
-    CloudDLPUpdateDeidentifyTemplateOperator, CloudDLPUpdateInspectTemplateOperator,
-    CloudDLPUpdateJobTriggerOperator, CloudDLPUpdateStoredInfoTypeOperator,
+    CloudDLPCancelDLPJobOperator,
+    CloudDLPCreateDeidentifyTemplateOperator,
+    CloudDLPCreateDLPJobOperator,
+    CloudDLPCreateInspectTemplateOperator,
+    CloudDLPCreateJobTriggerOperator,
+    CloudDLPCreateStoredInfoTypeOperator,
+    CloudDLPDeidentifyContentOperator,
+    CloudDLPDeleteDeidentifyTemplateOperator,
+    CloudDLPDeleteDLPJobOperator,
+    CloudDLPDeleteInspectTemplateOperator,
+    CloudDLPDeleteJobTriggerOperator,
+    CloudDLPDeleteStoredInfoTypeOperator,
+    CloudDLPGetDeidentifyTemplateOperator,
+    CloudDLPGetDLPJobOperator,
+    CloudDLPGetDLPJobTriggerOperator,
+    CloudDLPGetInspectTemplateOperator,
+    CloudDLPGetStoredInfoTypeOperator,
+    CloudDLPInspectContentOperator,
+    CloudDLPListDeidentifyTemplatesOperator,
+    CloudDLPListDLPJobsOperator,
+    CloudDLPListInfoTypesOperator,
+    CloudDLPListInspectTemplatesOperator,
+    CloudDLPListJobTriggersOperator,
+    CloudDLPListStoredInfoTypesOperator,
+    CloudDLPRedactImageOperator,
+    CloudDLPReidentifyContentOperator,
+    CloudDLPUpdateDeidentifyTemplateOperator,
+    CloudDLPUpdateInspectTemplateOperator,
+    CloudDLPUpdateJobTriggerOperator,
+    CloudDLPUpdateStoredInfoTypeOperator,
 )
 
 GCP_CONN_ID = "google_cloud_default"
@@ -57,11 +75,7 @@ class TestCloudDLPCancelDLPJobOperator(unittest.TestCase):
         operator.execute(context=None)
         mock_hook.assert_called_once_with(gcp_conn_id=GCP_CONN_ID)
         mock_hook.return_value.cancel_dlp_job.assert_called_once_with(
-            dlp_job_id=DLP_JOB_ID,
-            project_id=None,
-            retry=None,
-            timeout=None,
-            metadata=None,
+            dlp_job_id=DLP_JOB_ID, project_id=None, retry=None, timeout=None, metadata=None,
         )
 
 
@@ -69,9 +83,7 @@ class TestCloudDLPCreateDeidentifyTemplateOperator(unittest.TestCase):
     @mock.patch("airflow.providers.google.cloud.operators.dlp.CloudDLPHook")
     def test_create_deidentify_template(self, mock_hook):
         mock_hook.return_value.create_deidentify_template.return_value = mock.MagicMock()
-        operator = CloudDLPCreateDeidentifyTemplateOperator(
-            organization_id=ORGANIZATION_ID, task_id="id"
-        )
+        operator = CloudDLPCreateDeidentifyTemplateOperator(organization_id=ORGANIZATION_ID, task_id="id")
         operator.execute(context=None)
         mock_hook.assert_called_once_with(gcp_conn_id=GCP_CONN_ID)
         mock_hook.return_value.create_deidentify_template.assert_called_once_with(
@@ -108,9 +120,7 @@ class TestCloudDLPCreateInspectTemplateOperator(unittest.TestCase):
     @mock.patch("airflow.providers.google.cloud.operators.dlp.CloudDLPHook")
     def test_create_inspect_template(self, mock_hook):
         mock_hook.return_value.create_inspect_template.return_value = mock.MagicMock()
-        operator = CloudDLPCreateInspectTemplateOperator(
-            organization_id=ORGANIZATION_ID, task_id="id"
-        )
+        operator = CloudDLPCreateInspectTemplateOperator(organization_id=ORGANIZATION_ID, task_id="id")
         operator.execute(context=None)
         mock_hook.assert_called_once_with(gcp_conn_id=GCP_CONN_ID)
         mock_hook.return_value.create_inspect_template.assert_called_once_with(
@@ -132,12 +142,7 @@ class TestCloudDLPCreateJobTriggerOperator(unittest.TestCase):
         operator.execute(context=None)
         mock_hook.assert_called_once_with(gcp_conn_id=GCP_CONN_ID)
         mock_hook.return_value.create_job_trigger.assert_called_once_with(
-            project_id=PROJECT_ID,
-            job_trigger=None,
-            trigger_id=None,
-            retry=None,
-            timeout=None,
-            metadata=None,
+            project_id=PROJECT_ID, job_trigger=None, trigger_id=None, retry=None, timeout=None, metadata=None,
         )
 
 
@@ -145,9 +150,7 @@ class TestCloudDLPCreateStoredInfoTypeOperator(unittest.TestCase):
     @mock.patch("airflow.providers.google.cloud.operators.dlp.CloudDLPHook")
     def test_create_stored_info_type(self, mock_hook):
         mock_hook.return_value.create_stored_info_type.return_value = mock.MagicMock()
-        operator = CloudDLPCreateStoredInfoTypeOperator(
-            organization_id=ORGANIZATION_ID, task_id="id"
-        )
+        operator = CloudDLPCreateStoredInfoTypeOperator(organization_id=ORGANIZATION_ID, task_id="id")
         operator.execute(context=None)
         mock_hook.assert_called_once_with(gcp_conn_id=GCP_CONN_ID)
         mock_hook.return_value.create_stored_info_type.assert_called_once_with(
@@ -165,9 +168,7 @@ class TestCloudDLPDeidentifyContentOperator(unittest.TestCase):
     @mock.patch("airflow.providers.google.cloud.operators.dlp.CloudDLPHook")
     def test_deidentify_content(self, mock_hook):
         mock_hook.return_value.deidentify_content.return_value = mock.MagicMock()
-        operator = CloudDLPDeidentifyContentOperator(
-            project_id=PROJECT_ID, task_id="id"
-        )
+        operator = CloudDLPDeidentifyContentOperator(project_id=PROJECT_ID, task_id="id")
         operator.execute(context=None)
         mock_hook.assert_called_once_with(gcp_conn_id=GCP_CONN_ID)
         mock_hook.return_value.deidentify_content.assert_called_once_with(
@@ -206,17 +207,11 @@ class TestCloudDLPDeleteDlpJobOperator(unittest.TestCase):
     @mock.patch("airflow.providers.google.cloud.operators.dlp.CloudDLPHook")
     def test_delete_dlp_job(self, mock_hook):
         mock_hook.return_value.delete_dlp_job.return_value = mock.MagicMock()
-        operator = CloudDLPDeleteDLPJobOperator(
-            dlp_job_id=DLP_JOB_ID, project_id=PROJECT_ID, task_id="id"
-        )
+        operator = CloudDLPDeleteDLPJobOperator(dlp_job_id=DLP_JOB_ID, project_id=PROJECT_ID, task_id="id")
         operator.execute(context=None)
         mock_hook.assert_called_once_with(gcp_conn_id=GCP_CONN_ID)
         mock_hook.return_value.delete_dlp_job.assert_called_once_with(
-            dlp_job_id=DLP_JOB_ID,
-            project_id=PROJECT_ID,
-            retry=None,
-            timeout=None,
-            metadata=None,
+            dlp_job_id=DLP_JOB_ID, project_id=PROJECT_ID, retry=None, timeout=None, metadata=None,
         )
 
 
@@ -249,11 +244,7 @@ class TestCloudDLPDeleteJobTriggerOperator(unittest.TestCase):
         operator.execute(context=None)
         mock_hook.assert_called_once_with(gcp_conn_id=GCP_CONN_ID)
         mock_hook.return_value.delete_job_trigger.assert_called_once_with(
-            job_trigger_id=TRIGGER_ID,
-            project_id=PROJECT_ID,
-            retry=None,
-            timeout=None,
-            metadata=None,
+            job_trigger_id=TRIGGER_ID, project_id=PROJECT_ID, retry=None, timeout=None, metadata=None,
         )
 
 
@@ -262,9 +253,7 @@ class TestCloudDLPDeleteStoredInfoTypeOperator(unittest.TestCase):
     def test_delete_stored_info_type(self, mock_hook):
         mock_hook.return_value.delete_stored_info_type.return_value = mock.MagicMock()
         operator = CloudDLPDeleteStoredInfoTypeOperator(
-            stored_info_type_id=STORED_INFO_TYPE_ID,
-            organization_id=ORGANIZATION_ID,
-            task_id="id",
+            stored_info_type_id=STORED_INFO_TYPE_ID, organization_id=ORGANIZATION_ID, task_id="id",
         )
         operator.execute(context=None)
         mock_hook.assert_called_once_with(gcp_conn_id=GCP_CONN_ID)
@@ -301,17 +290,11 @@ class TestCloudDLPGetDlpJobOperator(unittest.TestCase):
     @mock.patch("airflow.providers.google.cloud.operators.dlp.CloudDLPHook")
     def test_get_dlp_job(self, mock_hook):
         mock_hook.return_value.get_dlp_job.return_value = mock.MagicMock()
-        operator = CloudDLPGetDLPJobOperator(
-            dlp_job_id=DLP_JOB_ID, project_id=PROJECT_ID, task_id="id"
-        )
+        operator = CloudDLPGetDLPJobOperator(dlp_job_id=DLP_JOB_ID, project_id=PROJECT_ID, task_id="id")
         operator.execute(context=None)
         mock_hook.assert_called_once_with(gcp_conn_id=GCP_CONN_ID)
         mock_hook.return_value.get_dlp_job.assert_called_once_with(
-            dlp_job_id=DLP_JOB_ID,
-            project_id=PROJECT_ID,
-            retry=None,
-            timeout=None,
-            metadata=None,
+            dlp_job_id=DLP_JOB_ID, project_id=PROJECT_ID, retry=None, timeout=None, metadata=None,
         )
 
 
@@ -344,11 +327,7 @@ class TestCloudDLPGetJobTripperOperator(unittest.TestCase):
         operator.execute(context=None)
         mock_hook.assert_called_once_with(gcp_conn_id=GCP_CONN_ID)
         mock_hook.return_value.get_job_trigger.assert_called_once_with(
-            job_trigger_id=TRIGGER_ID,
-            project_id=PROJECT_ID,
-            retry=None,
-            timeout=None,
-            metadata=None,
+            job_trigger_id=TRIGGER_ID, project_id=PROJECT_ID, retry=None, timeout=None, metadata=None,
         )
 
 
@@ -357,9 +336,7 @@ class TestCloudDLPGetStoredInfoTypeOperator(unittest.TestCase):
     def test_get_stored_info_type(self, mock_hook):
         mock_hook.return_value.get_stored_info_type.return_value = mock.MagicMock()
         operator = CloudDLPGetStoredInfoTypeOperator(
-            stored_info_type_id=STORED_INFO_TYPE_ID,
-            organization_id=ORGANIZATION_ID,
-            task_id="id",
+            stored_info_type_id=STORED_INFO_TYPE_ID, organization_id=ORGANIZATION_ID, task_id="id",
         )
         operator.execute(context=None)
         mock_hook.assert_called_once_with(gcp_conn_id=GCP_CONN_ID)
@@ -395,9 +372,7 @@ class TestCloudDLPListDeidentifyTemplatesOperator(unittest.TestCase):
     @mock.patch("airflow.providers.google.cloud.operators.dlp.CloudDLPHook")
     def test_list_deidentify_templates(self, mock_hook):
         mock_hook.return_value.list_deidentify_templates.return_value = mock.MagicMock()
-        operator = CloudDLPListDeidentifyTemplatesOperator(
-            organization_id=ORGANIZATION_ID, task_id="id"
-        )
+        operator = CloudDLPListDeidentifyTemplatesOperator(organization_id=ORGANIZATION_ID, task_id="id")
         operator.execute(context=None)
         mock_hook.assert_called_once_with(gcp_conn_id=GCP_CONN_ID)
         mock_hook.return_value.list_deidentify_templates.assert_called_once_with(
@@ -438,11 +413,7 @@ class TestCloudDLPListInfoTypesOperator(unittest.TestCase):
         operator.execute(context=None)
         mock_hook.assert_called_once_with(gcp_conn_id=GCP_CONN_ID)
         mock_hook.return_value.list_info_types.assert_called_once_with(
-            language_code=None,
-            results_filter=None,
-            retry=None,
-            timeout=None,
-            metadata=None,
+            language_code=None, results_filter=None, retry=None, timeout=None, metadata=None,
         )
 
 
@@ -450,9 +421,7 @@ class TestCloudDLPListInspectTemplatesOperator(unittest.TestCase):
     @mock.patch("airflow.providers.google.cloud.operators.dlp.CloudDLPHook")
     def test_list_inspect_templates(self, mock_hook):
         mock_hook.return_value.list_inspect_templates.return_value = mock.MagicMock()
-        operator = CloudDLPListInspectTemplatesOperator(
-            organization_id=ORGANIZATION_ID, task_id="id"
-        )
+        operator = CloudDLPListInspectTemplatesOperator(organization_id=ORGANIZATION_ID, task_id="id")
         operator.execute(context=None)
         mock_hook.assert_called_once_with(gcp_conn_id=GCP_CONN_ID)
         mock_hook.return_value.list_inspect_templates.assert_called_once_with(
@@ -488,9 +457,7 @@ class TestCloudDLPListStoredInfoTypesOperator(unittest.TestCase):
     @mock.patch("airflow.providers.google.cloud.operators.dlp.CloudDLPHook")
     def test_list_stored_info_types(self, mock_hook):
         mock_hook.return_value.list_stored_info_types.return_value = mock.MagicMock()
-        operator = CloudDLPListStoredInfoTypesOperator(
-            organization_id=ORGANIZATION_ID, task_id="id"
-        )
+        operator = CloudDLPListStoredInfoTypesOperator(organization_id=ORGANIZATION_ID, task_id="id")
         operator.execute(context=None)
         mock_hook.assert_called_once_with(gcp_conn_id=GCP_CONN_ID)
         mock_hook.return_value.list_stored_info_types.assert_called_once_with(
@@ -527,9 +494,7 @@ class TestCloudDLPReidentifyContentOperator(unittest.TestCase):
     @mock.patch("airflow.providers.google.cloud.operators.dlp.CloudDLPHook")
     def test_reidentify_content(self, mock_hook):
         mock_hook.return_value.reidentify_content.return_value = mock.MagicMock()
-        operator = CloudDLPReidentifyContentOperator(
-            project_id=PROJECT_ID, task_id="id"
-        )
+        operator = CloudDLPReidentifyContentOperator(project_id=PROJECT_ID, task_id="id")
         operator.execute(context=None)
         mock_hook.assert_called_once_with(gcp_conn_id=GCP_CONN_ID)
         mock_hook.return_value.reidentify_content.assert_called_once_with(
@@ -591,9 +556,7 @@ class TestCloudDLPUpdateJobTriggerOperator(unittest.TestCase):
     @mock.patch("airflow.providers.google.cloud.operators.dlp.CloudDLPHook")
     def test_update_job_trigger(self, mock_hook):
         mock_hook.return_value.update_job_trigger.return_value = mock.MagicMock()
-        operator = CloudDLPUpdateJobTriggerOperator(
-            job_trigger_id=TRIGGER_ID, task_id="id"
-        )
+        operator = CloudDLPUpdateJobTriggerOperator(job_trigger_id=TRIGGER_ID, task_id="id")
         operator.execute(context=None)
         mock_hook.assert_called_once_with(gcp_conn_id=GCP_CONN_ID)
         mock_hook.return_value.update_job_trigger.assert_called_once_with(
@@ -612,9 +575,7 @@ class TestCloudDLPUpdateStoredInfoTypeOperator(unittest.TestCase):
     def test_update_stored_info_type(self, mock_hook):
         mock_hook.return_value.update_stored_info_type.return_value = mock.MagicMock()
         operator = CloudDLPUpdateStoredInfoTypeOperator(
-            stored_info_type_id=STORED_INFO_TYPE_ID,
-            organization_id=ORGANIZATION_ID,
-            task_id="id",
+            stored_info_type_id=STORED_INFO_TYPE_ID, organization_id=ORGANIZATION_ID, task_id="id",
         )
         operator.execute(context=None)
         mock_hook.assert_called_once_with(gcp_conn_id=GCP_CONN_ID)

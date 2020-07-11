@@ -58,6 +58,7 @@ class CloudSpeechToTextRecognizeSpeechOperator(BaseOperator):
         Note that if retry is specified, the timeout applies to each individual attempt.
     :type timeout: float
     """
+
     # [START gcp_speech_to_text_synthesize_template_fields]
     template_fields = ("audio", "config", "project_id", "gcp_conn_id", "timeout")
     # [END gcp_speech_to_text_synthesize_template_fields]
@@ -72,7 +73,7 @@ class CloudSpeechToTextRecognizeSpeechOperator(BaseOperator):
         retry: Optional[Retry] = None,
         timeout: Optional[float] = None,
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         self.audio = audio
         self.config = config

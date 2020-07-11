@@ -67,6 +67,7 @@ class CloudTextToSpeechSynthesizeOperator(BaseOperator):
         Note that if retry is specified, the timeout applies to each individual attempt.
     :type timeout: float
     """
+
     # [START gcp_text_to_speech_synthesize_template_fields]
     template_fields = (
         "input_data",
@@ -92,7 +93,7 @@ class CloudTextToSpeechSynthesizeOperator(BaseOperator):
         retry: Optional[Retry] = None,
         timeout: Optional[float] = None,
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         self.input_data = input_data
         self.voice = voice

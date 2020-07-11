@@ -64,9 +64,7 @@ class TestDagEndpoint(unittest.TestCase):
     def _create_dag_models(self, count, session=None):
         for num in range(1, count + 1):
             dag_model = DagModel(
-                dag_id=f"TEST_DAG_{num}",
-                fileloc=f"/tmp/dag_{num}.py",
-                schedule_interval="2 2 * * *"
+                dag_id=f"TEST_DAG_{num}", fileloc=f"/tmp/dag_{num}.py", schedule_interval="2 2 * * *"
             )
             session.add(dag_model)
 
@@ -79,17 +77,20 @@ class TestGetDag(TestDagEndpoint):
 
         current_response = response.json
         current_response["fileloc"] = "/tmp/test-dag.py"
-        self.assertEqual({
-            'dag_id': 'TEST_DAG_1',
-            'description': None,
-            'fileloc': '/tmp/test-dag.py',
-            'is_paused': False,
-            'is_subdag': False,
-            'owners': [],
-            'root_dag_id': None,
-            'schedule_interval': {'__type': 'CronExpression', 'value': '2 2 * * *'},
-            'tags': []
-        }, current_response)
+        self.assertEqual(
+            {
+                'dag_id': 'TEST_DAG_1',
+                'description': None,
+                'fileloc': '/tmp/test-dag.py',
+                'is_paused': False,
+                'is_subdag': False,
+                'owners': [],
+                'root_dag_id': None,
+                'schedule_interval': {'__type': 'CronExpression', 'value': '2 2 * * *'},
+                'tags': [],
+            },
+            current_response,
+        )
 
     def test_should_response_404(self):
         response = self.client.get("/api/v1/dags/INVALID_DAG")
@@ -113,15 +114,10 @@ class TestGetDagDetails(TestDagEndpoint):
             'is_subdag': False,
             'orientation': 'LR',
             'owners': [],
-            'schedule_interval': {
-                '__type': 'TimeDelta',
-                'days': 1,
-                'microseconds': 0,
-                'seconds': 0
-            },
+            'schedule_interval': {'__type': 'TimeDelta', 'days': 1, 'microseconds': 0, 'seconds': 0},
             'start_date': '2020-06-15T00:00:00+00:00',
             'tags': None,
-            'timezone': "Timezone('UTC')"
+            'timezone': "Timezone('UTC')",
         }
         assert response.json == expected
 
@@ -147,15 +143,10 @@ class TestGetDagDetails(TestDagEndpoint):
             'is_subdag': False,
             'orientation': 'LR',
             'owners': [],
-            'schedule_interval': {
-                '__type': 'TimeDelta',
-                'days': 1,
-                'microseconds': 0,
-                'seconds': 0
-            },
+            'schedule_interval': {'__type': 'TimeDelta', 'days': 1, 'microseconds': 0, 'seconds': 0},
             'start_date': '2020-06-15T00:00:00+00:00',
             'tags': None,
-            'timezone': "Timezone('UTC')"
+            'timezone': "Timezone('UTC')",
         }
         response = client.get(f"/api/v1/dags/{self.dag_id}/details")
         assert response.status_code == 200
@@ -163,7 +154,6 @@ class TestGetDagDetails(TestDagEndpoint):
 
 
 class TestGetDags(TestDagEndpoint):
-
     def test_should_response_200(self):
         self._create_dag_models(2)
 
@@ -208,13 +198,7 @@ class TestGetDags(TestDagEndpoint):
             ("api/v1/dags?limit=2", ["TEST_DAG_1", "TEST_DAG_10"]),
             (
                 "api/v1/dags?offset=5",
-                [
-                    "TEST_DAG_5",
-                    "TEST_DAG_6",
-                    "TEST_DAG_7",
-                    "TEST_DAG_8",
-                    "TEST_DAG_9",
-                ],
+                ["TEST_DAG_5", "TEST_DAG_6", "TEST_DAG_7", "TEST_DAG_8", "TEST_DAG_9",],
             ),
             (
                 "api/v1/dags?offset=0",

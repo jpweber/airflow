@@ -41,10 +41,7 @@ class TimeoutTestSensor(BaseSensorOperator):
     """
 
     @apply_defaults
-    def __init__(self,
-                 return_value=False,
-                 *args,
-                 **kwargs):
+    def __init__(self, return_value=False, *args, **kwargs):
         self.return_value = return_value
         super().__init__(*args, **kwargs)
 
@@ -68,10 +65,7 @@ class TimeoutTestSensor(BaseSensorOperator):
 
 class TestSensorTimeout(unittest.TestCase):
     def setUp(self):
-        args = {
-            'owner': 'airflow',
-            'start_date': DEFAULT_DATE
-        }
+        args = {'owner': 'airflow', 'start_date': DEFAULT_DATE}
         self.dag = DAG(TEST_DAG_ID, default_args=args)
 
     @pytest.mark.quarantined
@@ -82,10 +76,8 @@ class TestSensorTimeout(unittest.TestCase):
             return_value=False,
             poke_interval=5,
             params={'time_jump': timedelta(days=2, seconds=1)},
-            dag=self.dag
+            dag=self.dag,
         )
         self.assertRaises(
-            AirflowSensorTimeout,
-            op.run,
-            start_date=DEFAULT_DATE, end_date=DEFAULT_DATE, ignore_ti_state=True
+            AirflowSensorTimeout, op.run, start_date=DEFAULT_DATE, end_date=DEFAULT_DATE, ignore_ti_state=True
         )

@@ -38,12 +38,12 @@ class FileTaskHandler(logging.Handler):
     :param base_log_folder: Base log folder to place logs.
     :param filename_template: template filename string
     """
+
     def __init__(self, base_log_folder: str, filename_template: str):
         super().__init__()
         self.handler = None  # type: Optional[logging.FileHandler]
         self.local_base = base_log_folder
-        self.filename_template, self.filename_jinja_template = \
-            parse_template_string(filename_template)
+        self.filename_template, self.filename_jinja_template = parse_template_string(filename_template)
 
     def set_context(self, ti: TaskInstance):
         """
@@ -75,10 +75,12 @@ class FileTaskHandler(logging.Handler):
             jinja_context['try_number'] = try_number
             return self.filename_jinja_template.render(**jinja_context)
 
-        return self.filename_template.format(dag_id=ti.dag_id,
-                                             task_id=ti.task_id,
-                                             execution_date=ti.execution_date.isoformat(),
-                                             try_number=try_number)
+        return self.filename_template.format(
+            dag_id=ti.dag_id,
+            task_id=ti.task_id,
+            execution_date=ti.execution_date.isoformat(),
+            try_number=try_number,
+        )
 
     def _read(self, ti, try_number, metadata=None):  # pylint: disable=unused-argument
         """
@@ -108,8 +110,7 @@ class FileTaskHandler(logging.Handler):
                 log = "*** Failed to load local log file: {}\n".format(location)
                 log += "*** {}\n".format(str(e))
         elif conf.get('core', 'executor') == 'KubernetesExecutor':
-            log += '*** Trying to get logs (last 100 lines) from worker pod {} ***\n\n'\
-                .format(ti.hostname)
+            log += '*** Trying to get logs (last 100 lines) from worker pod {} ***\n\n'.format(ti.hostname)
 
             try:
                 from airflow.kubernetes.kube_client import get_kube_client
@@ -121,22 +122,17 @@ class FileTaskHandler(logging.Handler):
                     container='base',
                     follow=False,
                     tail_lines=100,
-                    _preload_content=False
+                    _preload_content=False,
                 )
 
                 for line in res:
                     log += line.decode()
 
             except Exception as f:  # pylint: disable=broad-except
-                log += '*** Unable to fetch logs from worker pod {} ***\n{}\n\n'.format(
-                    ti.hostname, str(f)
-                )
+                log += '*** Unable to fetch logs from worker pod {} ***\n{}\n\n'.format(ti.hostname, str(f))
         else:
-            url = os.path.join(
-                "http://{ti.hostname}:{worker_log_server_port}/log", log_relative_path
-            ).format(
-                ti=ti,
-                worker_log_server_port=conf.get('celery', 'WORKER_LOG_SERVER_PORT')
+            url = os.path.join("http://{ti.hostname}:{worker_log_server_port}/log", log_relative_path).format(
+                ti=ti, worker_log_server_port=conf.get('celery', 'WORKER_LOG_SERVER_PORT')
             )
             log += "*** Log file does not exist: {}\n".format(location)
             log += "*** Fetching from: {}\n".format(url)

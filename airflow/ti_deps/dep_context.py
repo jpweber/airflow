@@ -62,17 +62,19 @@ class DepContext:
     :param finished_tasks: A list of all the finished tasks of this run
     :type finished_tasks: list[airflow.models.TaskInstance]
     """
+
     def __init__(
-            self,
-            deps=None,
-            flag_upstream_failed=False,
-            ignore_all_deps=False,
-            ignore_depends_on_past=False,
-            ignore_in_retry_period=False,
-            ignore_in_reschedule_period=False,
-            ignore_task_deps=False,
-            ignore_ti_state=False,
-            finished_tasks=None):
+        self,
+        deps=None,
+        flag_upstream_failed=False,
+        ignore_all_deps=False,
+        ignore_depends_on_past=False,
+        ignore_in_retry_period=False,
+        ignore_in_reschedule_period=False,
+        ignore_task_deps=False,
+        ignore_ti_state=False,
+        finished_tasks=None,
+    ):
         self.deps = deps or set()
         self.flag_upstream_failed = flag_upstream_failed
         self.ignore_all_deps = ignore_all_deps

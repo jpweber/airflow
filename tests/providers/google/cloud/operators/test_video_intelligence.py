@@ -23,7 +23,8 @@ from google.cloud.videointelligence_v1 import enums
 from google.cloud.videointelligence_v1.proto.video_intelligence_pb2 import AnnotateVideoResponse
 
 from airflow.providers.google.cloud.operators.video_intelligence import (
-    CloudVideoIntelligenceDetectVideoExplicitContentOperator, CloudVideoIntelligenceDetectVideoLabelsOperator,
+    CloudVideoIntelligenceDetectVideoExplicitContentOperator,
+    CloudVideoIntelligenceDetectVideoLabelsOperator,
     CloudVideoIntelligenceDetectVideoShotsOperator,
 )
 
@@ -55,7 +56,7 @@ class TestCloudVideoIntelligenceOperators(unittest.TestCase):
             video_context=None,
             location=None,
             retry=None,
-            timeout=None
+            timeout=None,
         )
 
     @mock.patch("airflow.providers.google.cloud.operators.video_intelligence.CloudVideoIntelligenceHook")
@@ -76,7 +77,7 @@ class TestCloudVideoIntelligenceOperators(unittest.TestCase):
             video_context=None,
             location=None,
             retry=None,
-            timeout=None
+            timeout=None,
         )
 
     @mock.patch("airflow.providers.google.cloud.operators.video_intelligence.CloudVideoIntelligenceHook")
@@ -97,5 +98,5 @@ class TestCloudVideoIntelligenceOperators(unittest.TestCase):
             video_context=None,
             location=None,
             retry=None,
-            timeout=None
+            timeout=None,
         )

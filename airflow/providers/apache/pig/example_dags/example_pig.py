@@ -27,16 +27,6 @@ args = {
     'start_date': days_ago(2),
 }
 
-dag = DAG(
-    dag_id='example_pig_operator',
-    default_args=args,
-    schedule_interval=None,
-    tags=['example']
-)
+dag = DAG(dag_id='example_pig_operator', default_args=args, schedule_interval=None, tags=['example'])
 
-run_this = PigOperator(
-    task_id="run_example_pig_script",
-    pig="ls /;",
-    pig_opts="-x local",
-    dag=dag,
-)
+run_this = PigOperator(task_id="run_example_pig_script", pig="ls /;", pig_opts="-x local", dag=dag,)

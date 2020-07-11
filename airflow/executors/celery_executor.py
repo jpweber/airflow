@@ -63,9 +63,7 @@ if conf.has_option('celery', 'celery_config_options'):
 else:
     celery_configuration = DEFAULT_CELERY_CONFIG
 
-app = Celery(
-    conf.get('celery', 'CELERY_APP_NAME'),
-    config_source=celery_configuration)
+app = Celery(conf.get('celery', 'CELERY_APP_NAME'), config_source=celery_configuration)
 
 
 @app.task
@@ -77,8 +75,7 @@ def execute_command(command_to_exec: CommandType) -> None:
     log.info("Executing command in Celery: %s", command_to_exec)
     env = os.environ.copy()
     try:
-        subprocess.check_call(command_to_exec, stderr=subprocess.STDOUT,
-                              close_fds=True, env=env)
+        subprocess.check_call(command_to_exec, stderr=subprocess.STDOUT, close_fds=True, env=env)
     except subprocess.CalledProcessError as e:
         log.exception('execute_command encountered a CalledProcessError')
         log.error(e.output)
@@ -106,8 +103,9 @@ class ExceptionWithTraceback:
 TaskInstanceInCelery = Tuple[TaskInstanceKey, SimpleTaskInstance, CommandType, Optional[str], Task]
 
 
-def send_task_to_executor(task_tuple: TaskInstanceInCelery) \
-        -> Tuple[TaskInstanceKey, CommandType, Union[AsyncResult, ExceptionWithTraceback]]:
+def send_task_to_executor(
+    task_tuple: TaskInstanceInCelery,
+) -> Tuple[TaskInstanceKey, CommandType, Union[AsyncResult, ExceptionWithTraceback]]:
     """Sends task to executor."""
     key, _, command, queue, task_to_run = task_tuple
     try:
@@ -144,10 +142,7 @@ class CeleryExecutor(BaseExecutor):
         self.last_state = {}
 
     def start(self) -> None:
-        self.log.debug(
-            'Starting Celery Executor using %s processes for syncing',
-            self._sync_parallelism
-        )
+        self.log.debug('Starting Celery Executor using %s processes for syncing', self._sync_parallelism)
 
     def _num_tasks_per_send_process(self, to_send_count: int) -> int:
         """
@@ -156,8 +151,7 @@ class CeleryExecutor(BaseExecutor):
         :return: Number of tasks that should be sent per process
         :rtype: int
         """
-        return max(1,
-                   int(math.ceil(1.0 * to_send_count / self._sync_parallelism)))
+        return max(1, int(math.ceil(1.0 * to_send_count / self._sync_parallelism)))
 
     def trigger_tasks(self, open_slots: int) -> None:
         """
@@ -212,9 +206,8 @@ class CeleryExecutor(BaseExecutor):
         num_processes = min(len(task_tuples_to_send), self._sync_parallelism)
         with Pool(processes=num_processes) as send_pool:
             key_and_async_results = send_pool.map(
-                send_task_to_executor,
-                task_tuples_to_send,
-                chunksize=chunksize)
+                send_task_to_executor, task_tuples_to_send, chunksize=chunksize
+            )
         return key_and_async_results
 
     def sync(self) -> None:
@@ -264,11 +257,13 @@ class CeleryExecutor(BaseExecutor):
                 time.sleep(5)
         self.sync()
 
-    def execute_async(self,
-                      key: TaskInstanceKey,
-                      command: CommandType,
-                      queue: Optional[str] = None,
-                      executor_config: Optional[Any] = None):
+    def execute_async(
+        self,
+        key: TaskInstanceKey,
+        command: CommandType,
+        queue: Optional[str] = None,
+        executor_config: Optional[Any] = None,
+    ):
         """Do not allow async execution for Celery executor."""
         raise AirflowException("No Async execution for Celery executor.")
 
@@ -276,8 +271,7 @@ class CeleryExecutor(BaseExecutor):
         pass
 
 
-def fetch_celery_task_state(async_result: AsyncResult) -> \
-        Tuple[str, Union[str, ExceptionWithTraceback], Any]:
+def fetch_celery_task_state(async_result: AsyncResult) -> Tuple[str, Union[str, ExceptionWithTraceback], Any]:
     """
     Fetch and return the state of the given celery task. The scope of this function is
     global so that it can be called by subprocesses in the pool.
@@ -313,6 +307,7 @@ class BulkStateFetcher(LoggingMixin):
     If DatabaseBackend is used as result backend, the SELECT ...WHER task_id IN (...) query is used
     Otherwise, multiprocessing.Pool will be used. Each task status will be downloaded individually.
     """
+
     def __init__(self, sync_parralelism=None):
         super().__init__()
         self._sync_parallelism = sync_parralelism
@@ -351,8 +346,9 @@ class BulkStateFetcher(LoggingMixin):
         return self._prepare_state_and_info_by_task_dict(task_ids, task_results_by_task_id)
 
     @staticmethod
-    def _prepare_state_and_info_by_task_dict(task_ids,
-                                             task_results_by_task_id) -> Mapping[str, EventBufferValueType]:
+    def _prepare_state_and_info_by_task_dict(
+        task_ids, task_results_by_task_id
+    ) -> Mapping[str, EventBufferValueType]:
         state_info: MutableMapping[str, EventBufferValueType] = {}
         for task_id in task_ids:
             task_result = task_results_by_task_id.get(task_id)
@@ -372,16 +368,16 @@ class BulkStateFetcher(LoggingMixin):
             chunksize = max(1, math.floor(math.ceil(1.0 * len(async_results) / self._sync_parallelism)))
 
             task_id_to_states_and_info = sync_pool.map(
-                fetch_celery_task_state,
-                async_results,
-                chunksize=chunksize)
+                fetch_celery_task_state, async_results, chunksize=chunksize
+            )
 
             states_and_info_by_task_id: MutableMapping[str, EventBufferValueType] = {}
             for task_id, state_or_exception, info in task_id_to_states_and_info:
                 if isinstance(state_or_exception, ExceptionWithTraceback):
                     self.log.error(  # pylint: disable=logging-not-lazy
                         CELERY_FETCH_ERR_MSG_HEADER + ":%s\n%s\n",
-                        state_or_exception.exception, state_or_exception.traceback
+                        state_or_exception.exception,
+                        state_or_exception.traceback,
                     )
                 else:
                     states_and_info_by_task_id[task_id] = state_or_exception, info

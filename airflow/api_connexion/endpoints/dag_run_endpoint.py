@@ -21,7 +21,9 @@ from sqlalchemy import and_, func
 from airflow.api_connexion.exceptions import AlreadyExists, NotFound
 from airflow.api_connexion.parameters import check_limit, format_datetime, format_parameters
 from airflow.api_connexion.schemas.dag_run_schema import (
-    DAGRunCollection, dagrun_collection_schema, dagrun_schema,
+    DAGRunCollection,
+    dagrun_collection_schema,
+    dagrun_schema,
 )
 from airflow.models import DagModel, DagRun
 from airflow.utils.session import provide_session
@@ -33,12 +35,7 @@ def delete_dag_run(dag_id, dag_run_id, session):
     """
     Delete a DAG Run
     """
-    if (
-        session.query(DagRun)
-        .filter(and_(DagRun.dag_id == dag_id, DagRun.run_id == dag_run_id))
-        .delete()
-        == 0
-    ):
+    if session.query(DagRun).filter(and_(DagRun.dag_id == dag_id, DagRun.run_id == dag_run_id)).delete() == 0:
         raise NotFound(detail=f"DAGRun with DAG ID: '{dag_id}' and DagRun ID: '{dag_run_id}' not found")
     return NoContent, 204
 
@@ -48,22 +45,23 @@ def get_dag_run(dag_id, dag_run_id, session):
     """
     Get a DAG Run.
     """
-    dag_run = session.query(DagRun).filter(
-        DagRun.dag_id == dag_id, DagRun.run_id == dag_run_id).one_or_none()
+    dag_run = session.query(DagRun).filter(DagRun.dag_id == dag_id, DagRun.run_id == dag_run_id).one_or_none()
     if dag_run is None:
         raise NotFound("DAGRun not found")
     return dagrun_schema.dump(dag_run)
 
 
-@format_parameters({
-    'start_date_gte': format_datetime,
-    'start_date_lte': format_datetime,
-    'execution_date_gte': format_datetime,
-    'execution_date_lte': format_datetime,
-    'end_date_gte': format_datetime,
-    'end_date_lte': format_datetime,
-    'limit': check_limit
-})
+@format_parameters(
+    {
+        'start_date_gte': format_datetime,
+        'start_date_lte': format_datetime,
+        'execution_date_gte': format_datetime,
+        'execution_date_lte': format_datetime,
+        'end_date_gte': format_datetime,
+        'end_date_lte': format_datetime,
+        'limit': check_limit,
+    }
+)
 @provide_session
 def get_dag_runs(
     session,
@@ -112,9 +110,7 @@ def get_dag_runs(
     dag_run = query.order_by(DagRun.id).offset(offset).limit(limit).all()
     total_entries = session.query(func.count(DagRun.id)).scalar()
 
-    return dagrun_collection_schema.dump(
-        DAGRunCollection(dag_runs=dag_run, total_entries=total_entries)
-    )
+    return dagrun_collection_schema.dump(DAGRunCollection(dag_runs=dag_run, total_entries=total_entries))
 
 
 def get_dag_runs_batch():

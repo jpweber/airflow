@@ -33,9 +33,7 @@ class PigCliHook(BaseHook):
 
     """
 
-    def __init__(
-            self,
-            pig_cli_conn_id="pig_cli_default"):
+    def __init__(self, pig_cli_conn_id="pig_cli_default"):
         super().__init__()
         conn = self.get_connection(pig_cli_conn_id)
         self.pig_properties = conn.extra_dejson.get('pig_properties', '')
@@ -74,11 +72,8 @@ class PigCliHook(BaseHook):
                 if verbose:
                     self.log.info("%s", " ".join(pig_cmd))
                 sub_process = subprocess.Popen(
-                    pig_cmd,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.STDOUT,
-                    cwd=tmp_dir,
-                    close_fds=True)
+                    pig_cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=tmp_dir, close_fds=True
+                )
                 self.sub_process = sub_process
                 stdout = ''
                 for line in iter(sub_process.stdout.readline, b''):

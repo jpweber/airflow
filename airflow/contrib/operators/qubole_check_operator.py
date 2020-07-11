@@ -21,10 +21,13 @@ import warnings
 
 # pylint: disable=unused-import
 from airflow.providers.qubole.operators.qubole_check import (  # noqa
-    QuboleCheckOperator, QuboleValueCheckOperator, ValueCheckOperator,
+    QuboleCheckOperator,
+    QuboleValueCheckOperator,
+    ValueCheckOperator,
 )
 
 warnings.warn(
     "This module is deprecated. Please use `airflow.providers.qubole.operators.qubole_check`.",
-    DeprecationWarning, stacklevel=2
+    DeprecationWarning,
+    stacklevel=2,
 )

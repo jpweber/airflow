@@ -53,7 +53,7 @@ class GoogleDisplayVideo360ReportSensor(BaseSensorOperator):
         gcp_conn_id: str = "google_cloud_default",
         delegate_to: Optional[str] = None,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
 
@@ -64,9 +64,7 @@ class GoogleDisplayVideo360ReportSensor(BaseSensorOperator):
 
     def poke(self, context: Dict) -> bool:
         hook = GoogleDisplayVideo360Hook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            api_version=self.api_version,
+            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, api_version=self.api_version,
         )
 
         response = hook.get_query(query_id=self.report_id)
@@ -95,7 +93,7 @@ class GoogleDisplayVideo360GetSDFDownloadOperationSensor(BaseSensorOperator):
 
     """
 
-    template_fields = ("operation_name", )
+    template_fields = ("operation_name",)
 
     def __init__(
         self,
@@ -106,7 +104,7 @@ class GoogleDisplayVideo360GetSDFDownloadOperationSensor(BaseSensorOperator):
         mode: str = "reschedule",
         poke_interval: int = 60 * 5,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.mode = mode
@@ -118,9 +116,7 @@ class GoogleDisplayVideo360GetSDFDownloadOperationSensor(BaseSensorOperator):
 
     def poke(self, context: Dict) -> bool:
         hook = GoogleDisplayVideo360Hook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            api_version=self.api_version,
+            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, api_version=self.api_version,
         )
         operation = hook.get_sdf_download_operation(operation_name=self.operation_name)
 

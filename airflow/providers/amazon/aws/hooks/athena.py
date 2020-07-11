@@ -38,16 +38,23 @@ class AWSAthenaHook(AwsBaseHook):
     :type sleep_time: int
     """
 
-    INTERMEDIATE_STATES = ('QUEUED', 'RUNNING',)
-    FAILURE_STATES = ('FAILED', 'CANCELLED',)
+    INTERMEDIATE_STATES = (
+        'QUEUED',
+        'RUNNING',
+    )
+    FAILURE_STATES = (
+        'FAILED',
+        'CANCELLED',
+    )
     SUCCESS_STATES = ('SUCCEEDED',)
 
     def __init__(self, *args, sleep_time=30, **kwargs):
         super().__init__(client_type='athena', *args, **kwargs)
         self.sleep_time = sleep_time
 
-    def run_query(self, query, query_context, result_configuration, client_request_token=None,
-                  workgroup='primary'):
+    def run_query(
+        self, query, query_context, result_configuration, client_request_token=None, workgroup='primary'
+    ):
         """
         Run Presto query on athena with provided config and return submitted query_execution_id
 
@@ -67,7 +74,7 @@ class AWSAthenaHook(AwsBaseHook):
             'QueryString': query,
             'QueryExecutionContext': query_context,
             'ResultConfiguration': result_configuration,
-            'WorkGroup': workgroup
+            'WorkGroup': workgroup,
         }
         if client_request_token:
             params['ClientRequestToken'] = client_request_token
@@ -133,16 +140,14 @@ class AWSAthenaHook(AwsBaseHook):
         elif query_state in self.INTERMEDIATE_STATES or query_state in self.FAILURE_STATES:
             self.log.error('Query is in "%s" state. Cannot fetch results', query_state)
             return None
-        result_params = {
-            'QueryExecutionId': query_execution_id,
-            'MaxResults': max_results
-        }
+        result_params = {'QueryExecutionId': query_execution_id, 'MaxResults': max_results}
         if next_token_id:
             result_params['NextToken'] = next_token_id
         return self.get_conn().get_query_results(**result_params)
 
-    def get_query_results_paginator(self, query_execution_id, max_items=None,
-                                    page_size=None, starting_token=None):
+    def get_query_results_paginator(
+        self, query_execution_id, max_items=None, page_size=None, starting_token=None
+    ):
         """
         Fetch submitted athena query results. returns none if query is in intermediate state or
         failed/cancelled state else a paginator to iterate through pages of results. If you
@@ -170,9 +175,8 @@ class AWSAthenaHook(AwsBaseHook):
             'PaginationConfig': {
                 'MaxItems': max_items,
                 'PageSize': page_size,
-                'StartingToken': starting_token
-
-            }
+                'StartingToken': starting_token,
+            },
         }
         paginator = self.get_conn().get_paginator('get_query_results')
         return paginator.paginate(**result_params)

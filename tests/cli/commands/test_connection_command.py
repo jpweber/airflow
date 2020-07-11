@@ -32,18 +32,18 @@ from tests.test_utils.db import clear_db_connections
 
 class TestCliListConnections(unittest.TestCase):
     EXPECTED_CONS = [
-        ('airflow_db', 'mysql', ),
-        ('google_cloud_default', 'google_cloud_platform', ),
-        ('http_default', 'http', ),
-        ('local_mysql', 'mysql', ),
-        ('mongo_default', 'mongo', ),
-        ('mssql_default', 'mssql', ),
-        ('mysql_default', 'mysql', ),
-        ('pinot_broker_default', 'pinot', ),
-        ('postgres_default', 'postgres', ),
-        ('presto_default', 'presto', ),
-        ('sqlite_default', 'sqlite', ),
-        ('vertica_default', 'vertica', ),
+        ('airflow_db', 'mysql',),
+        ('google_cloud_default', 'google_cloud_platform',),
+        ('http_default', 'http',),
+        ('local_mysql', 'mysql',),
+        ('mongo_default', 'mongo',),
+        ('mssql_default', 'mssql',),
+        ('mysql_default', 'mysql',),
+        ('pinot_broker_default', 'pinot',),
+        ('postgres_default', 'postgres',),
+        ('presto_default', 'presto',),
+        ('sqlite_default', 'sqlite',),
+        ('vertica_default', 'vertica',),
     ]
 
     def setUp(self):
@@ -84,14 +84,17 @@ class TestCliListConnections(unittest.TestCase):
         conn_ids = [line.split("\t", 2)[0].strip() for line in lines[1:] if line]
         self.assertEqual(conn_ids, ['http_default'])
 
-    @mock.patch('airflow.cli.commands.connection_command.BaseHook.get_connections', return_value=[
-        Connection(conn_id="http_default", host="host1"),
-        Connection(conn_id="http_default", host="host2"),
-    ])
+    @mock.patch(
+        'airflow.cli.commands.connection_command.BaseHook.get_connections',
+        return_value=[
+            Connection(conn_id="http_default", host="host1"),
+            Connection(conn_id="http_default", host="host2"),
+        ],
+    )
     def test_cli_connections_filter_conn_id_include_secrets(self, mock_get_connections):
-        args = self.parser.parse_args([
-            "connections", "list", "--output", "tsv", '--conn-id', 'http_default', '--include-secrets'
-        ])
+        args = self.parser.parse_args(
+            ["connections", "list", "--output", "tsv", '--conn-id', 'http_default', '--include-secrets']
+        )
 
         with redirect_stdout(io.StringIO()) as stdout:
             connection_command.connections_list(args)
@@ -103,9 +106,7 @@ class TestCliListConnections(unittest.TestCase):
         mock_get_connections.assert_called_once_with('http_default')
 
     def test_cli_connections_include_secrets(self):
-        args = self.parser.parse_args([
-            "connections", "list", "--output", "tsv", '--include-secrets',
-        ])
+        args = self.parser.parse_args(["connections", "list", "--output", "tsv", '--include-secrets',])
 
         with self.assertRaises(SystemExit):
             connection_command.connections_list(args)
@@ -298,7 +299,7 @@ class TestCliDeleteConnections(unittest.TestCase):
             Connection(
                 conn_id="new1", conn_type="mysql", host="mysql", login="root", password="", schema="airflow"
             ),
-            session=session
+            session=session,
         )
         # Delete connections
         with redirect_stdout(io.StringIO()) as stdout:

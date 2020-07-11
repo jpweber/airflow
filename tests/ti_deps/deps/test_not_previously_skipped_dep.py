@@ -49,9 +49,7 @@ def test_no_skipmixin_parent():
     A simple DAG with no branching. Both op1 and op2 are DummyOperator. NotPreviouslySkippedDep is met.
     """
     start_date = pendulum.datetime(2020, 1, 1)
-    dag = DAG(
-        "test_no_skipmixin_parent_dag", schedule_interval=None, start_date=start_date
-    )
+    dag = DAG("test_no_skipmixin_parent_dag", schedule_interval=None, start_date=start_date)
     op1 = DummyOperator(task_id="op1", dag=dag)
     op2 = DummyOperator(task_id="op2", dag=dag)
     op1 >> op2
@@ -70,9 +68,7 @@ def test_parent_follow_branch():
     A simple DAG with a BranchPythonOperator that follows op2. NotPreviouslySkippedDep is met.
     """
     start_date = pendulum.datetime(2020, 1, 1)
-    dag = DAG(
-        "test_parent_follow_branch_dag", schedule_interval=None, start_date=start_date
-    )
+    dag = DAG("test_parent_follow_branch_dag", schedule_interval=None, start_date=start_date)
     op1 = BranchPythonOperator(task_id="op1", python_callable=lambda: "op2", dag=dag)
     op2 = DummyOperator(task_id="op2", dag=dag)
     op1 >> op2
@@ -92,9 +88,7 @@ def test_parent_skip_branch():
     A simple DAG with a BranchPythonOperator that does not follow op2. NotPreviouslySkippedDep is not met.
     """
     start_date = pendulum.datetime(2020, 1, 1)
-    dag = DAG(
-        "test_parent_skip_branch_dag", schedule_interval=None, start_date=start_date
-    )
+    dag = DAG("test_parent_skip_branch_dag", schedule_interval=None, start_date=start_date)
     op1 = BranchPythonOperator(task_id="op1", python_callable=lambda: "op3", dag=dag)
     op2 = DummyOperator(task_id="op2", dag=dag)
     op3 = DummyOperator(task_id="op3", dag=dag)
@@ -116,9 +110,7 @@ def test_parent_not_executed():
     executed (no xcom data). NotPreviouslySkippedDep is met (no decision).
     """
     start_date = pendulum.datetime(2020, 1, 1)
-    dag = DAG(
-        "test_parent_not_executed_dag", schedule_interval=None, start_date=start_date
-    )
+    dag = DAG("test_parent_not_executed_dag", schedule_interval=None, start_date=start_date)
     op1 = BranchPythonOperator(task_id="op1", python_callable=lambda: "op3", dag=dag)
     op2 = DummyOperator(task_id="op2", dag=dag)
     op3 = DummyOperator(task_id="op3", dag=dag)

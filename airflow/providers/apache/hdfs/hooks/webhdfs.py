@@ -84,8 +84,9 @@ class WebHDFSHook(BaseHook):
                     self.log.error("Could not connect to %s:%s", connection.host, connection.port)
                 host_socket.close()
             except HdfsError as hdfs_error:
-                self.log.error('Read operation on namenode %s failed with error: %s',
-                               connection.host, hdfs_error)
+                self.log.error(
+                    'Read operation on namenode %s failed with error: %s', connection.host, hdfs_error
+                )
         return None
 
     def _get_client(self, connection):
@@ -134,9 +135,7 @@ class WebHDFSHook(BaseHook):
         """
         conn = self.get_conn()
 
-        conn.upload(hdfs_path=destination,
-                    local_path=source,
-                    overwrite=overwrite,
-                    n_threads=parallelism,
-                    **kwargs)
+        conn.upload(
+            hdfs_path=destination, local_path=source, overwrite=overwrite, n_threads=parallelism, **kwargs
+        )
         self.log.debug("Uploaded file %s to %s", source, destination)

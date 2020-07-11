@@ -71,7 +71,7 @@ with models.DAG(
         format_=FORMAT,
         source_language=SOURCE_LANGUAGE,
         model=MODEL,
-        task_id='translate_speech_task'
+        task_id='translate_speech_task',
     )
     translate_speech_task2 = CloudTranslateSpeechOperator(
         audio=AUDIO,
@@ -80,7 +80,7 @@ with models.DAG(
         format_=FORMAT,
         source_language=SOURCE_LANGUAGE,
         model=MODEL,
-        task_id='translate_speech_task2'
+        task_id='translate_speech_task2',
     )
     # [END howto_operator_translate_speech]
     text_to_speech_synthesize_task >> translate_speech_task >> translate_speech_task2

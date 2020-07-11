@@ -24,9 +24,9 @@ from inspect import isclass
 from typing import List
 
 
-def import_all_provider_classes(source_path: str,
-                                provider_ids: List[str] = None,
-                                print_imports: bool = False) -> List[str]:
+def import_all_provider_classes(
+    source_path: str, provider_ids: List[str] = None, print_imports: bool = False
+) -> List[str]:
     """
     Imports all classes in providers packages. This method loads and imports
     all the classes found in providers, so that we can find all the subclasses
@@ -38,19 +38,22 @@ def import_all_provider_classes(source_path: str,
     :return: list of all imported classes
     """
     if provider_ids:
-        prefixed_provider_paths = [source_path + "/airflow/providers/" + provider_id.replace(".", "/")
-                                   for provider_id in provider_ids]
+        prefixed_provider_paths = [
+            source_path + "/airflow/providers/" + provider_id.replace(".", "/")
+            for provider_id in provider_ids
+        ]
     else:
         prefixed_provider_paths = [source_path + "/airflow/providers/"]
 
     imported_classes = []
     tracebacks = []
     for root, _, files in os.walk(source_path):
-        if all([not root.startswith(prefix_provider_path)
-                for prefix_provider_path in prefixed_provider_paths]) or root.endswith("__pycache__"):
+        if all(
+            [not root.startswith(prefix_provider_path) for prefix_provider_path in prefixed_provider_paths]
+        ) or root.endswith("__pycache__"):
             # Skip loading module if it is not in the list of providers that we are looking for
             continue
-        package_name = root[len(source_path) + 1:].replace("/", ".")
+        package_name = root[len(source_path) + 1 :].replace("/", ".")
         for file in files:
             if file.endswith(".py"):
                 module_name = package_name + "." + file[:-3] if file != "__init__.py" else package_name
@@ -70,9 +73,12 @@ def import_all_provider_classes(source_path: str,
                     exception_str = traceback.format_exc()
                     tracebacks.append(exception_str)
     if tracebacks:
-        print("""
+        print(
+            """
 ERROR: There were some import errors
-""", file=sys.stderr)
+""",
+            file=sys.stderr,
+        )
         for trace in tracebacks:
             print("----------------------------------------", file=sys.stderr)
             print(trace, file=sys.stderr)

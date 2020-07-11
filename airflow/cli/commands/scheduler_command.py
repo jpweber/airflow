@@ -35,23 +35,19 @@ def scheduler(args):
         dag_id=args.dag_id,
         subdir=process_subdir(args.subdir),
         num_runs=args.num_runs,
-        do_pickle=args.do_pickle)
+        do_pickle=args.do_pickle,
+    )
 
     if args.daemon:
-        pid, stdout, stderr, log_file = setup_locations("scheduler",
-                                                        args.pid,
-                                                        args.stdout,
-                                                        args.stderr,
-                                                        args.log_file)
+        pid, stdout, stderr, log_file = setup_locations(
+            "scheduler", args.pid, args.stdout, args.stderr, args.log_file
+        )
         handle = setup_logging(log_file)
         stdout = open(stdout, 'w+')
         stderr = open(stderr, 'w+')
 
         ctx = daemon.DaemonContext(
-            pidfile=TimeoutPIDLockFile(pid, -1),
-            files_preserve=[handle],
-            stdout=stdout,
-            stderr=stderr,
+            pidfile=TimeoutPIDLockFile(pid, -1), files_preserve=[handle], stdout=stdout, stderr=stderr,
         )
         with ctx:
             job.run()

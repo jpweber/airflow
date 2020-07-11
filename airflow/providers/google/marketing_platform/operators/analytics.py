@@ -54,22 +54,14 @@ class GoogleAnalyticsListAccountsOperator(BaseOperator):
     )
 
     @apply_defaults
-    def __init__(
-        self,
-        api_version: str = "v3",
-        gcp_conn_id: str = "google_cloud_default",
-        *args,
-        **kwargs
-    ):
+    def __init__(self, api_version: str = "v3", gcp_conn_id: str = "google_cloud_default", *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.api_version = api_version
         self.gcp_conn_id = gcp_conn_id
 
     def execute(self, context):
-        hook = GoogleAnalyticsHook(
-            api_version=self.api_version, gcp_conn_id=self.gcp_conn_id
-        )
+        hook = GoogleAnalyticsHook(api_version=self.api_version, gcp_conn_id=self.gcp_conn_id)
         result = hook.list_accounts()
         return result
 
@@ -111,7 +103,7 @@ class GoogleAnalyticsGetAdsLinkOperator(BaseOperator):
         api_version: str = "v3",
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
 
@@ -122,9 +114,7 @@ class GoogleAnalyticsGetAdsLinkOperator(BaseOperator):
         self.gcp_conn_id = gcp_conn_id
 
     def execute(self, context):
-        hook = GoogleAnalyticsHook(
-            api_version=self.api_version, gcp_conn_id=self.gcp_conn_id
-        )
+        hook = GoogleAnalyticsHook(api_version=self.api_version, gcp_conn_id=self.gcp_conn_id)
         result = hook.get_ad_words_link(
             account_id=self.account_id,
             web_property_id=self.web_property_id,
@@ -166,7 +156,7 @@ class GoogleAnalyticsRetrieveAdsLinksListOperator(BaseOperator):
         api_version: str = "v3",
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
 
@@ -176,12 +166,8 @@ class GoogleAnalyticsRetrieveAdsLinksListOperator(BaseOperator):
         self.gcp_conn_id = gcp_conn_id
 
     def execute(self, context):
-        hook = GoogleAnalyticsHook(
-            api_version=self.api_version, gcp_conn_id=self.gcp_conn_id
-        )
-        result = hook.list_ad_words_links(
-            account_id=self.account_id, web_property_id=self.web_property_id,
-        )
+        hook = GoogleAnalyticsHook(api_version=self.api_version, gcp_conn_id=self.gcp_conn_id)
+        result = hook.list_ad_words_links(account_id=self.account_id, web_property_id=self.web_property_id,)
         return result
 
 
@@ -227,7 +213,7 @@ class GoogleAnalyticsDataImportUploadOperator(BaseOperator):
         delegate_to: Optional[str] = None,
         api_version: str = "v3",
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.storage_bucket = storage_bucket
@@ -241,26 +227,18 @@ class GoogleAnalyticsDataImportUploadOperator(BaseOperator):
         self.api_version = api_version
 
     def execute(self, context):
-        gcs_hook = GCSHook(
-            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to
-        )
+        gcs_hook = GCSHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
 
         ga_hook = GoogleAnalyticsHook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-            api_version=self.api_version,
+            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to, api_version=self.api_version,
         )
 
         with NamedTemporaryFile("w+") as tmp_file:
             self.log.info(
-                "Downloading file from GCS: %s/%s ",
-                self.storage_bucket,
-                self.storage_name_object,
+                "Downloading file from GCS: %s/%s ", self.storage_bucket, self.storage_name_object,
             )
             gcs_hook.download(
-                bucket_name=self.storage_bucket,
-                object_name=self.storage_name_object,
-                filename=tmp_file.name,
+                bucket_name=self.storage_bucket, object_name=self.storage_name_object, filename=tmp_file.name,
             )
 
             ga_hook.upload_data(
@@ -299,7 +277,7 @@ class GoogleAnalyticsDeletePreviousDataUploadsOperator(BaseOperator):
         delegate_to: Optional[str] = None,
         api_version: str = "v3",
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
 
@@ -325,10 +303,7 @@ class GoogleAnalyticsDeletePreviousDataUploadsOperator(BaseOperator):
         delete_request_body = {"customDataImportUids": cids}
 
         ga_hook.delete_upload_data(
-            self.account_id,
-            self.web_property_id,
-            self.custom_data_source_id,
-            delete_request_body,
+            self.account_id, self.web_property_id, self.custom_data_source_id, delete_request_body,
         )
 
 
@@ -365,11 +340,9 @@ class GoogleAnalyticsModifyFileHeadersDataImportOperator(BaseOperator):
         delegate_to: Optional[str] = None,
         custom_dimension_header_mapping: Optional[Dict[str, str]] = None,
         *args,
-        **kwargs
+        **kwargs,
     ):
-        super(GoogleAnalyticsModifyFileHeadersDataImportOperator, self).__init__(
-            *args, **kwargs
-        )
+        super(GoogleAnalyticsModifyFileHeadersDataImportOperator, self).__init__(*args, **kwargs)
         self.storage_bucket = storage_bucket
         self.storage_name_object = storage_name_object
         self.gcp_conn_id = gcp_conn_id
@@ -414,15 +387,11 @@ class GoogleAnalyticsModifyFileHeadersDataImportOperator(BaseOperator):
         with NamedTemporaryFile("w+") as tmp_file:
             # Download file from GCS
             self.log.info(
-                "Downloading file from GCS: %s/%s ",
-                self.storage_bucket,
-                self.storage_name_object,
+                "Downloading file from GCS: %s/%s ", self.storage_bucket, self.storage_name_object,
             )
 
             gcs_hook.download(
-                bucket_name=self.storage_bucket,
-                object_name=self.storage_name_object,
-                filename=tmp_file.name,
+                bucket_name=self.storage_bucket, object_name=self.storage_name_object, filename=tmp_file.name,
             )
 
             # Modify file
@@ -434,12 +403,8 @@ class GoogleAnalyticsModifyFileHeadersDataImportOperator(BaseOperator):
 
             # Upload newly formatted file to cloud storage
             self.log.info(
-                "Uploading file to GCS: %s/%s ",
-                self.storage_bucket,
-                self.storage_name_object,
+                "Uploading file to GCS: %s/%s ", self.storage_bucket, self.storage_name_object,
             )
             gcs_hook.upload(
-                bucket_name=self.storage_bucket,
-                object_name=self.storage_name_object,
-                filename=tmp_file.name,
+                bucket_name=self.storage_bucket, object_name=self.storage_name_object, filename=tmp_file.name,
             )

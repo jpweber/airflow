@@ -67,6 +67,7 @@ class AirflowPluginException(Exception):
 
 class AirflowPlugin:
     """Class used to define AirflowPlugin."""
+
     name: Optional[str] = None
     operators: List[Any] = []
     sensors: List[Any] = []
@@ -122,9 +123,9 @@ def is_valid_plugin(plugin_obj):
     global plugins  # pylint: disable=global-statement
 
     if (
-        inspect.isclass(plugin_obj) and
-        issubclass(plugin_obj, AirflowPlugin) and
-        (plugin_obj is not AirflowPlugin)
+        inspect.isclass(plugin_obj)
+        and issubclass(plugin_obj, AirflowPlugin)
+        and (plugin_obj is not AirflowPlugin)
     ):
         plugin_obj.validate()
         return plugin_obj not in plugins
@@ -165,8 +166,7 @@ def load_plugins_from_plugin_directory():
     global plugins  # pylint: disable=global-statement
     log.debug("Loading plugins from directory: %s", settings.PLUGINS_FOLDER)
 
-    for file_path in find_path_from_directory(
-            settings.PLUGINS_FOLDER, ".airflowignore"):
+    for file_path in find_path_from_directory(settings.PLUGINS_FOLDER, ".airflowignore"):
 
         if not os.path.isfile(file_path):
             continue
@@ -202,9 +202,11 @@ def make_module(name: str, objects: List[Any]):
     name = name.lower()
     module = types.ModuleType(name)
     module._name = name.split('.')[-1]  # type: ignore
-    module._objects = objects           # type: ignore
+    module._objects = objects  # type: ignore
     module.__dict__.update((o.__name__, o) for o in objects)
     return module
+
+
 # pylint: enable=protected-access
 
 
@@ -243,11 +245,13 @@ def initialize_web_ui_plugins():
     global flask_appbuilder_menu_links
     # pylint: enable=global-statement
 
-    if admin_views is not None and \
-            flask_blueprints is not None and \
-            menu_links is not None and \
-            flask_appbuilder_views is not None and \
-            flask_appbuilder_menu_links is not None:
+    if (
+        admin_views is not None
+        and flask_blueprints is not None
+        and menu_links is not None
+        and flask_appbuilder_views is not None
+        and flask_appbuilder_menu_links is not None
+    ):
         return
 
     ensure_plugins_loaded()
@@ -268,16 +272,13 @@ def initialize_web_ui_plugins():
         menu_links.extend(plugin.menu_links)
         flask_appbuilder_views.extend(plugin.appbuilder_views)
         flask_appbuilder_menu_links.extend(plugin.appbuilder_menu_items)
-        flask_blueprints.extend([{
-            'name': plugin.name,
-            'blueprint': bp
-        } for bp in plugin.flask_blueprints])
+        flask_blueprints.extend([{'name': plugin.name, 'blueprint': bp} for bp in plugin.flask_blueprints])
 
         if (admin_views and not flask_appbuilder_views) or (menu_links and not flask_appbuilder_menu_links):
             log.warning(
                 "Plugin \'%s\' may not be compatible with the current Airflow version. "
                 "Please contact the author of the plugin.",
-                plugin.name
+                plugin.name,
             )
 
 
@@ -289,9 +290,11 @@ def initialize_extra_operators_links_plugins():
     global registered_operator_link_classes
     # pylint: enable=global-statement
 
-    if global_operator_extra_links is not None and \
-            operator_extra_links is not None and \
-            registered_operator_link_classes is not None:
+    if (
+        global_operator_extra_links is not None
+        and operator_extra_links is not None
+        and registered_operator_link_classes is not None
+    ):
         return
 
     ensure_plugins_loaded()
@@ -309,11 +312,12 @@ def initialize_extra_operators_links_plugins():
         global_operator_extra_links.extend(plugin.global_operator_extra_links)
         operator_extra_links.extend(list(plugin.operator_extra_links))
 
-        registered_operator_link_classes.update({
-            "{}.{}".format(link.__class__.__module__,
-                           link.__class__.__name__): link.__class__
-            for link in plugin.operator_extra_links
-        })
+        registered_operator_link_classes.update(
+            {
+                "{}.{}".format(link.__class__.__module__, link.__class__.__name__): link.__class__
+                for link in plugin.operator_extra_links
+            }
+        )
 
 
 def integrate_executor_plugins() -> None:
@@ -355,10 +359,12 @@ def integrate_dag_plugins() -> None:
     global macros_modules
     # pylint: enable=global-statement
 
-    if operators_modules is not None and \
-            sensors_modules is not None and \
-            hooks_modules is not None and \
-            macros_modules is not None:
+    if (
+        operators_modules is not None
+        and sensors_modules is not None
+        and hooks_modules is not None
+        and macros_modules is not None
+    ):
         return
 
     ensure_plugins_loaded()

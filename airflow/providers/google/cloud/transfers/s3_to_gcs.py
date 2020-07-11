@@ -92,33 +92,34 @@ class S3ToGCSOperator(S3ListOperator):
 
     # pylint: disable=too-many-arguments
     @apply_defaults
-    def __init__(self,
-                 bucket,
-                 prefix='',
-                 delimiter='',
-                 aws_conn_id='aws_default',
-                 verify=None,
-                 gcp_conn_id='google_cloud_default',
-                 dest_gcs_conn_id=None,
-                 dest_gcs=None,
-                 delegate_to=None,
-                 replace=False,
-                 gzip=False,
-                 *args,
-                 **kwargs):
+    def __init__(
+        self,
+        bucket,
+        prefix='',
+        delimiter='',
+        aws_conn_id='aws_default',
+        verify=None,
+        gcp_conn_id='google_cloud_default',
+        dest_gcs_conn_id=None,
+        dest_gcs=None,
+        delegate_to=None,
+        replace=False,
+        gzip=False,
+        *args,
+        **kwargs,
+    ):
 
         super().__init__(
-            bucket=bucket,
-            prefix=prefix,
-            delimiter=delimiter,
-            aws_conn_id=aws_conn_id,
-            *args,
-            **kwargs)
+            bucket=bucket, prefix=prefix, delimiter=delimiter, aws_conn_id=aws_conn_id, *args, **kwargs
+        )
 
         if dest_gcs_conn_id:
             warnings.warn(
                 "The dest_gcs_conn_id parameter has been deprecated. You should pass "
-                "the gcp_conn_id parameter.", DeprecationWarning, stacklevel=3)
+                "the gcp_conn_id parameter.",
+                DeprecationWarning,
+                stacklevel=3,
+            )
             gcp_conn_id = dest_gcs_conn_id
 
         self.gcp_conn_id = gcp_conn_id
@@ -132,17 +133,17 @@ class S3ToGCSOperator(S3ListOperator):
             self.log.info(
                 'Destination Google Cloud Storage path is not a valid '
                 '"directory", define a path that ends with a slash "/" or '
-                'leave it empty for the root of the bucket.')
-            raise AirflowException('The destination Google Cloud Storage path '
-                                   'must end with a slash "/" or be empty.')
+                'leave it empty for the root of the bucket.'
+            )
+            raise AirflowException(
+                'The destination Google Cloud Storage path ' 'must end with a slash "/" or be empty.'
+            )
 
     def execute(self, context):
         # use the super method to list all the files in an S3 bucket/key
         files = super().execute(context)
 
-        gcs_hook = GCSHook(
-            google_cloud_storage_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to)
+        gcs_hook = GCSHook(google_cloud_storage_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
 
         # pylint: disable=too-many-nested-blocks
         if not self.replace:
@@ -150,8 +151,7 @@ class S3ToGCSOperator(S3ListOperator):
             # and only keep those files which are present in
             # S3 and not in Google Cloud Storage
             bucket_name, object_prefix = _parse_gcs_url(self.dest_gcs)
-            existing_files_prefixed = gcs_hook.list(
-                bucket_name, prefix=object_prefix)
+            existing_files_prefixed = gcs_hook.list(bucket_name, prefix=object_prefix)
 
             existing_files = []
 
@@ -163,18 +163,15 @@ class S3ToGCSOperator(S3ListOperator):
                 # Remove the object prefix from all object string paths
                 for f in existing_files_prefixed:
                     if f.startswith(object_prefix):
-                        existing_files.append(f[len(object_prefix):])
+                        existing_files.append(f[len(object_prefix) :])
                     else:
                         existing_files.append(f)
 
             files = list(set(files) - set(existing_files))
             if len(files) > 0:
-                self.log.info(
-                    '%s files are going to be synced: %s.', len(files), files
-                )
+                self.log.info('%s files are going to be synced: %s.', len(files), files)
             else:
-                self.log.info(
-                    'There are no new files to sync. Have a nice day!')
+                self.log.info('There are no new files to sync. Have a nice day!')
 
         if files:
             hook = S3Hook(aws_conn_id=self.aws_conn_id, verify=self.verify)
@@ -187,8 +184,7 @@ class S3ToGCSOperator(S3ListOperator):
                     file_object.download_fileobj(f)
                     f.flush()
 
-                    dest_gcs_bucket, dest_gcs_object_prefix = _parse_gcs_url(
-                        self.dest_gcs)
+                    dest_gcs_bucket, dest_gcs_object_prefix = _parse_gcs_url(self.dest_gcs)
                     # There will always be a '/' before file because it is
                     # enforced at instantiation time
                     dest_gcs_object = dest_gcs_object_prefix + file
@@ -203,13 +199,9 @@ class S3ToGCSOperator(S3ListOperator):
 
                     gcs_hook.upload(dest_gcs_bucket, dest_gcs_object, f.name, gzip=self.gzip)
 
-            self.log.info(
-                "All done, uploaded %d files to Google Cloud Storage",
-                len(files))
+            self.log.info("All done, uploaded %d files to Google Cloud Storage", len(files))
         else:
-            self.log.info(
-                'In sync, no files needed to be uploaded to Google Cloud'
-                'Storage')
+            self.log.info('In sync, no files needed to be uploaded to Google Cloud' 'Storage')
 
         return files
 

@@ -20,9 +20,12 @@
 import warnings
 
 from airflow.providers.google.cloud.operators.spanner import (
-    SpannerDeleteDatabaseInstanceOperator, SpannerDeleteInstanceOperator,
-    SpannerDeployDatabaseInstanceOperator, SpannerDeployInstanceOperator,
-    SpannerQueryDatabaseInstanceOperator, SpannerUpdateDatabaseInstanceOperator,
+    SpannerDeleteDatabaseInstanceOperator,
+    SpannerDeleteInstanceOperator,
+    SpannerDeployDatabaseInstanceOperator,
+    SpannerDeployInstanceOperator,
+    SpannerQueryDatabaseInstanceOperator,
+    SpannerUpdateDatabaseInstanceOperator,
 )
 
 warnings.warn(

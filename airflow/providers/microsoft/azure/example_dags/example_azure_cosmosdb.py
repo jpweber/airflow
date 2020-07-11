@@ -37,14 +37,11 @@ default_args = {
     'start_date': dates.days_ago(2),
     'email': ['airflow@example.com'],
     'email_on_failure': False,
-    'email_on_retry': False
+    'email_on_retry': False,
 }
 
 with DAG(
-    dag_id='example_azure_cosmosdb_sensor',
-    default_args=default_args,
-    doc_md=__doc__,
-    tags=['example'],
+    dag_id='example_azure_cosmosdb_sensor', default_args=default_args, doc_md=__doc__, tags=['example'],
 ) as dag:
 
     t1 = AzureCosmosDocumentSensor(

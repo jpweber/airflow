@@ -33,13 +33,11 @@ TYPED_DECORATORS = {
 
 class TypedDecoratorPlugin(Plugin):
     """Mypy plugin for typed decorators."""
+
     def get_function_hook(self, fullname: str):
         """Check for known typed decorators by name."""
         if fullname in TYPED_DECORATORS:
-            return functools.partial(
-                _analyze_decorator,
-                provided_arguments=TYPED_DECORATORS[fullname],
-            )
+            return functools.partial(_analyze_decorator, provided_arguments=TYPED_DECORATORS[fullname],)
         return None
 
 
@@ -49,16 +47,12 @@ def _analyze_decorator(function_ctx: FunctionContext, provided_arguments: List[s
     if not isinstance(function_ctx.default_return_type, CallableType):
         return function_ctx.default_return_type
     return _change_decorator_function_type(
-        function_ctx.arg_types[0][0],
-        function_ctx.default_return_type,
-        provided_arguments,
+        function_ctx.arg_types[0][0], function_ctx.default_return_type, provided_arguments,
     )
 
 
 def _change_decorator_function_type(
-    decorated: CallableType,
-    decorator: CallableType,
-    provided_arguments: List[str],
+    decorated: CallableType, decorator: CallableType, provided_arguments: List[str],
 ) -> CallableType:
     decorator.arg_kinds = decorated.arg_kinds
     decorator.arg_names = decorated.arg_names

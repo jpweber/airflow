@@ -86,21 +86,21 @@ class ImapHook(BaseHook):
         :returns: True if there is an attachment with the given name and False if not.
         :rtype: bool
         """
-        mail_attachments = self._retrieve_mails_attachments_by_name(name,
-                                                                    check_regex,
-                                                                    True,
-                                                                    mail_folder,
-                                                                    mail_filter)
+        mail_attachments = self._retrieve_mails_attachments_by_name(
+            name, check_regex, True, mail_folder, mail_filter
+        )
         return len(mail_attachments) > 0
 
-    def retrieve_mail_attachments(self,
-                                  name,
-                                  *,
-                                  check_regex=False,
-                                  latest_only=False,
-                                  mail_folder='INBOX',
-                                  mail_filter='All',
-                                  not_found_mode='raise'):
+    def retrieve_mail_attachments(
+        self,
+        name,
+        *,
+        check_regex=False,
+        latest_only=False,
+        mail_folder='INBOX',
+        mail_filter='All',
+        not_found_mode='raise',
+    ):
         """
         Retrieves mail's attachments in the mail folder by its name.
 
@@ -124,26 +124,26 @@ class ImapHook(BaseHook):
         :returns: a list of tuple each containing the attachment filename and its payload.
         :rtype: a list of tuple
         """
-        mail_attachments = self._retrieve_mails_attachments_by_name(name,
-                                                                    check_regex,
-                                                                    latest_only,
-                                                                    mail_folder,
-                                                                    mail_filter)
+        mail_attachments = self._retrieve_mails_attachments_by_name(
+            name, check_regex, latest_only, mail_folder, mail_filter
+        )
 
         if not mail_attachments:
             self._handle_not_found_mode(not_found_mode)
 
         return mail_attachments
 
-    def download_mail_attachments(self,
-                                  name,
-                                  local_output_directory,
-                                  *,
-                                  check_regex=False,
-                                  latest_only=False,
-                                  mail_folder='INBOX',
-                                  mail_filter='All',
-                                  not_found_mode='raise'):
+    def download_mail_attachments(
+        self,
+        name,
+        local_output_directory,
+        *,
+        check_regex=False,
+        latest_only=False,
+        mail_folder='INBOX',
+        mail_filter='All',
+        not_found_mode='raise',
+    ):
         """
         Downloads mail's attachments in the mail folder by its name to the local directory.
 
@@ -168,11 +168,9 @@ class ImapHook(BaseHook):
             if set to 'ignore' it won't notify you at all.
         :type not_found_mode: str
         """
-        mail_attachments = self._retrieve_mails_attachments_by_name(name,
-                                                                    check_regex,
-                                                                    latest_only,
-                                                                    mail_folder,
-                                                                    mail_filter)
+        mail_attachments = self._retrieve_mails_attachments_by_name(
+            name, check_regex, latest_only, mail_folder, mail_filter
+        )
 
         if not mail_attachments:
             self._handle_not_found_mode(not_found_mode)
@@ -242,8 +240,11 @@ class ImapHook(BaseHook):
         return '../' in name
 
     def _correct_path(self, name, local_output_directory):
-        return local_output_directory + name if local_output_directory.endswith('/') \
+        return (
+            local_output_directory + name
+            if local_output_directory.endswith('/')
             else local_output_directory + '/' + name
+        )
 
     def _create_file(self, name, payload, local_output_directory):
         file_path = self._correct_path(name, local_output_directory)
@@ -290,8 +291,9 @@ class Mail(LoggingMixin):
         attachments = []
 
         for attachment in self._iterate_attachments():
-            found_attachment = attachment.has_matching_name(name) if check_regex \
-                else attachment.has_equal_name(name)
+            found_attachment = (
+                attachment.has_matching_name(name) if check_regex else attachment.has_equal_name(name)
+            )
             if found_attachment:
                 file_name, file_payload = attachment.get_file()
                 self.log.info('Found attachment: %s', file_name)

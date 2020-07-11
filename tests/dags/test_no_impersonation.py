@@ -38,10 +38,7 @@ test_command = dedent(
         echo 'current uid does not have root privileges!'
         exit 1
     fi
-    """)
-
-task = BashOperator(
-    task_id='test_superuser',
-    bash_command=test_command,
-    dag=dag,
+    """
 )
+
+task = BashOperator(task_id='test_superuser', bash_command=test_command, dag=dag,)

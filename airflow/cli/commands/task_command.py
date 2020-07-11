@@ -77,8 +77,7 @@ def _run_task_by_executor(args, dag, ti):
                 session.add(pickle)
                 pickle_id = pickle.id
                 # TODO: This should be written to a log
-                print('Pickled dag {dag} as pickle_id: {pickle_id}'.format(
-                    dag=dag, pickle_id=pickle_id))
+                print('Pickled dag {dag} as pickle_id: {pickle_id}'.format(dag=dag, pickle_id=pickle_id))
         except Exception as e:
             print('Could not pickle the DAG')
             print(e)
@@ -94,7 +93,8 @@ def _run_task_by_executor(args, dag, ti):
         ignore_depends_on_past=args.ignore_depends_on_past,
         ignore_task_deps=args.ignore_dependencies,
         ignore_ti_state=args.force,
-        pool=args.pool)
+        pool=args.pool,
+    )
     executor.heartbeat()
     executor.end()
 
@@ -111,12 +111,16 @@ def _run_task_by_local_task_job(args, ti):
         ignore_depends_on_past=args.ignore_depends_on_past,
         ignore_task_deps=args.ignore_dependencies,
         ignore_ti_state=args.force,
-        pool=args.pool)
+        pool=args.pool,
+    )
     run_job.run()
 
 
 RAW_TASK_UNSUPPORTED_OPTION = [
-    "ignore_all_dependencies", "ignore_depends_on_past", "ignore_dependencies", "force"
+    "ignore_all_dependencies",
+    "ignore_depends_on_past",
+    "ignore_dependencies",
+    "force",
 ]
 
 
@@ -134,9 +138,7 @@ def _run_raw_task(args, ti):
             )
         )
     ti._run_raw_task(  # pylint: disable=protected-access
-        mark_success=args.mark_success,
-        job_id=args.job_id,
-        pool=args.pool,
+        mark_success=args.mark_success, job_id=args.job_id, pool=args.pool,
     )
 
 
@@ -184,8 +186,9 @@ def task_run(args, dag=None):
         _run_task_by_selected_method(args, dag, ti)
     else:
         if settings.DONOT_MODIFY_HANDLERS:
-            with redirect_stdout(StreamLogWriter(ti.log, logging.INFO)), \
-                    redirect_stderr(StreamLogWriter(ti.log, logging.WARN)):
+            with redirect_stdout(StreamLogWriter(ti.log, logging.INFO)), redirect_stderr(
+                StreamLogWriter(ti.log, logging.WARN)
+            ):
                 _run_task_by_selected_method(args, dag, ti)
         else:
             # Get all the Handlers from 'airflow.task' logger
@@ -203,8 +206,9 @@ def task_run(args, dag=None):
                 root_logger.addHandler(handler)
             root_logger.setLevel(logging.getLogger('airflow.task').level)
 
-            with redirect_stdout(StreamLogWriter(ti.log, logging.INFO)), \
-                    redirect_stderr(StreamLogWriter(ti.log, logging.WARN)):
+            with redirect_stdout(StreamLogWriter(ti.log, logging.INFO)), redirect_stderr(
+                StreamLogWriter(ti.log, logging.WARN)
+            ):
                 _run_task_by_selected_method(args, dag, ti)
 
             # We need to restore the handlers to the loggers as celery worker process
@@ -303,15 +307,18 @@ def task_states_for_dag_run(args):
     """Get the status of all task instances in a DagRun"""
     session = settings.Session()
 
-    tis = session.query(
-        TaskInstance.dag_id,
-        TaskInstance.execution_date,
-        TaskInstance.task_id,
-        TaskInstance.state,
-        TaskInstance.start_date,
-        TaskInstance.end_date).filter(
-        TaskInstance.dag_id == args.dag_id,
-        TaskInstance.execution_date == args.execution_date).all()
+    tis = (
+        session.query(
+            TaskInstance.dag_id,
+            TaskInstance.execution_date,
+            TaskInstance.task_id,
+            TaskInstance.state,
+            TaskInstance.start_date,
+            TaskInstance.end_date,
+        )
+        .filter(TaskInstance.dag_id == args.dag_id, TaskInstance.execution_date == args.execution_date)
+        .all()
+    )
 
     if len(tis) == 0:
         raise AirflowException("DagRun does not exist.")
@@ -319,18 +326,18 @@ def task_states_for_dag_run(args):
     formatted_rows = []
 
     for ti in tis:
-        formatted_rows.append((ti.dag_id,
-                               ti.execution_date,
-                               ti.task_id,
-                               ti.state,
-                               ti.start_date,
-                               ti.end_date))
+        formatted_rows.append(
+            (ti.dag_id, ti.execution_date, ti.task_id, ti.state, ti.start_date, ti.end_date)
+        )
 
     print(
-        "\n%s" %
-        tabulate(
-            formatted_rows, [
-                'dag', 'exec_date', 'task', 'state', 'start_date', 'end_date'], tablefmt=args.output))
+        "\n%s"
+        % tabulate(
+            formatted_rows,
+            ['dag', 'exec_date', 'task', 'state', 'start_date', 'end_date'],
+            tablefmt=args.output,
+        )
+    )
 
     session.close()
 
@@ -390,20 +397,24 @@ def task_render(args):
     ti = TaskInstance(task, args.execution_date)
     ti.render_templates()
     for attr in task.__class__.template_fields:
-        print(textwrap.dedent("""\
+        print(
+            textwrap.dedent(
+                """\
         # ----------------------------------------------------------
         # property: {}
         # ----------------------------------------------------------
         {}
-        """.format(attr, getattr(task, attr))))
+        """.format(
+                    attr, getattr(task, attr)
+                )
+            )
+        )
 
 
 @cli_utils.action_logging
 def task_clear(args):
     """Clears all task instances or only those matched by regex for a DAG(s)"""
-    logging.basicConfig(
-        level=settings.LOGGING_LEVEL,
-        format=settings.SIMPLE_LOG_FORMAT)
+    logging.basicConfig(level=settings.LOGGING_LEVEL, format=settings.SIMPLE_LOG_FORMAT)
 
     if args.dag_id and not args.subdir and not args.dag_regex and not args.task_regex:
         dags = get_dag_by_file_location(args.dag_id)
@@ -416,7 +427,8 @@ def task_clear(args):
                 dags[idx] = dag.sub_dag(
                     task_regex=args.task_regex,
                     include_downstream=args.downstream,
-                    include_upstream=args.upstream)
+                    include_upstream=args.upstream,
+                )
 
     DAG.clear_dags(
         dags,

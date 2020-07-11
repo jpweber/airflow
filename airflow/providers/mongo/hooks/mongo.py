@@ -36,6 +36,7 @@ class MongoHook(BaseHook):
     ex.
         {"srv": true, "replicaSet": "test", "ssl": true, "connectTimeoutMS": 30000}
     """
+
     conn_type = 'mongo'
 
     def __init__(self, conn_id='mongo_default', *args, **kwargs):
@@ -51,13 +52,12 @@ class MongoHook(BaseHook):
 
         self.uri = '{scheme}://{creds}{host}{port}/{database}'.format(
             scheme=scheme,
-            creds='{}:{}@'.format(
-                self.connection.login, self.connection.password
-            ) if self.connection.login else '',
-
+            creds='{}:{}@'.format(self.connection.login, self.connection.password)
+            if self.connection.login
+            else '',
             host=self.connection.host,
             port='' if self.connection.port is None else ':{}'.format(self.connection.port),
-            database=self.connection.schema
+            database=self.connection.schema,
         )
 
     def __enter__(self):
@@ -143,8 +143,7 @@ class MongoHook(BaseHook):
 
         return collection.insert_many(docs, **kwargs)
 
-    def update_one(self, mongo_collection, filter_doc, update_doc,
-                   mongo_db=None, **kwargs):
+    def update_one(self, mongo_collection, filter_doc, update_doc, mongo_db=None, **kwargs):
         """
         Updates a single document in a mongo collection.
         https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.update_one
@@ -164,8 +163,7 @@ class MongoHook(BaseHook):
 
         return collection.update_one(filter_doc, update_doc, **kwargs)
 
-    def update_many(self, mongo_collection, filter_doc, update_doc,
-                    mongo_db=None, **kwargs):
+    def update_many(self, mongo_collection, filter_doc, update_doc, mongo_db=None, **kwargs):
         """
         Updates one or more documents in a mongo collection.
         https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.update_many
@@ -185,8 +183,7 @@ class MongoHook(BaseHook):
 
         return collection.update_many(filter_doc, update_doc, **kwargs)
 
-    def replace_one(self, mongo_collection, doc, filter_doc=None,
-                    mongo_db=None, **kwargs):
+    def replace_one(self, mongo_collection, doc, filter_doc=None, mongo_db=None, **kwargs):
         """
         Replaces a single document in a mongo collection.
         https://api.mongodb.com/python/current/api/pymongo/collection.html#pymongo.collection.Collection.replace_one
@@ -213,9 +210,9 @@ class MongoHook(BaseHook):
 
         return collection.replace_one(filter_doc, doc, **kwargs)
 
-    def replace_many(self, mongo_collection, docs,
-                     filter_docs=None, mongo_db=None, upsert=False, collation=None,
-                     **kwargs):
+    def replace_many(
+        self, mongo_collection, docs, filter_docs=None, mongo_db=None, upsert=False, collation=None, **kwargs
+    ):
         """
         Replaces many documents in a mongo collection.
 
@@ -252,12 +249,7 @@ class MongoHook(BaseHook):
             filter_docs = [{'_id': doc['_id']} for doc in docs]
 
         requests = [
-            ReplaceOne(
-                filter_docs[i],
-                docs[i],
-                upsert=upsert,
-                collation=collation)
-            for i in range(len(docs))
+            ReplaceOne(filter_docs[i], docs[i], upsert=upsert, collation=collation) for i in range(len(docs))
         ]
 
         return collection.bulk_write(requests, **kwargs)

@@ -24,16 +24,26 @@ from google.cloud.datacatalog_v1beta1.proto.tags_pb2 import FieldType, TagField,
 from airflow import models
 from airflow.operators.bash_operator import BashOperator
 from airflow.providers.google.cloud.operators.datacatalog import (
-    CloudDataCatalogCreateEntryGroupOperator, CloudDataCatalogCreateEntryOperator,
-    CloudDataCatalogCreateTagOperator, CloudDataCatalogCreateTagTemplateFieldOperator,
-    CloudDataCatalogCreateTagTemplateOperator, CloudDataCatalogDeleteEntryGroupOperator,
-    CloudDataCatalogDeleteEntryOperator, CloudDataCatalogDeleteTagOperator,
-    CloudDataCatalogDeleteTagTemplateFieldOperator, CloudDataCatalogDeleteTagTemplateOperator,
-    CloudDataCatalogGetEntryGroupOperator, CloudDataCatalogGetEntryOperator,
-    CloudDataCatalogGetTagTemplateOperator, CloudDataCatalogListTagsOperator,
-    CloudDataCatalogLookupEntryOperator, CloudDataCatalogRenameTagTemplateFieldOperator,
-    CloudDataCatalogSearchCatalogOperator, CloudDataCatalogUpdateEntryOperator,
-    CloudDataCatalogUpdateTagOperator, CloudDataCatalogUpdateTagTemplateFieldOperator,
+    CloudDataCatalogCreateEntryGroupOperator,
+    CloudDataCatalogCreateEntryOperator,
+    CloudDataCatalogCreateTagOperator,
+    CloudDataCatalogCreateTagTemplateFieldOperator,
+    CloudDataCatalogCreateTagTemplateOperator,
+    CloudDataCatalogDeleteEntryGroupOperator,
+    CloudDataCatalogDeleteEntryOperator,
+    CloudDataCatalogDeleteTagOperator,
+    CloudDataCatalogDeleteTagTemplateFieldOperator,
+    CloudDataCatalogDeleteTagTemplateOperator,
+    CloudDataCatalogGetEntryGroupOperator,
+    CloudDataCatalogGetEntryOperator,
+    CloudDataCatalogGetTagTemplateOperator,
+    CloudDataCatalogListTagsOperator,
+    CloudDataCatalogLookupEntryOperator,
+    CloudDataCatalogRenameTagTemplateFieldOperator,
+    CloudDataCatalogSearchCatalogOperator,
+    CloudDataCatalogUpdateEntryOperator,
+    CloudDataCatalogUpdateTagOperator,
+    CloudDataCatalogUpdateTagTemplateFieldOperator,
     CloudDataCatalogUpdateTagTemplateOperator,
 )
 from airflow.utils.dates import days_ago
@@ -290,7 +300,7 @@ with models.DAG("example_gcp_datacatalog", default_args=default_args, schedule_i
         task_id="lookup_entry",
         linked_resource=current_entry_template.format(
             project_id=PROJECT_ID, location=LOCATION, entry_group=ENTRY_GROUP_ID, entry=ENTRY_ID
-        )
+        ),
     )
     # [END howto_operator_gcp_datacatalog_lookup_entry_linked_resource]
 

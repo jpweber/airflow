@@ -22,10 +22,13 @@ Please use `airflow.providers.google.cloud.operators.cloud_storage_transfer_serv
 import warnings
 
 # pylint: disable=unused-import,line-too-long
-from airflow.providers.google.cloud.operators.cloud_storage_transfer_service import CloudDataTransferServiceS3ToGCSOperator  # noqa isort:skip
+from airflow.providers.google.cloud.operators.cloud_storage_transfer_service import (
+    CloudDataTransferServiceS3ToGCSOperator,
+)  # noqa isort:skip
 
 warnings.warn(
     "This module is deprecated. "
     "Please use `airflow.providers.google.cloud.operators.cloud_storage_transfer_service`.",
-    DeprecationWarning, stacklevel=2
+    DeprecationWarning,
+    stacklevel=2,
 )

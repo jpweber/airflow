@@ -73,28 +73,34 @@ class GCSToS3Operator(GCSListObjectsOperator):
         in the destination bucket.
     :type replace: bool
     """
+
     template_fields = ('bucket', 'prefix', 'delimiter', 'dest_s3_key')
     ui_color = '#f0eee4'
 
     @apply_defaults
-    def __init__(self,  # pylint: disable=too-many-arguments
-                 bucket,
-                 prefix=None,
-                 delimiter=None,
-                 gcp_conn_id='google_cloud_default',
-                 google_cloud_storage_conn_id=None,
-                 delegate_to=None,
-                 dest_aws_conn_id=None,
-                 dest_s3_key=None,
-                 dest_verify=None,
-                 replace=False,
-                 *args,
-                 **kwargs):
+    def __init__(
+        self,  # pylint: disable=too-many-arguments
+        bucket,
+        prefix=None,
+        delimiter=None,
+        gcp_conn_id='google_cloud_default',
+        google_cloud_storage_conn_id=None,
+        delegate_to=None,
+        dest_aws_conn_id=None,
+        dest_s3_key=None,
+        dest_verify=None,
+        replace=False,
+        *args,
+        **kwargs,
+    ):
 
         if google_cloud_storage_conn_id:
             warnings.warn(
                 "The google_cloud_storage_conn_id parameter has been deprecated. You should pass "
-                "the gcp_conn_id parameter.", DeprecationWarning, stacklevel=3)
+                "the gcp_conn_id parameter.",
+                DeprecationWarning,
+                stacklevel=3,
+            )
             gcp_conn_id = google_cloud_storage_conn_id
 
         super().__init__(
@@ -104,7 +110,7 @@ class GCSToS3Operator(GCSListObjectsOperator):
             gcp_conn_id=gcp_conn_id,
             delegate_to=delegate_to,
             *args,
-            **kwargs
+            **kwargs,
         )
 
         self.dest_aws_conn_id = dest_aws_conn_id
@@ -132,10 +138,7 @@ class GCSToS3Operator(GCSListObjectsOperator):
             files = list(set(files) - set(existing_files))
 
         if files:
-            hook = GCSHook(
-                google_cloud_storage_conn_id=self.gcp_conn_id,
-                delegate_to=self.delegate_to
-            )
+            hook = GCSHook(google_cloud_storage_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
 
             for file in files:
                 file_bytes = hook.download(self.bucket, file)
@@ -143,9 +146,7 @@ class GCSToS3Operator(GCSListObjectsOperator):
                 dest_key = self.dest_s3_key + file
                 self.log.info("Saving file to %s", dest_key)
 
-                s3_hook.load_bytes(file_bytes,
-                                   key=dest_key,
-                                   replace=self.replace)
+                s3_hook.load_bytes(file_bytes, key=dest_key, replace=self.replace)
 
             self.log.info("All done, uploaded %d files to S3", len(files))
         else:

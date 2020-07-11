@@ -38,9 +38,7 @@ OBJECT_SRC_2 = "parent-2.bin"
 OBJECT_SRC_3 = "parent-3.txt"
 
 
-with models.DAG(
-    "example_sftp_to_gcs", default_args=default_args, schedule_interval=None
-) as dag:
+with models.DAG("example_sftp_to_gcs", default_args=default_args, schedule_interval=None) as dag:
     # [START howto_operator_sftp_to_gcs_copy_single_file]
     copy_file_from_sftp_to_gcs = SFTPToGCSOperator(
         task_id="file-copy-sftp-to-gcs",

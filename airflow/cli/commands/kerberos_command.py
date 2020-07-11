@@ -37,11 +37,7 @@ def kerberos(args):
         stdout = open(stdout, 'w+')
         stderr = open(stderr, 'w+')
 
-        ctx = daemon.DaemonContext(
-            pidfile=TimeoutPIDLockFile(pid, -1),
-            stdout=stdout,
-            stderr=stderr,
-        )
+        ctx = daemon.DaemonContext(pidfile=TimeoutPIDLockFile(pid, -1), stdout=stdout, stderr=stderr,)
 
         with ctx:
             krb.run(principal=args.principal, keytab=args.keytab)

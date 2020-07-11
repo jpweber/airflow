@@ -37,7 +37,6 @@ FILE_TASK_HANDLER = 'task'
 
 
 class TestFileTaskLogHandler(unittest.TestCase):
-
     def clean_up(self):
         with create_session() as session:
             session.query(DagRun).delete()
@@ -65,19 +64,19 @@ class TestFileTaskLogHandler(unittest.TestCase):
     def test_file_task_handler(self):
         def task_callable(ti, **kwargs):
             ti.log.info("test")
+
         dag = DAG('dag_for_testing_file_task_handler', start_date=DEFAULT_DATE)
         task = PythonOperator(
-            task_id='task_for_testing_file_log_handler',
-            dag=dag,
-            python_callable=task_callable,
+            task_id='task_for_testing_file_log_handler', dag=dag, python_callable=task_callable,
         )
         ti = TaskInstance(task=task, execution_date=DEFAULT_DATE)
 
         logger = ti.log
         ti.log.disabled = False
 
-        file_handler = next((handler for handler in logger.handlers
-                             if handler.name == FILE_TASK_HANDLER), None)
+        file_handler = next(
+            (handler for handler in logger.handlers if handler.name == FILE_TASK_HANDLER), None
+        )
         self.assertIsNotNone(file_handler)
 
         set_context(logger, ti)
@@ -104,11 +103,7 @@ class TestFileTaskLogHandler(unittest.TestCase):
 
         # We should expect our log line from the callable above to appear in
         # the logs we read back
-        self.assertRegex(
-            logs[0],
-            target_re,
-            "Logs were " + str(logs)
-        )
+        self.assertRegex(logs[0], target_re, "Logs were " + str(logs))
 
         # Remove the generated tmp log file.
         os.remove(log_filename)
@@ -116,11 +111,10 @@ class TestFileTaskLogHandler(unittest.TestCase):
     def test_file_task_handler_running(self):
         def task_callable(ti, **kwargs):
             ti.log.info("test")
+
         dag = DAG('dag_for_testing_file_task_handler', start_date=DEFAULT_DATE)
         task = PythonOperator(
-            task_id='task_for_testing_file_log_handler',
-            dag=dag,
-            python_callable=task_callable,
+            task_id='task_for_testing_file_log_handler', dag=dag, python_callable=task_callable,
         )
         ti = TaskInstance(task=task, execution_date=DEFAULT_DATE)
         ti.try_number = 2
@@ -129,8 +123,9 @@ class TestFileTaskLogHandler(unittest.TestCase):
         logger = ti.log
         ti.log.disabled = False
 
-        file_handler = next((handler for handler in logger.handlers
-                             if handler.name == FILE_TASK_HANDLER), None)
+        file_handler = next(
+            (handler for handler in logger.handlers if handler.name == FILE_TASK_HANDLER), None
+        )
         self.assertIsNotNone(file_handler)
 
         set_context(logger, ti)
@@ -157,25 +152,26 @@ class TestFileTaskLogHandler(unittest.TestCase):
 
 
 class TestFilenameRendering(unittest.TestCase):
-
     def setUp(self):
         dag = DAG('dag_for_testing_filename_rendering', start_date=DEFAULT_DATE)
         task = DummyOperator(task_id='task_for_testing_filename_rendering', dag=dag)
         self.ti = TaskInstance(task=task, execution_date=DEFAULT_DATE)
 
     def test_python_formatting(self):
-        expected_filename = \
-            'dag_for_testing_filename_rendering/task_for_testing_filename_rendering/%s/42.log' \
+        expected_filename = (
+            'dag_for_testing_filename_rendering/task_for_testing_filename_rendering/%s/42.log'
             % DEFAULT_DATE.isoformat()
+        )
 
         fth = FileTaskHandler('', '{dag_id}/{task_id}/{execution_date}/{try_number}.log')
         rendered_filename = fth._render_filename(self.ti, 42)
         self.assertEqual(expected_filename, rendered_filename)
 
     def test_jinja_rendering(self):
-        expected_filename = \
-            'dag_for_testing_filename_rendering/task_for_testing_filename_rendering/%s/42.log' \
+        expected_filename = (
+            'dag_for_testing_filename_rendering/task_for_testing_filename_rendering/%s/42.log'
             % DEFAULT_DATE.isoformat()
+        )
 
         fth = FileTaskHandler('', '{{ ti.dag_id }}/{{ ti.task_id }}/{{ ts }}/{{ try_number }}.log')
         rendered_filename = fth._render_filename(self.ti, 42)

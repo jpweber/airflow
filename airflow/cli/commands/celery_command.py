@@ -64,18 +64,10 @@ def flower(args):
 
     if args.daemon:
         pidfile, stdout, stderr, _ = setup_locations(
-            process="flower",
-            pid=args.pid,
-            stdout=args.stdout,
-            stderr=args.stderr,
-            log=args.log_file,
+            process="flower", pid=args.pid, stdout=args.stdout, stderr=args.stderr, log=args.log_file,
         )
         with open(stdout, "w+") as stdout, open(stderr, "w+") as stderr:
-            ctx = daemon.DaemonContext(
-                pidfile=TimeoutPIDLockFile(pidfile, -1),
-                stdout=stdout,
-                stderr=stderr,
-            )
+            ctx = daemon.DaemonContext(pidfile=TimeoutPIDLockFile(pidfile, -1), stdout=stdout, stderr=stderr,)
             with ctx:
                 flower_cmd.execute_from_commandline(argv=options)
     else:
@@ -106,11 +98,7 @@ def worker(args):
 
     # Setup locations
     pid_file_path, stdout, stderr, log_file = setup_locations(
-        process=WORKER_PROCESS_NAME,
-        pid=args.pid,
-        stdout=args.stdout,
-        stderr=args.stderr,
-        log=args.log_file,
+        process=WORKER_PROCESS_NAME, pid=args.pid, stdout=args.stdout, stderr=args.stderr, log=args.log_file,
     )
 
     if hasattr(celery_app.backend, 'ResultSession'):
@@ -162,10 +150,7 @@ def worker(args):
             umask = args.umask
 
         ctx = daemon.DaemonContext(
-            files_preserve=[handle],
-            umask=int(umask, 8),
-            stdout=stdout,
-            stderr=stderr,
+            files_preserve=[handle], umask=int(umask, 8), stdout=stdout, stderr=stderr,
         )
         with ctx:
             sub_proc = _serve_logs(skip_serve_logs)

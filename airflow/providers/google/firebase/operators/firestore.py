@@ -59,7 +59,7 @@ class CloudFirestoreExportDatabaseOperator(BaseOperator):
         gcp_conn_id: str = "google_cloud_default",
         api_version: str = "v1",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.database_id = database_id

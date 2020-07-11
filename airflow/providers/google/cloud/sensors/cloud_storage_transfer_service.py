@@ -61,7 +61,7 @@ class CloudDataTransferServiceJobStatusSensor(BaseSensorOperator):
         project_id: Optional[str] = None,
         gcp_conn_id: str = 'google_cloud_default',
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.job_name = job_name

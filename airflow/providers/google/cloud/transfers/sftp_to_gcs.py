@@ -85,7 +85,7 @@ class SFTPToGCSOperator(BaseOperator):
         gzip: bool = False,
         move_object: bool = False,
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
 
@@ -100,9 +100,7 @@ class SFTPToGCSOperator(BaseOperator):
         self.move_object = move_object
 
     def execute(self, context):
-        gcs_hook = GCSHook(
-            gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to
-        )
+        gcs_hook = GCSHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
 
         sftp_hook = SFTPHook(self.sftp_conn_id)
 
@@ -117,9 +115,7 @@ class SFTPToGCSOperator(BaseOperator):
             prefix, delimiter = self.source_path.split(WILDCARD, 1)
             base_path = os.path.dirname(prefix)
 
-            files, _, _ = sftp_hook.get_tree_map(
-                base_path, prefix=prefix, delimiter=delimiter
-            )
+            files, _, _ = sftp_hook.get_tree_map(base_path, prefix=prefix, delimiter=delimiter)
 
             for file in files:
                 destination_path = file.replace(base_path, self.destination_path, 1)
@@ -127,29 +123,18 @@ class SFTPToGCSOperator(BaseOperator):
 
         else:
             destination_object = (
-                self.destination_path
-                if self.destination_path
-                else self.source_path.rsplit("/", 1)[1]
+                self.destination_path if self.destination_path else self.source_path.rsplit("/", 1)[1]
             )
-            self._copy_single_object(
-                gcs_hook, sftp_hook, self.source_path, destination_object
-            )
+            self._copy_single_object(gcs_hook, sftp_hook, self.source_path, destination_object)
 
     def _copy_single_object(
-        self,
-        gcs_hook: GCSHook,
-        sftp_hook: SFTPHook,
-        source_path: str,
-        destination_object: str,
+        self, gcs_hook: GCSHook, sftp_hook: SFTPHook, source_path: str, destination_object: str,
     ) -> None:
         """
         Helper function to copy single object.
         """
         self.log.info(
-            "Executing copy of %s to gs://%s/%s",
-            source_path,
-            self.destination_bucket,
-            destination_object,
+            "Executing copy of %s to gs://%s/%s", source_path, self.destination_bucket, destination_object,
         )
 
         with NamedTemporaryFile("w") as tmp:

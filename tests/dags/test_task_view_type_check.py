@@ -28,9 +28,7 @@ from airflow.models import DAG
 from airflow.operators.python import PythonOperator
 
 DEFAULT_DATE = datetime(2016, 1, 1)
-default_args = dict(
-    start_date=DEFAULT_DATE,
-    owner='airflow')
+default_args = dict(start_date=DEFAULT_DATE, owner='airflow')
 
 
 class CallableClass:
@@ -49,14 +47,6 @@ logging.info('class_instance type: %s', type(class_instance))
 
 dag = DAG(dag_id='test_task_view_type_check', default_args=default_args)
 
-dag_task1 = PythonOperator(
-    task_id='test_dagrun_functool_partial',
-    dag=dag,
-    python_callable=partial_function,
-)
+dag_task1 = PythonOperator(task_id='test_dagrun_functool_partial', dag=dag, python_callable=partial_function,)
 
-dag_task2 = PythonOperator(
-    task_id='test_dagrun_instance',
-    dag=dag,
-    python_callable=class_instance,
-)
+dag_task2 = PythonOperator(task_id='test_dagrun_instance', dag=dag, python_callable=class_instance,)

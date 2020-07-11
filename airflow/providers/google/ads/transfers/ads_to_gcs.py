@@ -89,13 +89,8 @@ class GoogleAdsToGcsOperator(BaseOperator):
         self.gzip = gzip
 
     def execute(self, context: Dict):
-        service = GoogleAdsHook(
-            gcp_conn_id=self.gcp_conn_id,
-            google_ads_conn_id=self.google_ads_conn_id
-        )
-        rows = service.search(
-            client_ids=self.client_ids, query=self.query, page_size=self.page_size
-        )
+        service = GoogleAdsHook(gcp_conn_id=self.gcp_conn_id, google_ads_conn_id=self.google_ads_conn_id)
+        rows = service.search(client_ids=self.client_ids, query=self.query, page_size=self.page_size)
 
         try:
             getter = attrgetter(*self.attributes)
@@ -111,9 +106,6 @@ class GoogleAdsToGcsOperator(BaseOperator):
 
             hook = GCSHook(gcp_conn_id=self.gcp_conn_id)
             hook.upload(
-                bucket_name=self.bucket,
-                object_name=self.obj,
-                filename=csvfile.name,
-                gzip=self.gzip,
+                bucket_name=self.bucket, object_name=self.obj, filename=csvfile.name, gzip=self.gzip,
             )
             self.log.info("%s uploaded to GCS", self.obj)

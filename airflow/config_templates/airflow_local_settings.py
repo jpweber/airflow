@@ -58,19 +58,17 @@ DEFAULT_LOGGING_CONFIG: Dict[str, Any] = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
-        'airflow': {
-            'format': LOG_FORMAT
-        },
+        'airflow': {'format': LOG_FORMAT},
         'airflow_coloured': {
             'format': COLORED_LOG_FORMAT if COLORED_LOG else LOG_FORMAT,
-            'class': COLORED_FORMATTER_CLASS if COLORED_LOG else 'logging.Formatter'
+            'class': COLORED_FORMATTER_CLASS if COLORED_LOG else 'logging.Formatter',
         },
     },
     'handlers': {
         'console': {
             'class': 'airflow.utils.log.logging_mixin.RedirectStdHandler',
             'formatter': 'airflow_coloured',
-            'stream': 'sys.stdout'
+            'stream': 'sys.stdout',
         },
         'task': {
             'class': 'airflow.utils.log.file_task_handler.FileTaskHandler',
@@ -83,34 +81,15 @@ DEFAULT_LOGGING_CONFIG: Dict[str, Any] = {
             'formatter': 'airflow',
             'base_log_folder': os.path.expanduser(PROCESSOR_LOG_FOLDER),
             'filename_template': PROCESSOR_FILENAME_TEMPLATE,
-        }
+        },
     },
     'loggers': {
-        'airflow.processor': {
-            'handlers': ['processor'],
-            'level': LOG_LEVEL,
-            'propagate': False,
-        },
-        'airflow.task': {
-            'handlers': ['task'],
-            'level': LOG_LEVEL,
-            'propagate': False,
-        },
-        'flask_appbuilder': {
-            'handler': ['console'],
-            'level': FAB_LOG_LEVEL,
-            'propagate': True,
-        },
-        'connexion': {
-            'handler': ['console'],
-            'level': LOG_LEVEL,
-            'propagate': True,
-        }
+        'airflow.processor': {'handlers': ['processor'], 'level': LOG_LEVEL, 'propagate': False,},
+        'airflow.task': {'handlers': ['task'], 'level': LOG_LEVEL, 'propagate': False,},
+        'flask_appbuilder': {'handler': ['console'], 'level': FAB_LOG_LEVEL, 'propagate': True,},
+        'connexion': {'handler': ['console'], 'level': LOG_LEVEL, 'propagate': True,},
     },
-    'root': {
-        'handlers': ['console'],
-        'level': LOG_LEVEL,
-    }
+    'root': {'handlers': ['console'], 'level': LOG_LEVEL,},
 }
 
 DEFAULT_DAG_PARSING_LOGGING_CONFIG: Dict[str, Dict[str, Dict[str, Any]]] = {
@@ -121,7 +100,7 @@ DEFAULT_DAG_PARSING_LOGGING_CONFIG: Dict[str, Dict[str, Dict[str, Any]]] = {
             'filename': DAG_PROCESSOR_MANAGER_LOG_LOCATION,
             'mode': 'a',
             'maxBytes': 104857600,  # 100MB
-            'backupCount': 5
+            'backupCount': 5,
         }
     },
     'loggers': {
@@ -130,22 +109,21 @@ DEFAULT_DAG_PARSING_LOGGING_CONFIG: Dict[str, Dict[str, Dict[str, Any]]] = {
             'level': LOG_LEVEL,
             'propagate': False,
         }
-    }
+    },
 }
 
 # Only update the handlers and loggers when CONFIG_PROCESSOR_MANAGER_LOGGER is set.
 # This is to avoid exceptions when initializing RotatingFileHandler multiple times
 # in multiple processes.
 if os.environ.get('CONFIG_PROCESSOR_MANAGER_LOGGER') == 'True':
-    DEFAULT_LOGGING_CONFIG['handlers'] \
-        .update(DEFAULT_DAG_PARSING_LOGGING_CONFIG['handlers'])
-    DEFAULT_LOGGING_CONFIG['loggers'] \
-        .update(DEFAULT_DAG_PARSING_LOGGING_CONFIG['loggers'])
+    DEFAULT_LOGGING_CONFIG['handlers'].update(DEFAULT_DAG_PARSING_LOGGING_CONFIG['handlers'])
+    DEFAULT_LOGGING_CONFIG['loggers'].update(DEFAULT_DAG_PARSING_LOGGING_CONFIG['loggers'])
 
     # Manually create log directory for processor_manager handler as RotatingFileHandler
     # will only create file but not the directory.
-    processor_manager_handler_config: Dict[str, Any] = \
-        DEFAULT_DAG_PARSING_LOGGING_CONFIG['handlers']['processor_manager']
+    processor_manager_handler_config: Dict[str, Any] = DEFAULT_DAG_PARSING_LOGGING_CONFIG['handlers'][
+        'processor_manager'
+    ]
     directory: str = os.path.dirname(processor_manager_handler_config['filename'])
     mkdirs(directory, 0o755)
 
@@ -226,7 +204,7 @@ if REMOTE_LOGGING:
                 'class': 'airflow.providers.google.cloud.log.stackdriver_task_handler.StackdriverTaskHandler',
                 'formatter': 'airflow',
                 'name': log_name,
-                'gcp_key_path': key_path
+                'gcp_key_path': key_path,
             }
         }
 
@@ -251,7 +229,7 @@ if REMOTE_LOGGING:
                 'frontend': ELASTICSEARCH_FRONTEND,
                 'write_stdout': ELASTICSEARCH_WRITE_STDOUT,
                 'json_format': ELASTICSEARCH_JSON_FORMAT,
-                'json_fields': ELASTICSEARCH_JSON_FIELDS
+                'json_fields': ELASTICSEARCH_JSON_FIELDS,
             },
         }
 
@@ -260,4 +238,5 @@ if REMOTE_LOGGING:
         raise AirflowException(
             "Incorrect remote log configuration. Please check the configuration of option 'host' in "
             "section 'elasticsearch' if you are using Elasticsearch. In the other case, "
-            "'remote_base_log_folder' option in 'core' section.")
+            "'remote_base_log_folder' option in 'core' section."
+        )

@@ -54,21 +54,28 @@ class SimpleHttpOperator(BaseOperator):
     :type log_response: bool
     """
 
-    template_fields = ['endpoint', 'data', 'headers', ]
+    template_fields = [
+        'endpoint',
+        'data',
+        'headers',
+    ]
     template_ext = ()
     ui_color = '#f4a460'
 
     @apply_defaults
-    def __init__(self,
-                 endpoint: str,
-                 method: str = 'POST',
-                 data: Any = None,
-                 headers: Optional[Dict[str, str]] = None,
-                 response_check: Optional[Callable] = None,
-                 extra_options: Optional[Dict[str, Any]] = None,
-                 http_conn_id: str = 'http_default',
-                 log_response: bool = False,
-                 *args, **kwargs) -> None:
+    def __init__(
+        self,
+        endpoint: str,
+        method: str = 'POST',
+        data: Any = None,
+        headers: Optional[Dict[str, str]] = None,
+        response_check: Optional[Callable] = None,
+        extra_options: Optional[Dict[str, Any]] = None,
+        http_conn_id: str = 'http_default',
+        log_response: bool = False,
+        *args,
+        **kwargs,
+    ) -> None:
         super().__init__(*args, **kwargs)
         self.http_conn_id = http_conn_id
         self.method = method
@@ -86,10 +93,7 @@ class SimpleHttpOperator(BaseOperator):
 
         self.log.info("Calling HTTP method")
 
-        response = http.run(self.endpoint,
-                            self.data,
-                            self.headers,
-                            self.extra_options)
+        response = http.run(self.endpoint, self.data, self.headers, self.extra_options)
         if self.log_response:
             self.log.info(response.text)
         if self.response_check:

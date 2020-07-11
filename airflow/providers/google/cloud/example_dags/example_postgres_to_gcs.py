@@ -35,9 +35,5 @@ with models.DAG(
     tags=['example'],
 ) as dag:
     upload_data = PostgresToGCSOperator(
-        task_id="get_data",
-        sql=SQL_QUERY,
-        bucket=GCS_BUCKET,
-        filename=FILENAME,
-        gzip=False
+        task_id="get_data", sql=SQL_QUERY, bucket=GCS_BUCKET, filename=FILENAME, gzip=False
     )

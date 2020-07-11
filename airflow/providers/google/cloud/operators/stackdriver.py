@@ -93,7 +93,8 @@ class StackdriverListAlertPoliciesOperator(BaseOperator):
         gcp_conn_id: Optional[str] = 'google_cloud_default',
         project_id: Optional[str] = None,
         delegate_to: Optional[str] = None,
-        *args, **kwargs
+        *args,
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.format_ = format_
@@ -109,8 +110,14 @@ class StackdriverListAlertPoliciesOperator(BaseOperator):
         self.hook = None
 
     def execute(self, context):
-        self.log.info('List Alert Policies: Project id: %s Format: %s Filter: %s Order By: %s Page Size: %d',
-                      self.project_id, self.format_, self.filter_, self.order_by, self.page_size)
+        self.log.info(
+            'List Alert Policies: Project id: %s Format: %s Filter: %s Order By: %s Page Size: %d',
+            self.project_id,
+            self.format_,
+            self.filter_,
+            self.order_by,
+            self.page_size,
+        )
         if self.hook is None:
             self.hook = StackdriverHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
 
@@ -122,7 +129,7 @@ class StackdriverListAlertPoliciesOperator(BaseOperator):
             page_size=self.page_size,
             retry=self.retry,
             timeout=self.timeout,
-            metadata=self.metadata
+            metadata=self.metadata,
         )
 
 
@@ -158,6 +165,7 @@ class StackdriverEnableAlertPoliciesOperator(BaseOperator):
         domain-wide delegation enabled.
     :type delegate_to: str
     """
+
     ui_color = "#e5ffcc"
     template_fields = ('filter_',)
 
@@ -171,7 +179,8 @@ class StackdriverEnableAlertPoliciesOperator(BaseOperator):
         gcp_conn_id: Optional[str] = 'google_cloud_default',
         project_id: Optional[str] = None,
         delegate_to: Optional[str] = None,
-        *args, **kwargs
+        *args,
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.gcp_conn_id = gcp_conn_id
@@ -192,7 +201,7 @@ class StackdriverEnableAlertPoliciesOperator(BaseOperator):
             project_id=self.project_id,
             retry=self.retry,
             timeout=self.timeout,
-            metadata=self.metadata
+            metadata=self.metadata,
         )
 
 
@@ -243,7 +252,8 @@ class StackdriverDisableAlertPoliciesOperator(BaseOperator):
         gcp_conn_id: Optional[str] = 'google_cloud_default',
         project_id: Optional[str] = None,
         delegate_to: Optional[str] = None,
-        *args, **kwargs
+        *args,
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.gcp_conn_id = gcp_conn_id
@@ -264,7 +274,7 @@ class StackdriverDisableAlertPoliciesOperator(BaseOperator):
             project_id=self.project_id,
             retry=self.retry,
             timeout=self.timeout,
-            metadata=self.metadata
+            metadata=self.metadata,
         )
 
 
@@ -317,7 +327,8 @@ class StackdriverUpsertAlertOperator(BaseOperator):
         gcp_conn_id: Optional[str] = 'google_cloud_default',
         project_id: Optional[str] = None,
         delegate_to: Optional[str] = None,
-        *args, **kwargs
+        *args,
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.alerts = alerts
@@ -338,7 +349,7 @@ class StackdriverUpsertAlertOperator(BaseOperator):
             project_id=self.project_id,
             retry=self.retry,
             timeout=self.timeout,
-            metadata=self.metadata
+            metadata=self.metadata,
         )
 
 
@@ -387,7 +398,8 @@ class StackdriverDeleteAlertOperator(BaseOperator):
         gcp_conn_id: Optional[str] = 'google_cloud_default',
         project_id: Optional[str] = None,
         delegate_to: Optional[str] = None,
-        *args, **kwargs
+        *args,
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.name = name
@@ -404,10 +416,7 @@ class StackdriverDeleteAlertOperator(BaseOperator):
         if self.hook is None:
             self.hook = StackdriverHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
         self.hook.delete_alert_policy(
-            name=self.name,
-            retry=self.retry,
-            timeout=self.timeout,
-            metadata=self.metadata,
+            name=self.name, retry=self.retry, timeout=self.timeout, metadata=self.metadata,
         )
 
 
@@ -480,7 +489,8 @@ class StackdriverListNotificationChannelsOperator(BaseOperator):
         gcp_conn_id: Optional[str] = 'google_cloud_default',
         project_id: Optional[str] = None,
         delegate_to: Optional[str] = None,
-        *args, **kwargs
+        *args,
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.format_ = format_
@@ -498,7 +508,11 @@ class StackdriverListNotificationChannelsOperator(BaseOperator):
     def execute(self, context):
         self.log.info(
             'List Notification Channels: Project id: %s Format: %s Filter: %s Order By: %s Page Size: %d',
-            self.project_id, self.format_, self.filter_, self.order_by, self.page_size
+            self.project_id,
+            self.format_,
+            self.filter_,
+            self.order_by,
+            self.page_size,
         )
         if self.hook is None:
             self.hook = StackdriverHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
@@ -510,7 +524,7 @@ class StackdriverListNotificationChannelsOperator(BaseOperator):
             page_size=self.page_size,
             retry=self.retry,
             timeout=self.timeout,
-            metadata=self.metadata
+            metadata=self.metadata,
         )
 
 
@@ -561,7 +575,8 @@ class StackdriverEnableNotificationChannelsOperator(BaseOperator):
         gcp_conn_id: Optional[str] = 'google_cloud_default',
         project_id: Optional[str] = None,
         delegate_to: Optional[str] = None,
-        *args, **kwargs
+        *args,
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.filter_ = filter_
@@ -574,8 +589,9 @@ class StackdriverEnableNotificationChannelsOperator(BaseOperator):
         self.hook = None
 
     def execute(self, context):
-        self.log.info('Enable Notification Channels: Project id: %s Filter: %s',
-                      self.project_id, self.filter_)
+        self.log.info(
+            'Enable Notification Channels: Project id: %s Filter: %s', self.project_id, self.filter_
+        )
         if self.hook is None:
             self.hook = StackdriverHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
         self.hook.enable_notification_channels(
@@ -583,7 +599,7 @@ class StackdriverEnableNotificationChannelsOperator(BaseOperator):
             project_id=self.project_id,
             retry=self.retry,
             timeout=self.timeout,
-            metadata=self.metadata
+            metadata=self.metadata,
         )
 
 
@@ -634,7 +650,8 @@ class StackdriverDisableNotificationChannelsOperator(BaseOperator):
         gcp_conn_id: Optional[str] = 'google_cloud_default',
         project_id: Optional[str] = None,
         delegate_to: Optional[str] = None,
-        *args, **kwargs
+        *args,
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.filter_ = filter_
@@ -647,8 +664,9 @@ class StackdriverDisableNotificationChannelsOperator(BaseOperator):
         self.hook = None
 
     def execute(self, context):
-        self.log.info('Disable Notification Channels: Project id: %s Filter: %s',
-                      self.project_id, self.filter_)
+        self.log.info(
+            'Disable Notification Channels: Project id: %s Filter: %s', self.project_id, self.filter_
+        )
         if self.hook is None:
             self.hook = StackdriverHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
         self.hook.disable_notification_channels(
@@ -656,7 +674,7 @@ class StackdriverDisableNotificationChannelsOperator(BaseOperator):
             project_id=self.project_id,
             retry=self.retry,
             timeout=self.timeout,
-            metadata=self.metadata
+            metadata=self.metadata,
         )
 
 
@@ -709,7 +727,8 @@ class StackdriverUpsertNotificationChannelOperator(BaseOperator):
         gcp_conn_id: Optional[str] = 'google_cloud_default',
         project_id: Optional[str] = None,
         delegate_to: Optional[str] = None,
-        *args, **kwargs
+        *args,
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.channels = channels
@@ -722,8 +741,9 @@ class StackdriverUpsertNotificationChannelOperator(BaseOperator):
         self.hook = None
 
     def execute(self, context):
-        self.log.info('Upsert Notification Channels: Channels: %s Project id: %s',
-                      self.channels, self.project_id)
+        self.log.info(
+            'Upsert Notification Channels: Channels: %s Project id: %s', self.channels, self.project_id
+        )
         if self.hook is None:
             self.hook = StackdriverHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
         self.hook.upsert_channel(
@@ -731,7 +751,7 @@ class StackdriverUpsertNotificationChannelOperator(BaseOperator):
             project_id=self.project_id,
             retry=self.retry,
             timeout=self.timeout,
-            metadata=self.metadata
+            metadata=self.metadata,
         )
 
 
@@ -780,7 +800,8 @@ class StackdriverDeleteNotificationChannelOperator(BaseOperator):
         gcp_conn_id: Optional[str] = 'google_cloud_default',
         project_id: Optional[str] = None,
         delegate_to: Optional[str] = None,
-        *args, **kwargs
+        *args,
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         self.name = name
@@ -797,8 +818,5 @@ class StackdriverDeleteNotificationChannelOperator(BaseOperator):
         if self.hook is None:
             self.hook = StackdriverHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
         self.hook.delete_notification_channel(
-            name=self.name,
-            retry=self.retry,
-            timeout=self.timeout,
-            metadata=self.metadata
+            name=self.name, retry=self.retry, timeout=self.timeout, metadata=self.metadata
         )

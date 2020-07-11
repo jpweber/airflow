@@ -95,10 +95,10 @@ class FacebookAdsReportToGcsOperator(BaseOperator):
         self.gzip = gzip
 
     def execute(self, context: Dict):
-        service = FacebookAdsReportingHook(facebook_conn_id=self.facebook_conn_id,
-                                           api_version=self.api_version)
-        rows = service.bulk_facebook_report(params=self.params,
-                                            fields=self.fields)
+        service = FacebookAdsReportingHook(
+            facebook_conn_id=self.facebook_conn_id, api_version=self.api_version
+        )
+        rows = service.bulk_facebook_report(params=self.params, fields=self.fields)
 
         converted_rows = [dict(row) for row in rows]
         self.log.info("Facebook Returned %s data points", len(converted_rows))

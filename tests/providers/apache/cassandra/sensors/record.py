@@ -25,10 +25,6 @@ from airflow.providers.apache.cassandra.sensors.table import CassandraTableSenso
 class TestCassandraTableSensor(unittest.TestCase):
     @patch("airflow.providers.apache.cassandra.sensors.table.CassandraHook")
     def test_poke(self, mock_hook):
-        sensor = CassandraTableSensor(
-            task_id='test_task',
-            cassandra_conn_id='cassandra_default',
-            table='t',
-        )
+        sensor = CassandraTableSensor(task_id='test_task', cassandra_conn_id='cassandra_default', table='t',)
         sensor.poke(None)
         mock_hook.return_value.table_exists.assert_called_once_with('t')

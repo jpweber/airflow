@@ -106,9 +106,7 @@ class TestShowInfo(unittest.TestCase):
         cls.parser = cli_parser.get_parser()
 
     @conf_vars(
-        {
-            ('core', 'sql_alchemy_conn'): 'postgresql+psycopg2://postgres:airflow@postgres/airflow',
-        }
+        {('core', 'sql_alchemy_conn'): 'postgresql+psycopg2://postgres:airflow@postgres/airflow',}
     )
     def test_show_info(self):
         with contextlib.redirect_stdout(io.StringIO()) as stdout:
@@ -119,9 +117,7 @@ class TestShowInfo(unittest.TestCase):
         self.assertIn("postgresql+psycopg2://postgres:airflow@postgres/airflow", output)
 
     @conf_vars(
-        {
-            ('core', 'sql_alchemy_conn'): 'postgresql+psycopg2://postgres:airflow@postgres/airflow',
-        }
+        {('core', 'sql_alchemy_conn'): 'postgresql+psycopg2://postgres:airflow@postgres/airflow',}
     )
     def test_show_info_anonymize(self):
         with contextlib.redirect_stdout(io.StringIO()) as stdout:
@@ -132,9 +128,7 @@ class TestShowInfo(unittest.TestCase):
         self.assertIn("postgresql+psycopg2://p...s:PASSWORD@postgres/airflow", output)
 
     @conf_vars(
-        {
-            ('core', 'sql_alchemy_conn'): 'postgresql+psycopg2://postgres:airflow@postgres/airflow',
-        }
+        {('core', 'sql_alchemy_conn'): 'postgresql+psycopg2://postgres:airflow@postgres/airflow',}
     )
     @mock.patch(
         "airflow.cli.commands.info_command.requests",
@@ -146,7 +140,7 @@ class TestShowInfo(unittest.TestCase):
                 "link": "https://file.io/TEST",
                 "expiry": "14 days",
             },
-        }
+        },
     )
     def test_show_info_anonymize_fileio(self, mock_requests):
         with contextlib.redirect_stdout(io.StringIO()) as stdout:

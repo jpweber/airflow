@@ -52,16 +52,18 @@ class EmailOperator(BaseOperator):
 
     @apply_defaults
     def __init__(
-            self,
-            to: Union[List[str], str],
-            subject: str,
-            html_content: str,
-            files: Optional[List] = None,
-            cc: Optional[Union[List[str], str]] = None,
-            bcc: Optional[Union[List[str], str]] = None,
-            mime_subtype: str = 'mixed',
-            mime_charset: str = 'utf-8',
-            *args, **kwargs) -> None:
+        self,
+        to: Union[List[str], str],
+        subject: str,
+        html_content: str,
+        files: Optional[List] = None,
+        cc: Optional[Union[List[str], str]] = None,
+        bcc: Optional[Union[List[str], str]] = None,
+        mime_subtype: str = 'mixed',
+        mime_charset: str = 'utf-8',
+        *args,
+        **kwargs,
+    ) -> None:
         super().__init__(*args, **kwargs)
         self.to = to  # pylint: disable=invalid-name
         self.subject = subject
@@ -73,6 +75,13 @@ class EmailOperator(BaseOperator):
         self.mime_charset = mime_charset
 
     def execute(self, context):
-        send_email(self.to, self.subject, self.html_content,
-                   files=self.files, cc=self.cc, bcc=self.bcc,
-                   mime_subtype=self.mime_subtype, mime_charset=self.mime_charset)
+        send_email(
+            self.to,
+            self.subject,
+            self.html_content,
+            files=self.files,
+            cc=self.cc,
+            bcc=self.bcc,
+            mime_subtype=self.mime_subtype,
+            mime_charset=self.mime_charset,
+        )

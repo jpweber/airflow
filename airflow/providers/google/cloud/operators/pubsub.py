@@ -103,34 +103,38 @@ class PubSubCreateTopicOperator(BaseOperator):
     :param project: (Deprecated) the GCP project ID where the topic will be created
     :type project: str
     """
+
     template_fields = ['project_id', 'topic']
     ui_color = '#0273d4'
 
     # pylint: disable=too-many-arguments
     @apply_defaults
     def __init__(
-            self,
-            topic: str,
-            project_id: Optional[str] = None,
-            fail_if_exists: bool = False,
-            gcp_conn_id: str = 'google_cloud_default',
-            delegate_to: Optional[str] = None,
-            labels: Optional[Dict[str, str]] = None,
-            message_storage_policy: Union[Dict, MessageStoragePolicy] = None,
-            kms_key_name: Optional[str] = None,
-            retry: Optional[Retry] = None,
-            timeout: Optional[float] = None,
-            metadata: Optional[Sequence[Tuple[str, str]]] = None,
-            project: Optional[str] = None,
-            *args,
-            **kwargs) -> None:
+        self,
+        topic: str,
+        project_id: Optional[str] = None,
+        fail_if_exists: bool = False,
+        gcp_conn_id: str = 'google_cloud_default',
+        delegate_to: Optional[str] = None,
+        labels: Optional[Dict[str, str]] = None,
+        message_storage_policy: Union[Dict, MessageStoragePolicy] = None,
+        kms_key_name: Optional[str] = None,
+        retry: Optional[Retry] = None,
+        timeout: Optional[float] = None,
+        metadata: Optional[Sequence[Tuple[str, str]]] = None,
+        project: Optional[str] = None,
+        *args,
+        **kwargs,
+    ) -> None:
 
         # To preserve backward compatibility
         # TODO: remove one day
         if project:
             warnings.warn(
-                "The project parameter has been deprecated. You should pass "
-                "the project_id parameter.", DeprecationWarning, stacklevel=2)
+                "The project parameter has been deprecated. You should pass " "the project_id parameter.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
             project_id = project
 
         super().__init__(*args, **kwargs)
@@ -147,8 +151,7 @@ class PubSubCreateTopicOperator(BaseOperator):
         self.metadata = metadata
 
     def execute(self, context):
-        hook = PubSubHook(gcp_conn_id=self.gcp_conn_id,
-                          delegate_to=self.delegate_to)
+        hook = PubSubHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
 
         self.log.info("Creating topic %s", self.topic)
         hook.create_topic(
@@ -160,7 +163,7 @@ class PubSubCreateTopicOperator(BaseOperator):
             kms_key_name=self.kms_key_name,
             retry=self.retry,
             timeout=self.timeout,
-            metadata=self.metadata
+            metadata=self.metadata,
         )
         self.log.info("Created topic %s", self.topic)
 
@@ -273,44 +276,52 @@ class PubSubCreateSubscriptionOperator(BaseOperator):
         will be created. If empty, ``topic_project`` will be used.
     :type subscription_project: str
     """
+
     template_fields = ['project_id', 'topic', 'subscription', 'subscription_project_id']
     ui_color = '#0273d4'
 
     # pylint: disable=too-many-arguments
     @apply_defaults
     def __init__(
-            self,
-            topic: str,
-            project_id: Optional[str] = None,
-            subscription: Optional[str] = None,
-            subscription_project_id: Optional[str] = None,
-            ack_deadline_secs: int = 10,
-            fail_if_exists: bool = False,
-            gcp_conn_id: str = 'google_cloud_default',
-            delegate_to: Optional[str] = None,
-            push_config: Optional[Union[Dict, PushConfig]] = None,
-            retain_acked_messages: Optional[bool] = None,
-            message_retention_duration: Optional[Union[Dict, Duration]] = None,
-            labels: Optional[Dict[str, str]] = None,
-            retry: Optional[Retry] = None,
-            timeout: Optional[float] = None,
-            metadata: Optional[Sequence[Tuple[str, str]]] = None,
-            topic_project: Optional[str] = None,
-            subscription_project: Optional[str] = None,
-            *args,
-            **kwargs) -> None:
+        self,
+        topic: str,
+        project_id: Optional[str] = None,
+        subscription: Optional[str] = None,
+        subscription_project_id: Optional[str] = None,
+        ack_deadline_secs: int = 10,
+        fail_if_exists: bool = False,
+        gcp_conn_id: str = 'google_cloud_default',
+        delegate_to: Optional[str] = None,
+        push_config: Optional[Union[Dict, PushConfig]] = None,
+        retain_acked_messages: Optional[bool] = None,
+        message_retention_duration: Optional[Union[Dict, Duration]] = None,
+        labels: Optional[Dict[str, str]] = None,
+        retry: Optional[Retry] = None,
+        timeout: Optional[float] = None,
+        metadata: Optional[Sequence[Tuple[str, str]]] = None,
+        topic_project: Optional[str] = None,
+        subscription_project: Optional[str] = None,
+        *args,
+        **kwargs,
+    ) -> None:
 
         # To preserve backward compatibility
         # TODO: remove one day
         if topic_project:
             warnings.warn(
                 "The topic_project parameter has been deprecated. You should pass "
-                "the project_id parameter.", DeprecationWarning, stacklevel=2)
+                "the project_id parameter.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
             project_id = topic_project
         if subscription_project:
             warnings.warn(
                 "The project_id parameter has been deprecated. You should pass "
-                "the subscription_project parameter.", DeprecationWarning, stacklevel=2)
+                "the subscription_project parameter.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
             subscription_project_id = subscription_project
 
         super().__init__(*args, **kwargs)
@@ -331,8 +342,7 @@ class PubSubCreateSubscriptionOperator(BaseOperator):
         self.metadata = metadata
 
     def execute(self, context):
-        hook = PubSubHook(gcp_conn_id=self.gcp_conn_id,
-                          delegate_to=self.delegate_to)
+        hook = PubSubHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
 
         self.log.info("Creating subscription for topic %s", self.topic)
         result = hook.create_subscription(
@@ -348,7 +358,7 @@ class PubSubCreateSubscriptionOperator(BaseOperator):
             labels=self.labels,
             retry=self.retry,
             timeout=self.timeout,
-            metadata=self.metadata
+            metadata=self.metadata,
         )
 
         self.log.info("Created subscription for topic %s", self.topic)
@@ -413,30 +423,34 @@ class PubSubDeleteTopicOperator(BaseOperator):
     :param project: (Deprecated) the GCP project ID where the topic will be created
     :type project: str
     """
+
     template_fields = ['project_id', 'topic']
     ui_color = '#cb4335'
 
     @apply_defaults
     def __init__(
-            self,
-            topic: str,
-            project_id: Optional[str] = None,
-            fail_if_not_exists: bool = False,
-            gcp_conn_id: str = 'google_cloud_default',
-            delegate_to: Optional[str] = None,
-            retry: Optional[Retry] = None,
-            timeout: Optional[float] = None,
-            metadata: Optional[Sequence[Tuple[str, str]]] = None,
-            project: Optional[str] = None,
-            *args,
-            **kwargs) -> None:
+        self,
+        topic: str,
+        project_id: Optional[str] = None,
+        fail_if_not_exists: bool = False,
+        gcp_conn_id: str = 'google_cloud_default',
+        delegate_to: Optional[str] = None,
+        retry: Optional[Retry] = None,
+        timeout: Optional[float] = None,
+        metadata: Optional[Sequence[Tuple[str, str]]] = None,
+        project: Optional[str] = None,
+        *args,
+        **kwargs,
+    ) -> None:
 
         # To preserve backward compatibility
         # TODO: remove one day
         if project:
             warnings.warn(
-                "The project parameter has been deprecated. You should pass "
-                "the project_id parameter.", DeprecationWarning, stacklevel=2)
+                "The project parameter has been deprecated. You should pass " "the project_id parameter.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
             project_id = project
 
         super().__init__(*args, **kwargs)
@@ -450,8 +464,7 @@ class PubSubDeleteTopicOperator(BaseOperator):
         self.metadata = metadata
 
     def execute(self, context):
-        hook = PubSubHook(gcp_conn_id=self.gcp_conn_id,
-                          delegate_to=self.delegate_to)
+        hook = PubSubHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
 
         self.log.info("Deleting topic %s", self.topic)
         hook.delete_topic(
@@ -460,7 +473,7 @@ class PubSubDeleteTopicOperator(BaseOperator):
             fail_if_not_exists=self.fail_if_not_exists,
             retry=self.retry,
             timeout=self.timeout,
-            metadata=self.metadata
+            metadata=self.metadata,
         )
         self.log.info("Deleted topic %s", self.topic)
 
@@ -525,30 +538,34 @@ class PubSubDeleteSubscriptionOperator(BaseOperator):
     :param project: (Deprecated) the GCP project ID where the topic will be created
     :type project: str
     """
+
     template_fields = ['project_id', 'subscription']
     ui_color = '#cb4335'
 
     @apply_defaults
     def __init__(
-            self,
-            subscription: str,
-            project_id: Optional[str] = None,
-            fail_if_not_exists: bool = False,
-            gcp_conn_id: str = 'google_cloud_default',
-            delegate_to: Optional[str] = None,
-            retry: Optional[Retry] = None,
-            timeout: Optional[float] = None,
-            metadata: Optional[Sequence[Tuple[str, str]]] = None,
-            project: Optional[str] = None,
-            *args,
-            **kwargs) -> None:
+        self,
+        subscription: str,
+        project_id: Optional[str] = None,
+        fail_if_not_exists: bool = False,
+        gcp_conn_id: str = 'google_cloud_default',
+        delegate_to: Optional[str] = None,
+        retry: Optional[Retry] = None,
+        timeout: Optional[float] = None,
+        metadata: Optional[Sequence[Tuple[str, str]]] = None,
+        project: Optional[str] = None,
+        *args,
+        **kwargs,
+    ) -> None:
 
         # To preserve backward compatibility
         # TODO: remove one day
         if project:
             warnings.warn(
-                "The project parameter has been deprecated. You should pass "
-                "the project_id parameter.", DeprecationWarning, stacklevel=2)
+                "The project parameter has been deprecated. You should pass " "the project_id parameter.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
             project_id = project
 
         super().__init__(*args, **kwargs)
@@ -562,8 +579,7 @@ class PubSubDeleteSubscriptionOperator(BaseOperator):
         self.metadata = metadata
 
     def execute(self, context):
-        hook = PubSubHook(gcp_conn_id=self.gcp_conn_id,
-                          delegate_to=self.delegate_to)
+        hook = PubSubHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
 
         self.log.info("Deleting subscription %s", self.subscription)
         hook.delete_subscription(
@@ -572,7 +588,7 @@ class PubSubDeleteSubscriptionOperator(BaseOperator):
             fail_if_not_exists=self.fail_if_not_exists,
             retry=self.retry,
             timeout=self.timeout,
-            metadata=self.metadata
+            metadata=self.metadata,
         )
         self.log.info("Deleted subscription %s", self.subscription)
 
@@ -630,27 +646,31 @@ class PubSubPublishMessageOperator(BaseOperator):
     :param project: (Deprecated) the GCP project ID where the topic will be created
     :type project: str
     """
+
     template_fields = ['project_id', 'topic', 'messages']
     ui_color = '#0273d4'
 
     @apply_defaults
     def __init__(
-            self,
-            topic: str,
-            messages: List,
-            project_id: Optional[str] = None,
-            gcp_conn_id: str = 'google_cloud_default',
-            delegate_to: Optional[str] = None,
-            project: Optional[str] = None,
-            *args,
-            **kwargs) -> None:
+        self,
+        topic: str,
+        messages: List,
+        project_id: Optional[str] = None,
+        gcp_conn_id: str = 'google_cloud_default',
+        delegate_to: Optional[str] = None,
+        project: Optional[str] = None,
+        *args,
+        **kwargs,
+    ) -> None:
 
         # To preserve backward compatibility
         # TODO: remove one day
         if project:
             warnings.warn(
-                "The project parameter has been deprecated. You should pass "
-                "the project_id parameter.", DeprecationWarning, stacklevel=2)
+                "The project parameter has been deprecated. You should pass " "the project_id parameter.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
             project_id = project
 
         super().__init__(*args, **kwargs)
@@ -661,8 +681,7 @@ class PubSubPublishMessageOperator(BaseOperator):
         self.delegate_to = delegate_to
 
     def execute(self, context):
-        hook = PubSubHook(gcp_conn_id=self.gcp_conn_id,
-                          delegate_to=self.delegate_to)
+        hook = PubSubHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
 
         self.log.info("Publishing to topic %s", self.topic)
         hook.publish(project_id=self.project_id, topic=self.topic, messages=self.messages)
@@ -716,20 +735,21 @@ class PubSubPullOperator(BaseOperator):
         into JSON-serializable dicts using `google.protobuf.json_format.MessageToDict` function.
     :type messages_callback: Optional[Callable[[List[ReceivedMessage], Dict[str, Any]], Any]]
     """
+
     template_fields = ['project_id', 'subscription']
 
     @apply_defaults
     def __init__(
-            self,
-            project_id: str,
-            subscription: str,
-            max_messages: int = 5,
-            ack_messages: bool = False,
-            messages_callback: Optional[Callable[[List[ReceivedMessage], Dict[str, Any]], Any]] = None,
-            gcp_conn_id: str = 'google_cloud_default',
-            delegate_to: Optional[str] = None,
-            *args,
-            **kwargs
+        self,
+        project_id: str,
+        subscription: str,
+        max_messages: int = 5,
+        ack_messages: bool = False,
+        messages_callback: Optional[Callable[[List[ReceivedMessage], Dict[str, Any]], Any]] = None,
+        gcp_conn_id: str = 'google_cloud_default',
+        delegate_to: Optional[str] = None,
+        *args,
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.gcp_conn_id = gcp_conn_id
@@ -741,10 +761,7 @@ class PubSubPullOperator(BaseOperator):
         self.messages_callback = messages_callback
 
     def execute(self, context):
-        hook = PubSubHook(
-            gcp_conn_id=self.gcp_conn_id,
-            delegate_to=self.delegate_to,
-        )
+        hook = PubSubHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to,)
 
         pulled_messages = hook.pull(
             project_id=self.project_id,
@@ -759,17 +776,15 @@ class PubSubPullOperator(BaseOperator):
 
         if pulled_messages and self.ack_messages:
             hook.acknowledge(
-                project_id=self.project_id,
-                subscription=self.subscription,
-                messages=pulled_messages,
+                project_id=self.project_id, subscription=self.subscription, messages=pulled_messages,
             )
 
         return ret
 
     def _default_message_callback(
-            self,
-            pulled_messages: List[ReceivedMessage],
-            context: Dict[str, Any],  # pylint: disable=unused-argument
+        self,
+        pulled_messages: List[ReceivedMessage],
+        context: Dict[str, Any],  # pylint: disable=unused-argument
     ):
         """
         This method can be overridden by subclasses or by `messages_callback` constructor argument.
@@ -781,9 +796,6 @@ class PubSubPullOperator(BaseOperator):
         :return: value to be saved to XCom.
         """
 
-        messages_json = [
-            MessageToDict(m)
-            for m in pulled_messages
-        ]
+        messages_json = [MessageToDict(m) for m in pulled_messages]
 
         return messages_json

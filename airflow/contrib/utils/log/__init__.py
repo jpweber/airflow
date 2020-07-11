@@ -20,7 +20,4 @@ This package is deprecated. Please use `airflow.utils.log`.
 
 import warnings
 
-warnings.warn(
-    "This module is deprecated. Please use `airflow.utils.log`.",
-    DeprecationWarning, stacklevel=2
-)
+warnings.warn("This module is deprecated. Please use `airflow.utils.log`.", DeprecationWarning, stacklevel=2)

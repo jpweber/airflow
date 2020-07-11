@@ -25,6 +25,7 @@ class RunnableExecDateDep(BaseTIDep):
     """
     Determines whether a task's execution date is valid.
     """
+
     NAME = "Execution Date"
     IGNOREABLE = True
 
@@ -37,21 +38,17 @@ class RunnableExecDateDep(BaseTIDep):
         if ti.execution_date > cur_date and not ti.task.dag.allow_future_exec_dates:
             yield self._failing_status(
                 reason="Execution date {0} is in the future (the current "
-                       "date is {1}).".format(ti.execution_date.isoformat(),
-                                              cur_date.isoformat()))
+                "date is {1}).".format(ti.execution_date.isoformat(), cur_date.isoformat())
+            )
 
         if ti.task.end_date and ti.execution_date > ti.task.end_date:
             yield self._failing_status(
                 reason="The execution date is {0} but this is after the task's end date "
-                "{1}.".format(
-                    ti.execution_date.isoformat(),
-                    ti.task.end_date.isoformat()))
+                "{1}.".format(ti.execution_date.isoformat(), ti.task.end_date.isoformat())
+            )
 
-        if (ti.task.dag and
-                ti.task.dag.end_date and
-                ti.execution_date > ti.task.dag.end_date):
+        if ti.task.dag and ti.task.dag.end_date and ti.execution_date > ti.task.dag.end_date:
             yield self._failing_status(
                 reason="The execution date is {0} but this is after the task's DAG's "
-                "end date {1}.".format(
-                    ti.execution_date.isoformat(),
-                    ti.task.dag.end_date.isoformat()))
+                "end date {1}.".format(ti.execution_date.isoformat(), ti.task.dag.end_date.isoformat())
+            )

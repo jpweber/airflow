@@ -32,6 +32,7 @@ def test_cycle(dag):
     Check to see if there are any cycles in the DAG. Returns False if no cycle found,
     otherwise raises exception.
     """
+
     def _test_cycle_helper(visit_map: Dict[str, int], task_id: str) -> None:
         """
         Checks if a cycle exists from the input task using DFS traversal

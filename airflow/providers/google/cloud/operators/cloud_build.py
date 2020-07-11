@@ -184,12 +184,15 @@ class CloudBuildCreateBuildOperator(BaseOperator):
     template_ext = ['.yml', '.yaml', '.json']
 
     @apply_defaults
-    def __init__(self,
-                 body: Union[dict, str],
-                 project_id: Optional[str] = None,
-                 gcp_conn_id: str = "google_cloud_default",
-                 api_version: str = "v1",
-                 *args, **kwargs) -> None:
+    def __init__(
+        self,
+        body: Union[dict, str],
+        project_id: Optional[str] = None,
+        gcp_conn_id: str = "google_cloud_default",
+        api_version: str = "v1",
+        *args,
+        **kwargs,
+    ) -> None:
         super().__init__(*args, **kwargs)
         self.body = body
         # Not template fields to keep original value

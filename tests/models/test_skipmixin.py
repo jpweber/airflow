@@ -35,28 +35,16 @@ DEFAULT_DATE = timezone.datetime(2016, 1, 1)
 
 
 class TestSkipMixin(unittest.TestCase):
-
     @patch('airflow.utils.timezone.utcnow')
     def test_skip(self, mock_now):
         session = settings.Session()
         now = datetime.datetime.utcnow().replace(tzinfo=pendulum.timezone('UTC'))
         mock_now.return_value = now
-        dag = DAG(
-            'dag',
-            start_date=DEFAULT_DATE,
-        )
+        dag = DAG('dag', start_date=DEFAULT_DATE,)
         with dag:
             tasks = [DummyOperator(task_id='task')]
-        dag_run = dag.create_dagrun(
-            run_type=DagRunType.MANUAL,
-            execution_date=now,
-            state=State.FAILED,
-        )
-        SkipMixin().skip(
-            dag_run=dag_run,
-            execution_date=now,
-            tasks=tasks,
-            session=session)
+        dag_run = dag.create_dagrun(run_type=DagRunType.MANUAL, execution_date=now, state=State.FAILED,)
+        SkipMixin().skip(dag_run=dag_run, execution_date=now, tasks=tasks, session=session)
 
         session.query(TI).filter(
             TI.dag_id == 'dag',
@@ -71,17 +59,10 @@ class TestSkipMixin(unittest.TestCase):
         session = settings.Session()
         now = datetime.datetime.utcnow().replace(tzinfo=pendulum.timezone('UTC'))
         mock_now.return_value = now
-        dag = DAG(
-            'dag',
-            start_date=DEFAULT_DATE,
-        )
+        dag = DAG('dag', start_date=DEFAULT_DATE,)
         with dag:
             tasks = [DummyOperator(task_id='task')]
-        SkipMixin().skip(
-            dag_run=None,
-            execution_date=now,
-            tasks=tasks,
-            session=session)
+        SkipMixin().skip(dag_run=None, execution_date=now, tasks=tasks, session=session)
 
         session.query(TI).filter(
             TI.dag_id == 'dag',

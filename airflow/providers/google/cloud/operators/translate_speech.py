@@ -97,6 +97,7 @@ class CloudTranslateSpeechOperator(BaseOperator):
     :type gcp_conn_id: str
 
     """
+
     # [START translate_speech_template_fields]
     template_fields = ('target_language', 'format_', 'source_language', 'model', 'project_id', 'gcp_conn_id')
     # [END translate_speech_template_fields]
@@ -113,7 +114,7 @@ class CloudTranslateSpeechOperator(BaseOperator):
         project_id: Optional[str] = None,
         gcp_conn_id: str = 'google_cloud_default',
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.audio = audio
@@ -129,9 +130,7 @@ class CloudTranslateSpeechOperator(BaseOperator):
         speech_to_text_hook = CloudSpeechToTextHook(gcp_conn_id=self.gcp_conn_id)
         translate_hook = CloudTranslateHook(gcp_conn_id=self.gcp_conn_id)
 
-        recognize_result = speech_to_text_hook.recognize_speech(
-            config=self.config, audio=self.audio
-        )
+        recognize_result = speech_to_text_hook.recognize_speech(config=self.config, audio=self.audio)
         recognize_dict = MessageToDict(recognize_result)
 
         self.log.info("Recognition operation finished")
@@ -144,8 +143,9 @@ class CloudTranslateSpeechOperator(BaseOperator):
         try:
             transcript = recognize_dict['results'][0]['alternatives'][0]['transcript']
         except KeyError as key:
-            raise AirflowException("Wrong response '{}' returned - it should contain {} field"
-                                   .format(recognize_dict, key))
+            raise AirflowException(
+                "Wrong response '{}' returned - it should contain {} field".format(recognize_dict, key)
+            )
 
         try:
             translation = translate_hook.translate(
@@ -153,7 +153,7 @@ class CloudTranslateSpeechOperator(BaseOperator):
                 target_language=self.target_language,
                 format_=self.format_,
                 source_language=self.source_language,
-                model=self.model
+                model=self.model,
             )
             self.log.info('Translated output: %s', translation)
             return translation

@@ -25,7 +25,12 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 from google.api_core.exceptions import AlreadyExists
 from google.api_core.retry import Retry
 from google.cloud.vision_v1.types import (
-    AnnotateImageRequest, FieldMask, Image, Product, ProductSet, ReferenceImage,
+    AnnotateImageRequest,
+    FieldMask,
+    Image,
+    Product,
+    ProductSet,
+    ReferenceImage,
 )
 
 from airflow.models import BaseOperator
@@ -69,6 +74,7 @@ class CloudVisionCreateProductSetOperator(BaseOperator):
     :param gcp_conn_id: (Optional) The connection ID used to connect to Google Cloud Platform.
     :type gcp_conn_id: str
     """
+
     # [START vision_productset_create_template_fields]
     template_fields = ("location", "project_id", "product_set_id", "gcp_conn_id")
     # [END vision_productset_create_template_fields]
@@ -85,7 +91,7 @@ class CloudVisionCreateProductSetOperator(BaseOperator):
         metadata: Optional[MetaData] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.location = location
@@ -145,6 +151,7 @@ class CloudVisionGetProductSetOperator(BaseOperator):
     :param gcp_conn_id: (Optional) The connection ID used to connect to Google Cloud Platform.
     :type gcp_conn_id: str
     """
+
     # [START vision_productset_get_template_fields]
     template_fields = ('location', 'project_id', 'product_set_id', 'gcp_conn_id')
     # [END vision_productset_get_template_fields]
@@ -160,7 +167,7 @@ class CloudVisionGetProductSetOperator(BaseOperator):
         metadata: Optional[MetaData] = None,
         gcp_conn_id: str = 'google_cloud_default',
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.location = location
@@ -230,6 +237,7 @@ class CloudVisionUpdateProductSetOperator(BaseOperator):
     :param gcp_conn_id: (Optional) The connection ID used to connect to Google Cloud Platform.
     :type gcp_conn_id: str
     """
+
     # [START vision_productset_update_template_fields]
     template_fields = ('location', 'project_id', 'product_set_id', 'gcp_conn_id')
     # [END vision_productset_update_template_fields]
@@ -247,7 +255,7 @@ class CloudVisionUpdateProductSetOperator(BaseOperator):
         metadata: Optional[MetaData] = None,
         gcp_conn_id: str = 'google_cloud_default',
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.product_set = product_set
@@ -304,6 +312,7 @@ class CloudVisionDeleteProductSetOperator(BaseOperator):
     :param gcp_conn_id: (Optional) The connection ID used to connect to Google Cloud Platform.
     :type gcp_conn_id: str
     """
+
     # [START vision_productset_delete_template_fields]
     template_fields = ('location', 'project_id', 'product_set_id', 'gcp_conn_id')
     # [END vision_productset_delete_template_fields]
@@ -319,7 +328,7 @@ class CloudVisionDeleteProductSetOperator(BaseOperator):
         metadata: Optional[MetaData] = None,
         gcp_conn_id: str = 'google_cloud_default',
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.location = location
@@ -382,6 +391,7 @@ class CloudVisionCreateProductOperator(BaseOperator):
     :param gcp_conn_id: (Optional) The connection ID used to connect to Google Cloud Platform.
     :type gcp_conn_id: str
     """
+
     # [START vision_product_create_template_fields]
     template_fields = ('location', 'project_id', 'product_id', 'gcp_conn_id')
     # [END vision_product_create_template_fields]
@@ -398,7 +408,7 @@ class CloudVisionCreateProductOperator(BaseOperator):
         metadata: Optional[MetaData] = None,
         gcp_conn_id: str = 'google_cloud_default',
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.location = location
@@ -461,6 +471,7 @@ class CloudVisionGetProductOperator(BaseOperator):
     :param gcp_conn_id: (Optional) The connection ID used to connect to Google Cloud Platform.
     :type gcp_conn_id: str
     """
+
     # [START vision_product_get_template_fields]
     template_fields = ('location', 'project_id', 'product_id', 'gcp_conn_id')
     # [END vision_product_get_template_fields]
@@ -476,7 +487,7 @@ class CloudVisionGetProductOperator(BaseOperator):
         metadata: Optional[MetaData] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.location = location
@@ -557,6 +568,7 @@ class CloudVisionUpdateProductOperator(BaseOperator):
     :param gcp_conn_id: (Optional) The connection ID used to connect to Google Cloud Platform.
     :type gcp_conn_id: str
     """
+
     # [START vision_product_update_template_fields]
     template_fields = ('location', 'project_id', 'product_id', 'gcp_conn_id')
     # [END vision_product_update_template_fields]
@@ -574,7 +586,7 @@ class CloudVisionUpdateProductOperator(BaseOperator):
         metadata: Optional[MetaData] = None,
         gcp_conn_id: str = 'google_cloud_default',
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.product = product
@@ -636,6 +648,7 @@ class CloudVisionDeleteProductOperator(BaseOperator):
     :param gcp_conn_id: (Optional) The connection ID used to connect to Google Cloud Platform.
     :type gcp_conn_id: str
     """
+
     # [START vision_product_delete_template_fields]
     template_fields = ('location', 'project_id', 'product_id', 'gcp_conn_id')
     # [END vision_product_delete_template_fields]
@@ -651,7 +664,7 @@ class CloudVisionDeleteProductOperator(BaseOperator):
         metadata: Optional[MetaData] = None,
         gcp_conn_id: str = 'google_cloud_default',
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.location = location
@@ -697,6 +710,7 @@ class CloudVisionImageAnnotateOperator(BaseOperator):
     :param gcp_conn_id: (Optional) The connection ID used to connect to Google Cloud Platform.
     :type gcp_conn_id: str
     """
+
     # [START vision_annotate_image_template_fields]
     template_fields = ('request', 'gcp_conn_id')
     # [END vision_annotate_image_template_fields]
@@ -709,7 +723,7 @@ class CloudVisionImageAnnotateOperator(BaseOperator):
         timeout: Optional[float] = None,
         gcp_conn_id: str = 'google_cloud_default',
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.request = request
@@ -724,9 +738,7 @@ class CloudVisionImageAnnotateOperator(BaseOperator):
             response = hook.annotate_image(request=self.request, retry=self.retry, timeout=self.timeout)
         else:
             response = hook.batch_annotate_images(
-                requests=self.request,
-                retry=self.retry,
-                timeout=self.timeout
+                requests=self.request, retry=self.retry, timeout=self.timeout
             )
 
         return response
@@ -770,6 +782,7 @@ class CloudVisionCreateReferenceImageOperator(BaseOperator):
     :param gcp_conn_id: (Optional) The connection ID used to connect to Google Cloud Platform.
     :type gcp_conn_id: str
     """
+
     # [START vision_reference_image_create_template_fields]
     template_fields = (
         "location",
@@ -794,7 +807,7 @@ class CloudVisionCreateReferenceImageOperator(BaseOperator):
         metadata: Optional[MetaData] = None,
         gcp_conn_id: str = 'google_cloud_default',
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.location = location
@@ -864,6 +877,7 @@ class CloudVisionAddProductToProductSetOperator(BaseOperator):
     :param gcp_conn_id: (Optional) The connection ID used to connect to Google Cloud Platform.
     :type gcp_conn_id: str
     """
+
     # [START vision_add_product_to_product_set_template_fields]
     template_fields = ("location", "product_set_id", "product_id", "project_id", "gcp_conn_id")
     # [END vision_add_product_to_product_set_template_fields]
@@ -880,7 +894,7 @@ class CloudVisionAddProductToProductSetOperator(BaseOperator):
         metadata: Optional[MetaData] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.product_set_id = product_set_id
@@ -935,6 +949,7 @@ class CloudVisionRemoveProductFromProductSetOperator(BaseOperator):
     :param gcp_conn_id: (Optional) The connection ID used to connect to Google Cloud Platform.
     :type gcp_conn_id: str
     """
+
     # [START vision_remove_product_from_product_set_template_fields]
     template_fields = ("location", "product_set_id", "product_id", "project_id", "gcp_conn_id")
     # [END vision_remove_product_from_product_set_template_fields]
@@ -951,7 +966,7 @@ class CloudVisionRemoveProductFromProductSetOperator(BaseOperator):
         metadata: Optional[MetaData] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.product_set_id = product_set_id
@@ -1004,6 +1019,7 @@ class CloudVisionDetectTextOperator(BaseOperator):
         :class:`google.cloud.vision_v1.types.AnnotateImageRequest`
     :type additional_properties: dict
     """
+
     # [START vision_detect_text_set_template_fields]
     template_fields = ("image", "max_results", "timeout", "gcp_conn_id")
     # [END vision_detect_text_set_template_fields]
@@ -1019,7 +1035,7 @@ class CloudVisionDetectTextOperator(BaseOperator):
         additional_properties: Optional[Dict] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.image = image
@@ -1073,6 +1089,7 @@ class CloudVisionTextDetectOperator(BaseOperator):
         https://googleapis.github.io/google-cloud-python/latest/vision/gapic/v1/types.html#google.cloud.vision_v1.types.AnnotateImageRequest
     :type additional_properties: dict
     """
+
     # [START vision_document_detect_text_set_template_fields]
     template_fields = ("image", "max_results", "timeout", "gcp_conn_id")  # Iterable[str]
     # [END vision_document_detect_text_set_template_fields]
@@ -1088,7 +1105,7 @@ class CloudVisionTextDetectOperator(BaseOperator):
         additional_properties: Optional[Dict] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.image = image
@@ -1135,6 +1152,7 @@ class CloudVisionDetectImageLabelsOperator(BaseOperator):
         https://googleapis.github.io/google-cloud-python/latest/vision/gapic/v1/types.html#google.cloud.vision_v1.types.AnnotateImageRequest
     :type additional_properties: dict
     """
+
     # [START vision_detect_labels_template_fields]
     template_fields = ("image", "max_results", "timeout", "gcp_conn_id")
     # [END vision_detect_labels_template_fields]
@@ -1148,7 +1166,7 @@ class CloudVisionDetectImageLabelsOperator(BaseOperator):
         additional_properties: Optional[Dict] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.image = image
@@ -1191,6 +1209,7 @@ class CloudVisionDetectImageSafeSearchOperator(BaseOperator):
         https://googleapis.github.io/google-cloud-python/latest/vision/gapic/v1/types.html#google.cloud.vision_v1.types.AnnotateImageRequest
     :type additional_properties: dict
     """
+
     # [START vision_detect_safe_search_template_fields]
     template_fields = ("image", "max_results", "timeout", "gcp_conn_id")
     # [END vision_detect_safe_search_template_fields]
@@ -1204,7 +1223,7 @@ class CloudVisionDetectImageSafeSearchOperator(BaseOperator):
         additional_properties: Optional[Dict] = None,
         gcp_conn_id: str = "google_cloud_default",
         *args,
-        **kwargs
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self.image = image
@@ -1226,9 +1245,7 @@ class CloudVisionDetectImageSafeSearchOperator(BaseOperator):
 
 
 def prepare_additional_parameters(
-    additional_properties: Optional[Dict],
-    language_hints: Any,
-    web_detection_params: Any
+    additional_properties: Optional[Dict], language_hints: Any, web_detection_params: Any
 ) -> Optional[Dict]:
     """
     Creates additional_properties parameter based on language_hints, web_detection_params and

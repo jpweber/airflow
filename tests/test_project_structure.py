@@ -23,9 +23,7 @@ import unittest
 
 from parameterized import parameterized
 
-ROOT_FOLDER = os.path.realpath(
-    os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)
-)
+ROOT_FOLDER = os.path.realpath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 
 MISSING_TEST_FILES = {
     'tests/providers/apache/cassandra/sensors/test_record.py',
@@ -41,7 +39,7 @@ MISSING_TEST_FILES = {
     'tests/providers/microsoft/azure/sensors/test_azure_cosmos.py',
     'tests/providers/microsoft/azure/log/test_wasb_task_handler.py',
     'tests/providers/microsoft/mssql/hooks/test_mssql.py',
-    'tests/providers/samba/hooks/test_samba.py'
+    'tests/providers/samba/hooks/test_samba.py',
 }
 
 
@@ -83,13 +81,13 @@ class TestProjectStructure(unittest.TestCase):
         expected_test_files = (f for f in expected_test_files if not f.endswith("__init__.py"))
         # Change airflow/ to tests/
         expected_test_files = (
-            f'tests/{f.partition("/")[2]}'
-            for f in expected_test_files if not f.endswith("__init__.py")
+            f'tests/{f.partition("/")[2]}' for f in expected_test_files if not f.endswith("__init__.py")
         )
         # Add test_ prefix to filename
         expected_test_files = (
             f'{f.rpartition("/")[0]}/test_{f.rpartition("/")[2]}'
-            for f in expected_test_files if not f.endswith("__init__.py")
+            for f in expected_test_files
+            if not f.endswith("__init__.py")
         )
 
         current_test_files = glob.glob(f"{ROOT_FOLDER}/tests/providers/**/*.py", recursive=True)
@@ -139,9 +137,7 @@ class TestGoogleProviderProjectStructure(unittest.TestCase):
         )
         example_dags_files = self.find_resource_files(resource_type="example_dags")
         # Generate tuple of department and service e.g. ('marketing_platform', 'display_video')
-        operator_sets = [
-            (f.split("/")[-3], f.split("/")[-1].rsplit(".")[0]) for f in operators_modules
-        ]
+        operator_sets = [(f.split("/")[-3], f.split("/")[-1].rsplit(".")[0]) for f in operators_modules]
         example_sets = [
             (f.split("/")[-3], f.split("/")[-1].rsplit(".")[0].replace("example_", "", 1))
             for f in example_dags_files
@@ -199,12 +195,8 @@ class TestGoogleProviderProjectStructure(unittest.TestCase):
         files = {f for f in operators_tests if f.endswith(filename_suffix)}
 
         expected_files = (f"tests/{f[8:]}" for f in operators_files)
-        expected_files = (
-            f.replace(".py", filename_suffix).replace("/test_", "/") for f in expected_files
-        )
-        expected_files = {
-            f'{f.rpartition("/")[0]}/test_{f.rpartition("/")[2]}' for f in expected_files
-        }
+        expected_files = (f.replace(".py", filename_suffix).replace("/test_", "/") for f in expected_files)
+        expected_files = {f'{f.rpartition("/")[0]}/test_{f.rpartition("/")[2]}' for f in expected_files}
 
         self.assertEqual(set(), files - expected_files)
 
@@ -213,7 +205,7 @@ class TestGoogleProviderProjectStructure(unittest.TestCase):
         top_level_directory: str = "airflow",
         department: str = "*",
         resource_type: str = "*",
-        service: str = "*"
+        service: str = "*",
     ):
         python_files = glob.glob(
             f"{ROOT_FOLDER}/{top_level_directory}/providers/google/{department}/{resource_type}/{service}.py"
@@ -228,16 +220,14 @@ class TestGoogleProviderProjectStructure(unittest.TestCase):
 class TestOperatorsHooks(unittest.TestCase):
     def test_no_illegal_suffixes(self):
         illegal_suffixes = ["_operator.py", "_hook.py", "_sensor.py"]
-        files = itertools.chain(*[
-            glob.glob(f"{ROOT_FOLDER}/{part}/providers/**/{resource_type}/*.py", recursive=True)
-            for resource_type in ["operators", "hooks", "sensors", "example_dags"]
-            for part in ["airflow", "tests"]
-        ])
+        files = itertools.chain(
+            *[
+                glob.glob(f"{ROOT_FOLDER}/{part}/providers/**/{resource_type}/*.py", recursive=True)
+                for resource_type in ["operators", "hooks", "sensors", "example_dags"]
+                for part in ["airflow", "tests"]
+            ]
+        )
 
-        invalid_files = [
-            f
-            for f in files
-            if any(f.endswith(suffix) for suffix in illegal_suffixes)
-        ]
+        invalid_files = [f for f in files if any(f.endswith(suffix) for suffix in illegal_suffixes)]
 
         self.assertEqual([], invalid_files)

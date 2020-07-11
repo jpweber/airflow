@@ -31,16 +31,19 @@ class TestApp(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         from airflow import settings
+
         settings.configure_orm()
 
-    @conf_vars({
-        ('webserver', 'enable_proxy_fix'): 'True',
-        ('webserver', 'proxy_fix_x_for'): '1',
-        ('webserver', 'proxy_fix_x_proto'): '1',
-        ('webserver', 'proxy_fix_x_host'): '1',
-        ('webserver', 'proxy_fix_x_port'): '1',
-        ('webserver', 'proxy_fix_x_prefix'): '1'
-    })
+    @conf_vars(
+        {
+            ('webserver', 'enable_proxy_fix'): 'True',
+            ('webserver', 'proxy_fix_x_for'): '1',
+            ('webserver', 'proxy_fix_x_proto'): '1',
+            ('webserver', 'proxy_fix_x_host'): '1',
+            ('webserver', 'proxy_fix_x_port'): '1',
+            ('webserver', 'proxy_fix_x_prefix'): '1',
+        }
+    )
     @mock.patch("airflow.www.app.app", None)
     def test_should_respect_proxy_fix(self):
         app = application.cached_app(testing=True)
@@ -76,9 +79,9 @@ class TestApp(unittest.TestCase):
         self.assertEqual(b"success", response.get_data())
         self.assertEqual(response.status_code, 200)
 
-    @conf_vars({
-        ('webserver', 'base_url'): 'http://localhost:8080/internal-client',
-    })
+    @conf_vars(
+        {('webserver', 'base_url'): 'http://localhost:8080/internal-client',}
+    )
     @mock.patch("airflow.www.app.app", None)
     def test_should_respect_base_url_ignore_proxy_headers(self):
         app = application.cached_app(testing=True)
@@ -114,15 +117,17 @@ class TestApp(unittest.TestCase):
         self.assertEqual(b"success", response.get_data())
         self.assertEqual(response.status_code, 200)
 
-    @conf_vars({
-        ('webserver', 'base_url'): 'http://localhost:8080/internal-client',
-        ('webserver', 'enable_proxy_fix'): 'True',
-        ('webserver', 'proxy_fix_x_for'): '1',
-        ('webserver', 'proxy_fix_x_proto'): '1',
-        ('webserver', 'proxy_fix_x_host'): '1',
-        ('webserver', 'proxy_fix_x_port'): '1',
-        ('webserver', 'proxy_fix_x_prefix'): '1'
-    })
+    @conf_vars(
+        {
+            ('webserver', 'base_url'): 'http://localhost:8080/internal-client',
+            ('webserver', 'enable_proxy_fix'): 'True',
+            ('webserver', 'proxy_fix_x_for'): '1',
+            ('webserver', 'proxy_fix_x_proto'): '1',
+            ('webserver', 'proxy_fix_x_host'): '1',
+            ('webserver', 'proxy_fix_x_port'): '1',
+            ('webserver', 'proxy_fix_x_prefix'): '1',
+        }
+    )
     @mock.patch("airflow.www.app.app", None)
     def test_should_respect_base_url_when_proxy_fix_and_base_url_is_set_up_but_headers_missing(self):
         app = application.cached_app(testing=True)
@@ -152,15 +157,17 @@ class TestApp(unittest.TestCase):
         self.assertEqual(b"success", response.get_data())
         self.assertEqual(response.status_code, 200)
 
-    @conf_vars({
-        ('webserver', 'base_url'): 'http://localhost:8080/internal-client',
-        ('webserver', 'enable_proxy_fix'): 'True',
-        ('webserver', 'proxy_fix_x_for'): '1',
-        ('webserver', 'proxy_fix_x_proto'): '1',
-        ('webserver', 'proxy_fix_x_host'): '1',
-        ('webserver', 'proxy_fix_x_port'): '1',
-        ('webserver', 'proxy_fix_x_prefix'): '1'
-    })
+    @conf_vars(
+        {
+            ('webserver', 'base_url'): 'http://localhost:8080/internal-client',
+            ('webserver', 'enable_proxy_fix'): 'True',
+            ('webserver', 'proxy_fix_x_for'): '1',
+            ('webserver', 'proxy_fix_x_proto'): '1',
+            ('webserver', 'proxy_fix_x_host'): '1',
+            ('webserver', 'proxy_fix_x_port'): '1',
+            ('webserver', 'proxy_fix_x_prefix'): '1',
+        }
+    )
     @mock.patch("airflow.www.app.app", None)
     def test_should_respect_base_url_and_proxy_when_proxy_fix_and_base_url_is_set_up(self):
         app = application.cached_app(testing=True)

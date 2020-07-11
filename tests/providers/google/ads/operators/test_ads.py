@@ -59,9 +59,7 @@ class TestGoogleAdsListAccountsOperator:
         )
         op.execute({})
 
-        mock_ads_hook.assert_called_once_with(
-            gcp_conn_id=gcp_conn_id, google_ads_conn_id=google_ads_conn_id
-        )
+        mock_ads_hook.assert_called_once_with(gcp_conn_id=gcp_conn_id, google_ads_conn_id=google_ads_conn_id)
         mock_gcs_hook.assert_called_once_with(gcp_conn_id=gcp_conn_id)
 
         mock_ads_hook.return_value.list_accessible_customers.assert_called_once_with()

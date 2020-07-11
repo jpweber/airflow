@@ -60,7 +60,7 @@ class TestUtils(unittest.TestCase):
         [
             (None, 'TRELLO_API', False),
             ('token', 'TRELLO_KEY', False),
-            ('token, mysecretword', 'TRELLO_KEY', False)
+            ('token, mysecretword', 'TRELLO_KEY', False),
         ],
     )
     def test_normal_variable_fields_should_not_be_hidden(
@@ -69,22 +69,15 @@ class TestUtils(unittest.TestCase):
         with conf_vars({('admin', 'sensitive_variable_fields'): str(sensitive_variable_fields)}):
             self.assertEqual(expected_result, utils.should_hide_value_for_key(key))
 
-    def check_generate_pages_html(self, current_page, total_pages,
-                                  window=7, check_middle=False):
+    def check_generate_pages_html(self, current_page, total_pages, window=7, check_middle=False):
         extra_links = 4  # first, prev, next, last
         search = "'>\"/><img src=x onerror=alert(1)>"
-        html_str = utils.generate_pages(current_page, total_pages,
-                                        search=search)
+        html_str = utils.generate_pages(current_page, total_pages, search=search)
 
-        self.assertNotIn(search, html_str,
-                         "The raw search string shouldn't appear in the output")
-        self.assertIn('search=%27%3E%22%2F%3E%3Cimg+src%3Dx+onerror%3Dalert%281%29%3E',
-                      html_str)
+        self.assertNotIn(search, html_str, "The raw search string shouldn't appear in the output")
+        self.assertIn('search=%27%3E%22%2F%3E%3Cimg+src%3Dx+onerror%3Dalert%281%29%3E', html_str)
 
-        self.assertTrue(
-            callable(html_str.__html__),
-            "Should return something that is HTML-escaping aware"
-        )
+        self.assertTrue(callable(html_str.__html__), "Should return something that is HTML-escaping aware")
 
         dom = BeautifulSoup(html_str, 'html.parser')
         self.assertIsNotNone(dom)
@@ -111,25 +104,20 @@ class TestUtils(unittest.TestCase):
                 self.assertListEqual(query['search'], [search])
 
     def test_generate_pager_current_start(self):
-        self.check_generate_pages_html(current_page=0,
-                                       total_pages=6)
+        self.check_generate_pages_html(current_page=0, total_pages=6)
 
     def test_generate_pager_current_middle(self):
-        self.check_generate_pages_html(current_page=10,
-                                       total_pages=20,
-                                       check_middle=True)
+        self.check_generate_pages_html(current_page=10, total_pages=20, check_middle=True)
 
     def test_generate_pager_current_end(self):
-        self.check_generate_pages_html(current_page=38,
-                                       total_pages=39)
+        self.check_generate_pages_html(current_page=38, total_pages=39)
 
     def test_params_no_values(self):
         """Should return an empty string if no params are passed"""
         self.assertEqual('', utils.get_params())
 
     def test_params_search(self):
-        self.assertEqual('search=bash_',
-                         utils.get_params(search='bash_'))
+        self.assertEqual('search=bash_', utils.get_params(search='bash_'))
 
     def test_params_none_and_zero(self):
         query_str = utils.get_params(a=0, b=None, c='true')
@@ -139,16 +127,13 @@ class TestUtils(unittest.TestCase):
 
     def test_params_all(self):
         query = utils.get_params(status='active', page=3, search='bash_')
-        self.assertEqual(
-            {'page': ['3'],
-             'search': ['bash_'],
-             'status': ['active']},
-            parse_qs(query)
-        )
+        self.assertEqual({'page': ['3'], 'search': ['bash_'], 'status': ['active']}, parse_qs(query))
 
     def test_params_escape(self):
-        self.assertEqual('search=%27%3E%22%2F%3E%3Cimg+src%3Dx+onerror%3Dalert%281%29%3E',
-                         utils.get_params(search="'>\"/><img src=x onerror=alert(1)>"))
+        self.assertEqual(
+            'search=%27%3E%22%2F%3E%3Cimg+src%3Dx+onerror%3Dalert%281%29%3E',
+            utils.get_params(search="'>\"/><img src=x onerror=alert(1)>"),
+        )
 
     def test_state_token(self):
         # It's shouldn't possible to set these odd values anymore, but lets
@@ -156,23 +141,22 @@ class TestUtils(unittest.TestCase):
         html = str(utils.state_token('<script>alert(1)</script>'))
 
         self.assertIn(
-            '&lt;script&gt;alert(1)&lt;/script&gt;',
-            html,
+            '&lt;script&gt;alert(1)&lt;/script&gt;', html,
         )
         self.assertNotIn(
-            '<script>alert(1)</script>',
-            html,
+            '<script>alert(1)</script>', html,
         )
 
     def test_task_instance_link(self):
 
         from airflow.www.app import cached_app
+
         with cached_app(testing=True).test_request_context():
-            html = str(utils.task_instance_link({
-                'dag_id': '<a&1>',
-                'task_id': '<b2>',
-                'execution_date': datetime.now()
-            }))
+            html = str(
+                utils.task_instance_link(
+                    {'dag_id': '<a&1>', 'task_id': '<b2>', 'execution_date': datetime.now()}
+                )
+            )
 
         self.assertIn('%3Ca%261%3E', html)
         self.assertIn('%3Cb2%3E', html)
@@ -181,23 +165,20 @@ class TestUtils(unittest.TestCase):
 
     def test_dag_link(self):
         from airflow.www.app import cached_app
+
         with cached_app(testing=True).test_request_context():
-            html = str(utils.dag_link({
-                'dag_id': '<a&1>',
-                'execution_date': datetime.now()
-            }))
+            html = str(utils.dag_link({'dag_id': '<a&1>', 'execution_date': datetime.now()}))
 
         self.assertIn('%3Ca%261%3E', html)
         self.assertNotIn('<a&1>', html)
 
     def test_dag_run_link(self):
         from airflow.www.app import cached_app
+
         with cached_app(testing=True).test_request_context():
-            html = str(utils.dag_run_link({
-                'dag_id': '<a&1>',
-                'run_id': '<b2>',
-                'execution_date': datetime.now()
-            }))
+            html = str(
+                utils.dag_run_link({'dag_id': '<a&1>', 'run_id': '<b2>', 'execution_date': datetime.now()})
+            )
 
         self.assertIn('%3Ca%261%3E', html)
         self.assertIn('%3Cb2%3E', html)
@@ -206,13 +187,13 @@ class TestUtils(unittest.TestCase):
 
 
 class TestAttrRenderer(unittest.TestCase):
-
     def setUp(self):
         self.attr_renderer = utils.get_attr_renderer()
 
     def test_python_callable(self):
         def example_callable(unused_self):
             print("example")
+
         rendered = self.attr_renderer["python_callable"](example_callable)
         self.assertIn('&quot;example&quot;', rendered)
 

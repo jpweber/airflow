@@ -35,17 +35,20 @@ class AzureCosmosInsertDocumentOperator(BaseOperator):
     :param azure_cosmos_conn_id: reference to a CosmosDB connection.
     :type azure_cosmos_conn_id: str
     """
+
     template_fields = ('database_name', 'collection_name')
     ui_color = '#e4f0e8'
 
     @apply_defaults
-    def __init__(self,
-                 database_name,
-                 collection_name,
-                 document,
-                 azure_cosmos_conn_id='azure_cosmos_default',
-                 *args,
-                 **kwargs):
+    def __init__(
+        self,
+        database_name,
+        collection_name,
+        document,
+        azure_cosmos_conn_id='azure_cosmos_default',
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.database_name = database_name
         self.collection_name = collection_name

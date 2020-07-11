@@ -53,7 +53,6 @@ class TestXComEndpoint(unittest.TestCase):
 
 
 class TestGetXComEntry(TestXComEndpoint):
-
     @provide_session
     def test_should_response_200(self, session):
         dag_id = 'test-dag-id'
@@ -61,17 +60,21 @@ class TestGetXComEntry(TestXComEndpoint):
         execution_date = '2005-04-02T00:00:00+00:00'
         xcom_key = 'test-xcom-key'
         execution_date_parsed = parse_execution_date(execution_date)
-        xcom_model = XCom(key=xcom_key,
-                          execution_date=execution_date_parsed,
-                          task_id=task_id,
-                          dag_id=dag_id,
-                          timestamp=execution_date_parsed)
+        xcom_model = XCom(
+            key=xcom_key,
+            execution_date=execution_date_parsed,
+            task_id=task_id,
+            dag_id=dag_id,
+            timestamp=execution_date_parsed,
+        )
         dag_run_id = DR.generate_run_id(DagRunType.MANUAL, execution_date_parsed)
-        dagrun = DR(dag_id=dag_id,
-                    run_id=dag_run_id,
-                    execution_date=execution_date_parsed,
-                    start_date=execution_date_parsed,
-                    run_type=DagRunType.MANUAL.value)
+        dagrun = DR(
+            dag_id=dag_id,
+            run_id=dag_run_id,
+            execution_date=execution_date_parsed,
+            start_date=execution_date_parsed,
+            run_type=DagRunType.MANUAL.value,
+        )
         session.add(xcom_model)
         session.add(dagrun)
         session.commit()
@@ -86,8 +89,8 @@ class TestGetXComEntry(TestXComEndpoint):
                 'execution_date': execution_date,
                 'key': xcom_key,
                 'task_id': task_id,
-                'timestamp': execution_date
-            }
+                'timestamp': execution_date,
+            },
         )
 
 
@@ -98,22 +101,28 @@ class TestGetXComEntries(TestXComEndpoint):
         task_id = 'test-task-id'
         execution_date = '2005-04-02T00:00:00+00:00'
         execution_date_parsed = parse_execution_date(execution_date)
-        xcom_model_1 = XCom(key='test-xcom-key-1',
-                            execution_date=execution_date_parsed,
-                            task_id=task_id,
-                            dag_id=dag_id,
-                            timestamp=execution_date_parsed)
-        xcom_model_2 = XCom(key='test-xcom-key-2',
-                            execution_date=execution_date_parsed,
-                            task_id=task_id,
-                            dag_id=dag_id,
-                            timestamp=execution_date_parsed)
+        xcom_model_1 = XCom(
+            key='test-xcom-key-1',
+            execution_date=execution_date_parsed,
+            task_id=task_id,
+            dag_id=dag_id,
+            timestamp=execution_date_parsed,
+        )
+        xcom_model_2 = XCom(
+            key='test-xcom-key-2',
+            execution_date=execution_date_parsed,
+            task_id=task_id,
+            dag_id=dag_id,
+            timestamp=execution_date_parsed,
+        )
         dag_run_id = DR.generate_run_id(DagRunType.MANUAL, execution_date_parsed)
-        dagrun = DR(dag_id=dag_id,
-                    run_id=dag_run_id,
-                    execution_date=execution_date_parsed,
-                    start_date=execution_date_parsed,
-                    run_type=DagRunType.MANUAL.value)
+        dagrun = DR(
+            dag_id=dag_id,
+            run_id=dag_run_id,
+            execution_date=execution_date_parsed,
+            start_date=execution_date_parsed,
+            run_type=DagRunType.MANUAL.value,
+        )
         xcom_models = [xcom_model_1, xcom_model_2]
         session.add_all(xcom_models)
         session.add(dagrun)
@@ -131,23 +140,22 @@ class TestGetXComEntries(TestXComEndpoint):
                         'execution_date': execution_date,
                         'key': 'test-xcom-key-1',
                         'task_id': task_id,
-                        'timestamp': execution_date
+                        'timestamp': execution_date,
                     },
                     {
                         'dag_id': dag_id,
                         'execution_date': execution_date,
                         'key': 'test-xcom-key-2',
                         'task_id': task_id,
-                        'timestamp': execution_date
-                    }
+                        'timestamp': execution_date,
+                    },
                 ],
                 'total_entries': 2,
-            }
+            },
         )
 
 
 class TestPaginationGetXComEntries(TestXComEndpoint):
-
     def setUp(self):
         super().setUp()
         self.dag_id = 'test-dag-id'
@@ -158,23 +166,11 @@ class TestPaginationGetXComEntries(TestXComEndpoint):
 
     @parameterized.expand(
         [
-            (
-                "limit=1",
-                ["TEST_XCOM_KEY1"],
-            ),
-            (
-                "limit=2",
-                ["TEST_XCOM_KEY1", "TEST_XCOM_KEY10"],
-            ),
+            ("limit=1", ["TEST_XCOM_KEY1"],),
+            ("limit=2", ["TEST_XCOM_KEY1", "TEST_XCOM_KEY10"],),
             (
                 "offset=5",
-                [
-                    "TEST_XCOM_KEY5",
-                    "TEST_XCOM_KEY6",
-                    "TEST_XCOM_KEY7",
-                    "TEST_XCOM_KEY8",
-                    "TEST_XCOM_KEY9",
-                ]
+                ["TEST_XCOM_KEY5", "TEST_XCOM_KEY6", "TEST_XCOM_KEY7", "TEST_XCOM_KEY8", "TEST_XCOM_KEY9",],
             ),
             (
                 "offset=0",
@@ -188,35 +184,27 @@ class TestPaginationGetXComEntries(TestXComEndpoint):
                     "TEST_XCOM_KEY6",
                     "TEST_XCOM_KEY7",
                     "TEST_XCOM_KEY8",
-                    "TEST_XCOM_KEY9"
-                ]
+                    "TEST_XCOM_KEY9",
+                ],
             ),
-            (
-                "limit=1&offset=5",
-                ["TEST_XCOM_KEY5"],
-            ),
-            (
-                "limit=1&offset=1",
-                ["TEST_XCOM_KEY10"],
-            ),
-            (
-                "limit=2&offset=2",
-                ["TEST_XCOM_KEY2", "TEST_XCOM_KEY3"],
-            ),
+            ("limit=1&offset=5", ["TEST_XCOM_KEY5"],),
+            ("limit=1&offset=1", ["TEST_XCOM_KEY10"],),
+            ("limit=2&offset=2", ["TEST_XCOM_KEY2", "TEST_XCOM_KEY3"],),
         ]
     )
     @provide_session
     def test_handle_limit_offset(self, query_params, expected_xcom_ids, session):
         url = "/api/v1/dags/{dag_id}/dagRuns/{dag_run_id}/taskInstances/{task_id}/xcomEntries?{query_params}"
-        url = url.format(dag_id=self.dag_id,
-                         dag_run_id=self.dag_run_id,
-                         task_id=self.task_id,
-                         query_params=query_params)
-        dagrun = DR(dag_id=self.dag_id,
-                    run_id=self.dag_run_id,
-                    execution_date=self.execution_date_parsed,
-                    start_date=self.execution_date_parsed,
-                    run_type=DagRunType.MANUAL.value)
+        url = url.format(
+            dag_id=self.dag_id, dag_run_id=self.dag_run_id, task_id=self.task_id, query_params=query_params
+        )
+        dagrun = DR(
+            dag_id=self.dag_id,
+            run_id=self.dag_run_id,
+            execution_date=self.execution_date_parsed,
+            start_date=self.execution_date_parsed,
+            run_type=DagRunType.MANUAL.value,
+        )
         xcom_models = self._create_xcoms(10)
         session.add_all(xcom_models)
         session.add(dagrun)
@@ -228,10 +216,13 @@ class TestPaginationGetXComEntries(TestXComEndpoint):
         self.assertEqual(conn_ids, expected_xcom_ids)
 
     def _create_xcoms(self, count):
-        return [XCom(
-            key=f'TEST_XCOM_KEY{i}',
-            execution_date=self.execution_date_parsed,
-            task_id=self.task_id,
-            dag_id=self.dag_id,
-            timestamp=self.execution_date_parsed,
-        ) for i in range(1, count + 1)]
+        return [
+            XCom(
+                key=f'TEST_XCOM_KEY{i}',
+                execution_date=self.execution_date_parsed,
+                task_id=self.task_id,
+                dag_id=self.dag_id,
+                timestamp=self.execution_date_parsed,
+            )
+            for i in range(1, count + 1)
+        ]

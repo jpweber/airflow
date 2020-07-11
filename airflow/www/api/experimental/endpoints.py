@@ -67,15 +67,15 @@ def trigger_dag(dag_id):
         except ValueError:
             error_message = (
                 'Given execution date, {}, could not be identified '
-                'as a date. Example date format: 2015-11-16T14:34:15+00:00'
-                .format(execution_date))
+                'as a date. Example date format: 2015-11-16T14:34:15+00:00'.format(execution_date)
+            )
             log.error(error_message)
             response = jsonify({'error': error_message})
             response.status_code = 400
 
             return response
 
-    replace_microseconds = (execution_date is None)
+    replace_microseconds = execution_date is None
     if 'replace_microseconds' in data:
         replace_microseconds = to_boolean(data['replace_microseconds'])
 
@@ -91,9 +91,7 @@ def trigger_dag(dag_id):
         log.info("User %s created %s", g.user, dr)
 
     response = jsonify(
-        message="Created {}".format(dr),
-        execution_date=dr.execution_date.isoformat(),
-        run_id=dr.run_id
+        message="Created {}".format(dr), execution_date=dr.execution_date.isoformat(), run_id=dr.run_id
     )
     return response
 
@@ -177,9 +175,7 @@ def task_info(dag_id, task_id):
         return response
 
     # JSONify and return.
-    fields = {k: str(v)
-              for k, v in vars(t_info).items()
-              if not k.startswith('_')}
+    fields = {k: str(v) for k, v in vars(t_info).items() if not k.startswith('_')}
     return jsonify(fields)
 
 
@@ -191,9 +187,7 @@ def dag_paused(dag_id, paused):
 
     is_paused = bool(paused == 'true')
 
-    models.DagModel.get_dagmodel(dag_id).set_is_paused(
-        is_paused=is_paused,
-    )
+    models.DagModel.get_dagmodel(dag_id).set_is_paused(is_paused=is_paused,)
 
     return jsonify({'response': 'ok'})
 
@@ -209,8 +203,8 @@ def dag_is_paused(dag_id):
 
 
 @api_experimental.route(
-    '/dags/<string:dag_id>/dag_runs/<string:execution_date>/tasks/<string:task_id>',
-    methods=['GET'])
+    '/dags/<string:dag_id>/dag_runs/<string:execution_date>/tasks/<string:task_id>', methods=['GET']
+)
 @requires_authentication
 def task_instance_info(dag_id, execution_date, task_id):
     """
@@ -226,8 +220,8 @@ def task_instance_info(dag_id, execution_date, task_id):
     except ValueError:
         error_message = (
             'Given execution date, {}, could not be identified '
-            'as a date. Example date format: 2015-11-16T14:34:15+00:00'
-            .format(execution_date))
+            'as a date. Example date format: 2015-11-16T14:34:15+00:00'.format(execution_date)
+        )
         log.error(error_message)
         response = jsonify({'error': error_message})
         response.status_code = 400
@@ -243,15 +237,11 @@ def task_instance_info(dag_id, execution_date, task_id):
         return response
 
     # JSONify and return.
-    fields = {k: str(v)
-              for k, v in vars(ti_info).items()
-              if not k.startswith('_')}
+    fields = {k: str(v) for k, v in vars(ti_info).items() if not k.startswith('_')}
     return jsonify(fields)
 
 
-@api_experimental.route(
-    '/dags/<string:dag_id>/dag_runs/<string:execution_date>',
-    methods=['GET'])
+@api_experimental.route('/dags/<string:dag_id>/dag_runs/<string:execution_date>', methods=['GET'])
 @requires_authentication
 def dag_run_status(dag_id, execution_date):
     """
@@ -267,8 +257,8 @@ def dag_run_status(dag_id, execution_date):
     except ValueError:
         error_message = (
             'Given execution date, {}, could not be identified '
-            'as a date. Example date format: 2015-11-16T14:34:15+00:00'.format(
-                execution_date))
+            'as a date. Example date format: 2015-11-16T14:34:15+00:00'.format(execution_date)
+        )
         log.error(error_message)
         response = jsonify({'error': error_message})
         response.status_code = 400
@@ -291,18 +281,21 @@ def dag_run_status(dag_id, execution_date):
 def latest_dag_runs():
     """Returns the latest DagRun for each DAG formatted for the UI. """
     from airflow.models import DagRun
+
     dagruns = DagRun.get_latest_runs()
     payload = []
     for dagrun in dagruns:
         if dagrun.execution_date:
-            payload.append({
-                'dag_id': dagrun.dag_id,
-                'execution_date': dagrun.execution_date.isoformat(),
-                'start_date': ((dagrun.start_date or '') and
-                               dagrun.start_date.isoformat()),
-                'dag_run_url': url_for('Airflow.graph', dag_id=dagrun.dag_id,
-                                       execution_date=dagrun.execution_date)
-            })
+            payload.append(
+                {
+                    'dag_id': dagrun.dag_id,
+                    'execution_date': dagrun.execution_date.isoformat(),
+                    'start_date': ((dagrun.start_date or '') and dagrun.start_date.isoformat()),
+                    'dag_run_url': url_for(
+                        'Airflow.graph', dag_id=dagrun.dag_id, execution_date=dagrun.execution_date
+                    ),
+                }
+            )
     return jsonify(items=payload)  # old flask versions dont support jsonifying arrays
 
 
@@ -367,8 +360,7 @@ def delete_pool(name):
         return jsonify(pool.to_json())
 
 
-@api_experimental.route('/lineage/<string:dag_id>/<string:execution_date>',
-                        methods=['GET'])
+@api_experimental.route('/lineage/<string:dag_id>/<string:execution_date>', methods=['GET'])
 @requires_authentication
 def get_lineage(dag_id: str, execution_date: str):
     """ Get Lineage details for a DagRun """
@@ -378,8 +370,8 @@ def get_lineage(dag_id: str, execution_date: str):
     except ValueError:
         error_message = (
             'Given execution date, {}, could not be identified '
-            'as a date. Example date format: 2015-11-16T14:34:15+00:00'.format(
-                execution_date))
+            'as a date. Example date format: 2015-11-16T14:34:15+00:00'.format(execution_date)
+        )
         log.error(error_message)
         response = jsonify({'error': error_message})
         response.status_code = 400

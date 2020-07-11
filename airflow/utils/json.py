@@ -28,6 +28,7 @@ class AirflowJsonEncoder(json.JSONEncoder):
     """
     Custom Airflow json encoder implementation.
     """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.default = self._default
@@ -41,14 +42,28 @@ class AirflowJsonEncoder(json.JSONEncoder):
             return obj.strftime('%Y-%m-%dT%H:%M:%SZ')
         elif isinstance(obj, date):
             return obj.strftime('%Y-%m-%d')
-        elif isinstance(obj, (np.int_, np.intc, np.intp, np.int8, np.int16,
-                              np.int32, np.int64, np.uint8, np.uint16,
-                              np.uint32, np.uint64)):
+        elif isinstance(
+            obj,
+            (
+                np.int_,
+                np.intc,
+                np.intp,
+                np.int8,
+                np.int16,
+                np.int32,
+                np.int64,
+                np.uint8,
+                np.uint16,
+                np.uint32,
+                np.uint64,
+            ),
+        ):
             return int(obj)
         elif isinstance(obj, np.bool_):
             return bool(obj)
-        elif isinstance(obj, (np.float_, np.float16, np.float32, np.float64,
-                              np.complex_, np.complex64, np.complex128)):
+        elif isinstance(
+            obj, (np.float_, np.float16, np.float32, np.float64, np.complex_, np.complex64, np.complex128)
+        ):
             return float(obj)
 
         raise TypeError(f"Object of type '{obj.__class__.__name__}' is not JSON serializable")

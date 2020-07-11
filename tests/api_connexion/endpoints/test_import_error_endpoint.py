@@ -77,12 +77,7 @@ class TestGetImportErrorEndpoint(TestBaseImportError):
         response = self.client.get("/api/v1/importErrors/2")
         assert response.status_code == 404
         self.assertEqual(
-            {
-                "detail": None,
-                "status": 404,
-                "title": "Import error not found",
-                "type": "about:blank",
-            },
+            {"detail": None, "status": 404, "title": "Import error not found", "type": "about:blank",},
             response.json,
         )
 
@@ -157,9 +152,7 @@ class TestGetImportErrorsEndpointPagination(TestBaseImportError):
         response = self.client.get(url)
 
         assert response.status_code == 200
-        import_ids = [
-            pool["filename"] for pool in response.json["import_errors"]
-        ]
+        import_ids = [pool["filename"] for pool in response.json["import_errors"]]
         self.assertEqual(import_ids, expected_import_error_ids)
 
     @provide_session

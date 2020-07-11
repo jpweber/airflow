@@ -86,7 +86,7 @@ class GCSToGoogleDriveOperator(BaseOperator):
         gcp_conn_id: str = "google_cloud_default",
         delegate_to: Optional[str] = None,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
 
@@ -101,9 +101,7 @@ class GCSToGoogleDriveOperator(BaseOperator):
 
     def execute(self, context):
 
-        self.gcs_hook = GCSHook(
-            google_cloud_storage_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to
-        )
+        self.gcs_hook = GCSHook(google_cloud_storage_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
         self.gdrive_hook = GoogleDriveHook(gcp_conn_id=self.gcp_conn_id, delegate_to=self.delegate_to)
 
         if WILDCARD in self.source_object:

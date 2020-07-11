@@ -19,7 +19,8 @@
 from unittest import TestCase, mock
 
 from airflow.providers.google.marketing_platform.sensors.display_video import (
-    GoogleDisplayVideo360GetSDFDownloadOperationSensor, GoogleDisplayVideo360ReportSensor,
+    GoogleDisplayVideo360GetSDFDownloadOperationSensor,
+    GoogleDisplayVideo360ReportSensor,
 )
 
 API_VERSION = "api_version"
@@ -28,43 +29,31 @@ GCP_CONN_ID = "google_cloud_default"
 
 class TestGoogleDisplayVideo360ReportSensor(TestCase):
     @mock.patch(
-        "airflow.providers.google.marketing_platform.sensors."
-        "display_video.GoogleDisplayVideo360Hook"
+        "airflow.providers.google.marketing_platform.sensors." "display_video.GoogleDisplayVideo360Hook"
     )
-    @mock.patch(
-        "airflow.providers.google.marketing_platform.sensors."
-        "display_video.BaseSensorOperator"
-    )
+    @mock.patch("airflow.providers.google.marketing_platform.sensors." "display_video.BaseSensorOperator")
     def test_poke(self, mock_base_op, hook_mock):
         report_id = "REPORT_ID"
         op = GoogleDisplayVideo360ReportSensor(
             report_id=report_id, api_version=API_VERSION, task_id="test_task"
         )
         op.poke(context=None)
-        hook_mock.assert_called_once_with(
-            gcp_conn_id=GCP_CONN_ID, delegate_to=None, api_version=API_VERSION
-        )
+        hook_mock.assert_called_once_with(gcp_conn_id=GCP_CONN_ID, delegate_to=None, api_version=API_VERSION)
         hook_mock.return_value.get_query.assert_called_once_with(query_id=report_id)
 
 
 class TestGoogleDisplayVideo360Sensor(TestCase):
     @mock.patch(
-        "airflow.providers.google.marketing_platform.sensors."
-        "display_video.GoogleDisplayVideo360Hook"
+        "airflow.providers.google.marketing_platform.sensors." "display_video.GoogleDisplayVideo360Hook"
     )
-    @mock.patch(
-        "airflow.providers.google.marketing_platform.sensors."
-        "display_video.BaseSensorOperator"
-    )
+    @mock.patch("airflow.providers.google.marketing_platform.sensors." "display_video.BaseSensorOperator")
     def test_poke(self, mock_base_op, hook_mock):
         operation_name = "operation_name"
         op = GoogleDisplayVideo360GetSDFDownloadOperationSensor(
             operation_name=operation_name, api_version=API_VERSION, task_id="test_task",
         )
         op.poke(context=None)
-        hook_mock.assert_called_once_with(
-            gcp_conn_id=GCP_CONN_ID, delegate_to=None, api_version=API_VERSION
-        )
+        hook_mock.assert_called_once_with(gcp_conn_id=GCP_CONN_ID, delegate_to=None, api_version=API_VERSION)
         hook_mock.return_value.get_sdf_download_operation.assert_called_once_with(
             operation_name=operation_name
         )

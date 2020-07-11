@@ -62,8 +62,7 @@ class XComArg:
         self._key = key
 
     def __eq__(self, other):
-        return (self.operator == other.operator
-                and self.key == other.key)
+        return self.operator == other.operator and self.key == other.key
 
     def __lshift__(self, other):
         """
@@ -95,9 +94,10 @@ class XComArg:
 
         :return:
         """
-        xcom_pull_kwargs = [f"task_ids='{self.operator.task_id}'",
-                            f"dag_id='{self.operator.dag.dag_id}'",
-                            ]
+        xcom_pull_kwargs = [
+            f"task_ids='{self.operator.task_id}'",
+            f"dag_id='{self.operator.dag.dag_id}'",
+        ]
         if self.key is not None:
             xcom_pull_kwargs.append(f"key='{self.key}'")
 
@@ -121,9 +121,7 @@ class XComArg:
         """
         self.operator.set_upstream(task_or_task_list)
 
-    def set_downstream(
-        self, task_or_task_list: Union[BaseOperator, List[BaseOperator]]
-    ):
+    def set_downstream(self, task_or_task_list: Union[BaseOperator, List[BaseOperator]]):
         """
         Proxy to underlying operator set_downstream method
         """
@@ -143,7 +141,8 @@ class XComArg:
         if not resolved_value:
             raise AirflowException(
                 f'XComArg result from {self.operator.task_id} at {self.operator.dag.dag_id} '
-                f'with key="{self.key}"" is not found!')
+                f'with key="{self.key}"" is not found!'
+            )
         resolved_value = resolved_value[0]
 
         return resolved_value

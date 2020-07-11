@@ -27,6 +27,7 @@ class DagrunIdDep(BaseTIDep):
     """
     Dep for valid DagRun ID to schedule from scheduler
     """
+
     NAME = "Dagrun run_id is not backfill job ID"
     IGNOREABLE = True
 
@@ -48,8 +49,9 @@ class DagrunIdDep(BaseTIDep):
         if not dagrun or not dagrun.run_id or dagrun.run_type != DagRunType.BACKFILL_JOB.value:
             yield self._passing_status(
                 reason=f"Task's DagRun doesn't exist or run_id is either NULL "
-                       f"or run_type is not {DagRunType.BACKFILL_JOB.value}")
+                f"or run_type is not {DagRunType.BACKFILL_JOB.value}"
+            )
         else:
             yield self._failing_status(
-                reason=f"Task's DagRun run_id is not NULL "
-                       f"and run type is {DagRunType.BACKFILL_JOB.value}")
+                reason=f"Task's DagRun run_id is not NULL " f"and run type is {DagRunType.BACKFILL_JOB.value}"
+            )

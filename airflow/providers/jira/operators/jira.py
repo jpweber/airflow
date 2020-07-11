@@ -44,14 +44,16 @@ class JiraOperator(BaseOperator):
     template_fields = ("jira_method_args",)
 
     @apply_defaults
-    def __init__(self,
-                 jira_conn_id='jira_default',
-                 jira_method=None,
-                 jira_method_args=None,
-                 result_processor=None,
-                 get_jira_resource_method=None,
-                 *args,
-                 **kwargs):
+    def __init__(
+        self,
+        jira_conn_id='jira_default',
+        jira_method=None,
+        jira_method_args=None,
+        result_processor=None,
+        get_jira_resource_method=None,
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.jira_conn_id = jira_conn_id
         self.method_name = jira_method
@@ -86,7 +88,6 @@ class JiraOperator(BaseOperator):
             return jira_result
 
         except JIRAError as jira_error:
-            raise AirflowException("Failed to execute jiraOperator, error: %s"
-                                   % str(jira_error))
+            raise AirflowException("Failed to execute jiraOperator, error: %s" % str(jira_error))
         except Exception as e:
             raise AirflowException("Jira operator error: %s" % str(e))

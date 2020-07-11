@@ -21,7 +21,10 @@ from airflow import DAG
 from airflow.api_connexion.exceptions import NotFound
 from airflow.api_connexion.parameters import check_limit, format_parameters
 from airflow.api_connexion.schemas.dag_schema import (
-    DAGCollection, dag_detail_schema, dag_schema, dags_collection_schema,
+    DAGCollection,
+    dag_detail_schema,
+    dag_schema,
+    dags_collection_schema,
 )
 from airflow.models.dag import DagModel
 from airflow.utils.session import provide_session
@@ -50,9 +53,7 @@ def get_dag_details(dag_id):
     return dag_detail_schema.dump(dag)
 
 
-@format_parameters({
-    'limit': check_limit
-})
+@format_parameters({'limit': check_limit})
 @provide_session
 def get_dags(session, limit, offset=0):
     """

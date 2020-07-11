@@ -49,13 +49,16 @@ class LifeSciencesRunPipelineOperator(BaseOperator):
     template_fields = ("body", "gcp_conn_id", "api_version")  # type: Iterable[str]
 
     @apply_defaults
-    def __init__(self,
-                 body: dict,
-                 location: str,
-                 project_id: Optional[str] = None,
-                 gcp_conn_id: str = "google_cloud_default",
-                 api_version: str = "v2beta",
-                 *args, **kwargs) -> None:
+    def __init__(
+        self,
+        body: dict,
+        location: str,
+        project_id: Optional[str] = None,
+        gcp_conn_id: str = "google_cloud_default",
+        api_version: str = "v2beta",
+        *args,
+        **kwargs,
+    ) -> None:
         super().__init__(*args, **kwargs)
         self.body = body
         self.location = location
@@ -73,6 +76,4 @@ class LifeSciencesRunPipelineOperator(BaseOperator):
     def execute(self, context):
         hook = LifeSciencesHook(gcp_conn_id=self.gcp_conn_id, api_version=self.api_version)
 
-        return hook.run_pipeline(body=self.body,
-                                 location=self.location,
-                                 project_id=self.project_id)
+        return hook.run_pipeline(body=self.body, location=self.location, project_id=self.project_id)

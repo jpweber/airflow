@@ -35,19 +35,14 @@ class TestBigqueryTableExistenceSensor(TestCase):
             dataset_id=TEST_DATASET_ID,
             table_id=TEST_TABLE_ID,
             bigquery_conn_id=TEST_GCP_CONN_ID,
-            delegate_to=TEST_DELEGATE_TO
+            delegate_to=TEST_DELEGATE_TO,
         )
         mock_hook.return_value.table_exists.return_value = True
         results = task.poke(mock.MagicMock())
 
         self.assertEqual(True, results)
 
-        mock_hook.assert_called_once_with(
-            bigquery_conn_id=TEST_GCP_CONN_ID,
-            delegate_to=TEST_DELEGATE_TO
-        )
+        mock_hook.assert_called_once_with(bigquery_conn_id=TEST_GCP_CONN_ID, delegate_to=TEST_DELEGATE_TO)
         mock_hook.return_value.table_exists.assert_called_once_with(
-            TEST_PROJECT_ID,
-            TEST_DATASET_ID,
-            TEST_TABLE_ID
+            TEST_PROJECT_ID, TEST_DATASET_ID, TEST_TABLE_ID
         )
