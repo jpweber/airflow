@@ -19,3 +19,8 @@ exclude = '''
   | logs
 )/
 '''
+
+[tool.isort]
+line_length = 110
+combine_as_imports = true
+profile = "black"
