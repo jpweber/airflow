@@ -19,9 +19,12 @@
 from functools import wraps
 from typing import Callable, Optional, TypeVar, cast
 
+import logging
+log = logging.getLogger(__name__)
+
 from airflow.typing_compat import Protocol
 
-
+from flask import request
 class ClientAuthProtocol(Protocol):
     """
     Protocol type for CLIENT_AUTH
@@ -47,6 +50,7 @@ def requires_authentication(function: T):
     """Decorator for functions that require authentication"""
     @wraps(function)
     def decorated(*args, **kwargs):
+        log.error(f"{request.headers}")
         return function(*args, **kwargs)
 
     return cast(T, decorated)

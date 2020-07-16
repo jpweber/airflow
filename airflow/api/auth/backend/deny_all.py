@@ -19,7 +19,10 @@
 from functools import wraps
 from typing import Callable, Optional, TypeVar, cast
 
-from flask import Response
+from flask import Response, request
+
+import logging
+log = logging.getLogger(__name__)
 
 from airflow.api.auth.backend.default import ClientAuthProtocol
 
@@ -35,7 +38,7 @@ T = TypeVar("T", bound=Callable)  # pylint: disable=invalid-name
 
 def requires_authentication(function: T):
     """Decorator for functions that require authentication"""
-
+    log.error(f"{request.headers}")
     # noinspection PyUnusedLocal
     @wraps(function)
     def decorated(*args, **kwargs):  # pylint: disable=unused-argument
