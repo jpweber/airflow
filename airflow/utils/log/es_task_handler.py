@@ -198,7 +198,7 @@ class ElasticsearchTaskHandler(FileTaskHandler, LoggingMixin):
         super(ElasticsearchTaskHandler, self).set_context(ti)
         self.mark_end_on_close = not ti.raw
 
-        if self.write_stdout:
+        if self.write_stdout and ti.operator != "SubDagOperator":
             self.handler = logging.StreamHandler(stream=sys.__stdout__)
             self.handler.setLevel(self.level)
             if self.json_format and not ti.raw:
