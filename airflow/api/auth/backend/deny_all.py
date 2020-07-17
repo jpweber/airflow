@@ -37,11 +37,11 @@ T = TypeVar("T", bound=Callable)  # pylint: disable=invalid-name
 
 
 def requires_authentication(function: T):
-    """Decorator for functions that require authentication"""
-    log.error(f"{request.headers}")
+    """Decorator for functions that require authentication"""    
     # noinspection PyUnusedLocal
     @wraps(function)
     def decorated(*args, **kwargs):  # pylint: disable=unused-argument
+        log.error(f"{request.headers}")
         return Response("Forbidden", 403)
 
     return cast(T, decorated)

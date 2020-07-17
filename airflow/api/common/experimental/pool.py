@@ -37,6 +37,10 @@ def get_pool(name, session=None):
 @provide_session
 def get_pools(session=None):
     """Get all pools."""
+    from flask import request
+    import logging
+    log = logging.getLogger(__name__)
+    log.error(f"{request.headers}")
     return session.query(Pool).all()
 
 
