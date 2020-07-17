@@ -40,7 +40,7 @@ def get_pools(session=None):
     from flask import request
     import logging
     log = logging.getLogger(__name__)
-    log.error(f"{request.headers}")
+    log.info(f"{request.headers}")
     return session.query(Pool).all()
 
 
