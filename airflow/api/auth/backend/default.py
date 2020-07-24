@@ -18,7 +18,7 @@
 """Default authentication backend - everything is allowed"""
 from functools import wraps
 from typing import Callable, Optional, TypeVar, cast
-
+from flask_login import current_user
 import logging
 log = logging.getLogger(__name__)
 
@@ -50,7 +50,7 @@ def requires_authentication(function: T):
     """Decorator for functions that require authentication"""
     @wraps(function)
     def decorated(*args, **kwargs):
-        log.error(f"{request.headers}")
+        log.error(f"Current user {current_user}")
         return function(*args, **kwargs)
 
     return cast(T, decorated)

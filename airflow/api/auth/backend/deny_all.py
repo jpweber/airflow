@@ -41,7 +41,7 @@ def requires_authentication(function: T):
     # noinspection PyUnusedLocal
     @wraps(function)
     def decorated(*args, **kwargs):  # pylint: disable=unused-argument
-        log.error(f"{request.headers}")
+        
         return Response("Forbidden", 403)
 
     return cast(T, decorated)
