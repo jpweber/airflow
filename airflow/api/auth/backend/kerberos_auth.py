@@ -140,12 +140,12 @@ def _gssapi_authenticate(token):
 
 
 def requires_authentication(function):
-    """Decorator for functions that require authentication with Kerberos"""
-    from airflow.utils.log.logging_mixin import LoggingMixin
-    logger = LoggingMixin()
-    logger.log.error("KERBEROS AUTH")
+    """Decorator for functions that require authentication with Kerberos"""    
     @wraps(function)
     def decorated(*args, **kwargs):
+        from airflow.utils.log.logging_mixin import LoggingMixin
+        logger = LoggingMixin()
+        logger.log.error("KERBEROS AUTH")
         header = request.headers.get("Authorization")
         if header:
             ctx = stack.top
