@@ -28,6 +28,9 @@ def init_app(_):
 
 def requires_authentication(function):
     """Decorator for functions that require authentication"""
+    from airflow.utils.log.logging_mixin import LoggingMixin
+    logger = LoggingMixin()
+    logger.log.error("DEFAULT AUTH")
     @wraps(function)
     def decorated(*args, **kwargs):
         return function(*args, **kwargs)
