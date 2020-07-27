@@ -18,7 +18,7 @@
 # under the License.
 """Default authentication backend - everything is allowed"""
 from functools import wraps
-
+from flask_login import current_user
 CLIENT_AUTH = None
 
 
@@ -33,7 +33,7 @@ def requires_authentication(function):
     def decorated(*args, **kwargs):
         from airflow.utils.log.logging_mixin import LoggingMixin
         logger = LoggingMixin()
-        logger.log.error("DEFAULT AUTH")
+        logger.log.error(f"Current user {current_user}")
         return function(*args, **kwargs)
 
     return decorated
