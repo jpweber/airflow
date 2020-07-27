@@ -34,6 +34,7 @@ def requires_authentication(function):
         from airflow.utils.log.logging_mixin import LoggingMixin
         logger = LoggingMixin()
         logger.log.error(f"Current user {current_user.__dict__}")
+        logger.log.error(f"Roles {current_user.roles}")
         return function(*args, **kwargs)
 
     return decorated
