@@ -35,6 +35,7 @@ def requires_authentication(function):
         logger = LoggingMixin()
         logger.log.error(f"Current user {current_user.__dict__}")
         logger.log.error(f"Roles {current_user.roles}")
+        logger.log.error(f"Function {function.__name__}")
         return function(*args, **kwargs)
 
     return decorated
