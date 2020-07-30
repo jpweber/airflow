@@ -24,15 +24,6 @@ from airflow.www_rbac.app import cached_appbuilder
 CLIENT_AUTH = None
 
 
-update_views = {
-    'trigger_dag': [()],
-    'delete_dag': [()],
-    'dag_paused': [()],
-    'create_pool': [()],
-    'delete_pool': [()],
-    'get_pools': [('set_running', 'DagRunModelView')]
-}
-
 def init_app(_):
     """Initializes authentication backend"""
 
@@ -48,9 +39,18 @@ def requires_authentication(function):
         logger.log.error(f"Security manager {appbuilder.sm}")        
         logger.log.error(f"Current user {current_user.__dict__}")
         logger.log.error(f"Roles {current_user.roles}")
+        update_views = {
+            'trigger_dag': [('trigger', 'Airflow')],
+            'delete_dag': [('delete', 'Airflow'), ('can_dag_edit', request.args.get('dag_id'))],
+            'dag_paused': [('can_paused', 'Airflow'), ('can_dag_edit', request.args.get('dag_id'))],
+            'create_pool': [('can_add', 'PoolModelView')],
+            'delete_pool': [('can_delete', 'PoolModelView')],
+        }
         permissions = update_views[function.__name__]
+        logger.log.error(f"Permissions for request {permissions}")
         for permission in permissions:
             if not appbuilder.sm.has_access(*permission):
+                logger.log.error(f"NOT permissioned {permission}")
                 return Response("Forbidden", 403)
             else:
                 logger.log.error(f"Has permission {permission}")
