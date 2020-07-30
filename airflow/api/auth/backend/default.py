@@ -18,10 +18,20 @@
 # under the License.
 """Default authentication backend - everything is allowed"""
 from functools import wraps
+from flask import Response
 from flask_login import current_user
 from airflow.www_rbac.app import cached_appbuilder
 CLIENT_AUTH = None
 
+
+update_views = {
+    'trigger_dag': [()],
+    'delete_dag': [()],
+    'dag_paused': [()],
+    'create_pool': [()],
+    'delete_pool': [()],
+    'get_pools': [('set_running', 'DagRunModelView')]
+}
 
 def init_app(_):
     """Initializes authentication backend"""
@@ -38,11 +48,18 @@ def requires_authentication(function):
         logger.log.error(f"Security manager {appbuilder.sm}")        
         logger.log.error(f"Current user {current_user.__dict__}")
         logger.log.error(f"Roles {current_user.roles}")
-        for role in current_user.roles:
-            # role_object = appbuilder.sm.find_role(role)
-            logger.log.error(f"Role object {appbuilder.sm.has_access('set_running', 'DagRunModelView')}")
+        permissions = update_views[function.__name__]
+        for permission in permissions:
+            if not appbuilder.sm.has_access(*permission):
+                return Response("Forbidden", 403)
+            else:
+                logger.log.error(f"Has permission {permission}")
 
-        logger.log.error(f"Function {function.__name__}")
+
+        # for role in current_user.roles:
+        # logger.log.error(f"Role object {appbuilder.sm.has_access('set_running', 'DagRunModelView')}")
+
+        # logger.log.error(f"Function {function.__name__}")
 
         return function(*args, **kwargs)
 
