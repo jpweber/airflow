@@ -19,6 +19,7 @@
 """Default authentication backend - everything is allowed"""
 from functools import wraps
 from flask_login import current_user
+from airflow.www_rbac.app import cached_appbuilder
 CLIENT_AUTH = None
 
 
@@ -33,9 +34,16 @@ def requires_authentication(function):
     def decorated(*args, **kwargs):
         from airflow.utils.log.logging_mixin import LoggingMixin
         logger = LoggingMixin()
+        appbuilder = cached_appbuilder()
+        logger.log.error(f"Security manager {appbuilder.sm}")        
         logger.log.error(f"Current user {current_user.__dict__}")
         logger.log.error(f"Roles {current_user.roles}")
+        for role in current_user.roles:
+            role_object = appbuilder.sm.find_role(role)
+            logger.log.error(f"Role object {role_object}")
+
         logger.log.error(f"Function {function.__name__}")
+
         return function(*args, **kwargs)
 
     return decorated
