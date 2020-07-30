@@ -18,7 +18,7 @@
 # under the License.
 """Default authentication backend - everything is allowed"""
 from functools import wraps
-from flask import Response
+from flask import Response, request
 from flask_login import current_user
 from airflow.www_rbac.app import cached_appbuilder
 CLIENT_AUTH = None
