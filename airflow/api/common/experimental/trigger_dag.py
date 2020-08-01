@@ -48,6 +48,9 @@ def _trigger_dag(
     :param replace_microseconds: whether microseconds should be zeroed
     :return: list of triggered dags
     """
+    from airflow.utils.log.logging_mixin import LoggingMixin
+    logger = LoggingMixin()
+    logger.log.error(f"Common.experimental.trigger_dag._trigger_dag")
     dag = dag_bag.get_dag(dag_id)  # prefetch dag if it is stored serialized
 
     if dag_id not in dag_bag.dags:
@@ -119,6 +122,9 @@ def trigger_dag(
     :param replace_microseconds: whether microseconds should be zeroed
     :return: first dag run triggered - even if more than one Dag Runs were triggered or None
     """
+    from airflow.utils.log.logging_mixin import LoggingMixin
+    logger = LoggingMixin()
+    logger.log.error(f"Common.experimental.trigger_dag.trigger_dag")
     dag_model = DagModel.get_current(dag_id)
     if dag_model is None:
         raise DagNotFound("Dag id {} not found in DagModel".format(dag_id))

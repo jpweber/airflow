@@ -59,7 +59,7 @@ def requires_authentication(function):
         # for role in current_user.roles:
         # logger.log.error(f"Role object {appbuilder.sm.has_access('set_running', 'DagRunModelView')}")
 
-        # logger.log.error(f"Function {function.__name__}")
+        logger.log.error(f"Function {function.__name__}")
 
         return function(*args, **kwargs)
 

@@ -51,6 +51,9 @@ def trigger_dag(dag_id):
     Trigger a new dag run for a Dag with an execution date of now unless
     specified in the data.
     """
+    from airflow.utils.log.logging_mixin import LoggingMixin
+    logger = LoggingMixin()
+    logger.log.error(f"www.api.experimental.endpoints.trigger_dag")
     _log.error(f"Triggering dag id {dag_id}")
     data = request.get_json(force=True)
 
