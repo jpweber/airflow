@@ -51,6 +51,7 @@ def trigger_dag(dag_id):
     Trigger a new dag run for a Dag with an execution date of now unless
     specified in the data.
     """
+    _log.error(f"Triggering dag id {dag_id}")
     data = request.get_json(force=True)
 
     run_id = None
