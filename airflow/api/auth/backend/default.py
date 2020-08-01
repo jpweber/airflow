@@ -46,7 +46,7 @@ def requires_authentication(function):
             'create_pool': [('can_add', 'PoolModelView')],
             'delete_pool': [('can_delete', 'PoolModelView')],
         }
-        permissions = update_views[function.__name__]
+        permissions = update_views.get(function.__name__, [])
         logger.log.error(f"Permissions for request {permissions}")
         for permission in permissions:
             if not appbuilder.sm.has_access(*permission):
