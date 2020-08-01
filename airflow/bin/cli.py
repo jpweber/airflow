@@ -230,6 +230,9 @@ def trigger_dag(args):
     :param args:
     :return:
     """
+    from airflow.utils.log.logging_mixin import LoggingMixin
+    logger = LoggingMixin()
+    logger.log.error(f"airflow.bin.cli")
     try:
         message = api_client.trigger_dag(dag_id=args.dag_id,
                                          run_id=args.run_id,

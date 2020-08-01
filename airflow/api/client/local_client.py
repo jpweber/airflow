@@ -28,6 +28,9 @@ class Client(api_client.Client):
     """Local API client implementation."""
 
     def trigger_dag(self, dag_id, run_id=None, conf=None, execution_date=None):
+        from airflow.utils.log.logging_mixin import LoggingMixin
+        logger = LoggingMixin()
+        logger.log.error(f"api.client.local_client")
         dag_run = trigger_dag.trigger_dag(dag_id=dag_id,
                                           run_id=run_id,
                                           conf=conf,

@@ -48,6 +48,9 @@ class Client(api_client.Client):
         return resp.json()
 
     def trigger_dag(self, dag_id, run_id=None, conf=None, execution_date=None):
+        from airflow.utils.log.logging_mixin import LoggingMixin
+        logger = LoggingMixin()
+        logger.log.error(f"airflow.api.client.json_client.trigger_dag")
         endpoint = '/api/experimental/dags/{}/dag_runs'.format(dag_id)
         url = urljoin(self._api_base_url, endpoint)
         data = self._request(url, method='POST',
