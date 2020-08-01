@@ -40,8 +40,8 @@ def requires_authentication(function):
         logger.log.error(f"Current user {current_user.__dict__}")
         logger.log.error(f"Roles {current_user.roles}")
         update_views = {
-            'trigger_dag': [('trigger', 'Airflow')],
-            'delete_dag': [('delete', 'Airflow'), ('can_dag_edit', request.args.get('dag_id'))],
+            'trigger_dag': [('can_trigger', 'Airflow')],
+            'delete_dag': [('can_delete', 'Airflow'), ('can_dag_edit', request.args.get('dag_id'))],
             'dag_paused': [('can_paused', 'Airflow'), ('can_dag_edit', request.args.get('dag_id'))],
             'create_pool': [('can_add', 'PoolModelView')],
             'delete_pool': [('can_delete', 'PoolModelView')],
