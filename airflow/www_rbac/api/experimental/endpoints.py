@@ -62,7 +62,7 @@ def trigger_dag(dag_id):
     conf = None
     if 'conf' in data:
         conf = data['conf']
-
+    logger.log.error(f"locals -- line 65 -- {locals()}")
     execution_date = None
     if 'execution_date' in data and data['execution_date'] is not None:
         execution_date = data['execution_date']
@@ -80,7 +80,7 @@ def trigger_dag(dag_id):
             response.status_code = 400
 
             return response
-
+    logger.log.error(f"locals -- line 83 -- {locals()}")
     replace_microseconds = (execution_date is None)
     if 'replace_microseconds' in data:
         replace_microseconds = to_boolean(data['replace_microseconds'])
@@ -92,7 +92,7 @@ def trigger_dag(dag_id):
         response = jsonify(error="{}".format(err))
         response.status_code = err.status_code
         return response
-
+    logger.log.error(f"locals -- line 95 -- {locals()}")
     if getattr(g, 'user', None):
         _log.info("User {} created {}".format(g.user, dr))
 
