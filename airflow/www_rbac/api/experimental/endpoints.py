@@ -53,8 +53,9 @@ def trigger_dag(dag_id):
     from airflow.utils.log.logging_mixin import LoggingMixin
     logger = LoggingMixin()
     logger.log.error(f"www_rbac.api.experimental.endpoints.trigger_dag")
+    logger.log.error(f"request {request}")
     data = request.get_json(force=True)
-
+    logger.log.error(f"Data {data}")
     run_id = None
     if 'run_id' in data:
         run_id = data['run_id']
