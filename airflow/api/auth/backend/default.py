@@ -40,7 +40,7 @@ def requires_authentication(function):
         logger.log.error(f"Current user {current_user.__dict__}")
         logger.log.error(f"Roles {current_user.roles}")
         logger.log.error(f"Request {request}")
-        logger.log.error(f"Request.args {request.args}")
+        logger.log.error(f"Request.args {request.args.iterlists()}")
         update_views = {
             'trigger_dag': [('can_trigger', 'Airflow')],
             # 'delete_dag': [('can_delete', 'Airflow'), ('can_dag_edit', request.args.get('dag_id'))],
