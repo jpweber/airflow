@@ -17,7 +17,7 @@
 # specific language governing permissions and limitations
 # under the License.
 import airflow.api
-
+from airflow.api.common.experimental import delete_dag as delete
 from airflow.api.common.experimental import pool as pool_api
 from airflow.api.common.experimental import trigger_dag as trigger
 from airflow.api.common.experimental.get_dag_runs import get_dag_runs
@@ -99,6 +99,23 @@ def trigger_dag(dag_id):
         run_id=dr.run_id
     )
     return response
+
+
+@csrf.exempt
+@api_experimental.route('/dags/<string:dag_id>', methods=['DELETE'])
+@requires_authentication
+def delete_dag(dag_id):
+    """
+    Delete all DB records related to the specified Dag.
+    """
+    try:
+        count = delete.delete_dag(dag_id)
+    except AirflowException as err:
+        _log.error(err)
+        response = jsonify(error="{}".format(err))
+        response.status_code = err.status_code
+        return response
+    return jsonify(message="Removed {} record(s)".format(count), count=count)
 
 
 @api_experimental.route('/dags/<string:dag_id>/dag_runs', methods=['GET'])

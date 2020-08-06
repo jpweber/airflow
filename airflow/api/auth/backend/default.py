@@ -46,7 +46,7 @@ def requires_authentication(function):
         # logger.log.error(f"Request.args {request.args.iterlists()}")
         update_views = {
             'trigger_dag': [('can_trigger', 'Airflow')],
-            # 'delete_dag': [('can_delete', 'Airflow'), ('can_dag_edit', request.args.get('dag_id'))],
+            'delete_dag': [('can_delete', 'Airflow'), ('can_dag_edit', kwargs.get('dag_id'))],
             'dag_paused': [('can_paused', 'Airflow'), ('can_dag_edit', kwargs.get('dag_id'))],
             'create_pool': [('can_add', 'PoolModelView')],
             'delete_pool': [('can_delete', 'PoolModelView')],
