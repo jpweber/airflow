@@ -44,21 +44,36 @@ def requires_authentication(function):
         logger.log.error(f"Kwargs {kwargs}")
         logger.log.error(f"Request {request}")
         # logger.log.error(f"Request.args {request.args.iterlists()}")
-        update_views = {
+        view_permissions = {
             'trigger_dag': [('can_trigger', 'Airflow')],
-            'delete_dag': [('can_delete', 'Airflow'), ('can_dag_edit', kwargs.get('dag_id'))],
-            'dag_paused': [('can_paused', 'Airflow'), ('can_dag_edit', kwargs.get('dag_id'))],
+            'delete_dag': [('can_delete', 'Airflow')],
+            'dag_paused': [('can_paused', 'Airflow')],
             'create_pool': [('can_add', 'PoolModelView')],
             'delete_pool': [('can_delete', 'PoolModelView')],
         }
+
+        dag_permissions = {
+            'delete_dag': [('can_dag_edit', 'all_dags'), ('can_dag_edit', kwargs.get('dag_id'))],
+            'dag_paused': [('can_dag_edit', 'all_dags'), ('can_dag_edit', kwargs.get('dag_id'))],
+        }
+
         permissions = update_views.get(function.__name__, [])
-        logger.log.error(f"Permissions for request {permissions}")
-        for permission in permissions:
+        logger.log.error(f"View permissions for request {permissions}")
+        func_name = function.__name__
+        for permission in view_permissions.get(func_name, []):
             if not appbuilder.sm.has_access(*permission):
                 logger.log.error(f"NOT permissioned {permission}")
                 return Response("Forbidden", 403)
             else:
                 logger.log.error(f"Has permission {permission}")
+
+        if func_name in dag_permissions:
+            if any(appbuilder.sm.has_access(*permission) for permission in dag_permissions[func_name]):
+                logger.log.error(f"Has func permission {dag_permissions[func_name])}")
+            else:
+                logger.log.error(f"NOT func permission {dag_permissions[func_name])}")
+                return Response("Forbidden", 403)
+
 
 
         # for role in current_user.roles:
