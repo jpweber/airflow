@@ -57,7 +57,7 @@ def requires_authentication(function):
             'dag_paused': [('can_dag_edit', 'all_dags'), ('can_dag_edit', kwargs.get('dag_id'))],
         }
 
-        permissions = update_views.get(function.__name__, [])
+        permissions = view_permissions.get(function.__name__, [])
         logger.log.error(f"View permissions for request {permissions}")
         func_name = function.__name__
         for permission in view_permissions.get(func_name, []):
