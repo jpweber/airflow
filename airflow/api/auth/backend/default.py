@@ -67,12 +67,12 @@ def requires_authentication(function):
             else:
                 logger.log.error(f"Has permission {permission}")
 
-        # if func_name in dag_permissions:
-        #     if any(appbuilder.sm.has_access(*permission) for permission in dag_permissions[func_name]):
-        #         logger.log.error(f"Has func permission {dag_permissions[func_name])}")
-        #     else:
-        #         logger.log.error(f"NOT func permission {dag_permissions[func_name])}")
-        #         return Response("Forbidden", 403)
+        if func_name in dag_permissions:
+            if any(appbuilder.sm.has_access(*permission) for permission in dag_permissions[func_name]):
+                logger.log.error(f"Has func permission {dag_permissions[func_name]}")
+            else:
+                logger.log.error(f"NOT func permission {dag_permissions[func_name]}")
+                return Response("Forbidden", 403)
 
 
 
