@@ -39,12 +39,15 @@ def requires_authentication(function):
         logger.log.error(f"Security manager {appbuilder.sm}")
         logger.log.error(f"Current user {current_user.__dict__}")
         logger.log.error(f"Roles {current_user.roles}")
+        logger.log.error(f"Locals {locals()}")
+        logger.log.error(f"Args {args}")
+        logger.log.error(f"Kwargs {kwargs}")
         logger.log.error(f"Request {request}")
-        logger.log.error(f"Request.args {request.args.iterlists()}")
+        # logger.log.error(f"Request.args {request.args.iterlists()}")
         update_views = {
             'trigger_dag': [('can_trigger', 'Airflow')],
             # 'delete_dag': [('can_delete', 'Airflow'), ('can_dag_edit', request.args.get('dag_id'))],
-            'dag_paused': [('can_paused', 'Airflow'), ('can_dag_edit', request.args.get('dag_id'))],
+            'dag_paused': [('can_paused', 'Airflow'), ('can_dag_edit', kwargs.get('dag_id'))],
             'create_pool': [('can_add', 'PoolModelView')],
             'delete_pool': [('can_delete', 'PoolModelView')],
         }
