@@ -98,11 +98,16 @@ class TestPod(unittest.TestCase):
                 request_cpu="100Mi",
                 limit_gpu="100G"
             ),
+            init_containers=k8s.V1Container(
+                name="test-container",
+                volume_mounts=k8s.V1VolumeMount(mount_path="/foo/bar", name="init-volume-secret")
+            ),
             volumes=[
                 Volume(name="foo", configs={}),
                 {"name": "bar", 'secret': {'secretName': 'volume-secret'}}
             ],
             secrets=[
+                Secret("volume", None, "init-volume-secret"),
                 Secret('env', "AIRFLOW_SECRET", 'secret_name', "airflow_config"),
                 Secret("volume", "/opt/airflow", "volume-secret", "secret-key")
             ],
@@ -137,11 +142,16 @@ class TestPod(unittest.TestCase):
                                                        'name': 'secretvol' + str(static_uuid),
                                                         'readOnly': True}]}],
                       'hostNetwork': False,
+                      'initContainers': {'name': 'test-container',
+                                         'volumeMounts': {'mountPath': '/foo/bar',
+                                                          'name': 'init-volume-secret'}},
                       'securityContext': {},
                       'tolerations': [],
                       'volumes': [{'name': 'foo'},
                                   {'name': 'bar',
                                    'secret': {'secretName': 'volume-secret'}},
+                                  {'name': 'secretvolcf4a56d2-8101-4217-b027-2af6216feb48',
+                                   'secret': {'secretName': 'init-volume-secret'}},
                                   {'name': 'secretvol' + str(static_uuid),
                                    'secret': {'secretName': 'volume-secret'}}
                                   ]}}
