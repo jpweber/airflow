@@ -50,10 +50,6 @@ DEFAULT_AIRFLOW_SECTIONS = [
     'elasticsearch',
     'elasticsearch_configs',
     'kubernetes',
-    'kubernetes_node_selectors',
-    'kubernetes_environment_variables',
-    'kubernetes_secrets',
-    'kubernetes_labels'
 ]
 
 DEFAULT_TEST_SECTIONS = [
