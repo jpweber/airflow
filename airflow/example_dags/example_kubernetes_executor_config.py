@@ -20,6 +20,8 @@ This is an example dag for using a Kubernetes Executor Configuration.
 """
 import os
 
+from kubernetes.client import models as k8s
+
 from airflow import DAG
 from airflow.example_dags.libs.helper import print_stuff
 from airflow.operators.python import PythonOperator
@@ -36,7 +38,6 @@ with DAG(
     start_date=days_ago(2),
     tags=['example'],
 ) as dag:
-
     def test_volume_mount():
         """
         Tests whether the volume has been mounted.
@@ -52,10 +53,11 @@ with DAG(
     start_task = PythonOperator(
         task_id="start_task",
         python_callable=print_stuff,
-        executor_config={
-            "KubernetesExecutor": {
-                "annotations": {"test": "annotation"}
-            }
+        executor_config={"KubernetesExecutor": k8s.V1Pod(
+            metadata=k8s.V1ObjectMeta(
+                annotations={"test": "annotation"}
+            )
+        )
         }
     )
 
@@ -63,21 +65,29 @@ with DAG(
     second_task = PythonOperator(
         task_id="four_task",
         python_callable=test_volume_mount,
-        executor_config={
-            "KubernetesExecutor": {
-                "volumes": [
-                    {
-                        "name": "example-kubernetes-test-volume",
-                        "hostPath": {"path": "/tmp/"},
-                    },
+        executor_config={"KubernetesExecutor": k8s.V1Pod(
+            spec=k8s.V1PodSpec(
+                containers=[
+                    k8s.V1Container(
+                        name="base",
+                        volume_mounts=[
+                            k8s.V1VolumeMount(
+                                mount_path="/foo/",
+                                name="example-kubernetes-test-volume"
+                            )
+                        ]
+                    )
                 ],
-                "volume_mounts": [
-                    {
-                        "mountPath": "/foo/",
-                        "name": "example-kubernetes-test-volume",
-                    },
+                volumes=[
+                    k8s.V1Volume(
+                        name="example-kubernetes-test-volume",
+                        host_path=k8s.V1HostPathVolumeSource(
+                            path="/tmp/"
+                        )
+                    )
                 ]
-            }
+            )
+        )
         }
     )
 
@@ -85,26 +95,26 @@ with DAG(
     third_task = PythonOperator(
         task_id="non_root_task",
         python_callable=print_stuff,
-        executor_config={
-            "KubernetesExecutor": {
-                "labels": {
+        executor_config={"KubernetesExecutor": k8s.V1Pod(
+            metadata=k8s.V1ObjectMeta(
+                labels={
                     "release": "stable"
                 }
-            }
+            )
+        )
         }
     )
 
     other_ns_task = PythonOperator(
         task_id="other_namespace_task",
         python_callable=print_stuff,
-        executor_config={
-            "KubernetesExecutor": {
-                "namespace": "test-namespace",
-                "labels": {
-                    "release": "stable"
-                }
-            }
-        }
+        # executor_config={"KubernetesExecutor": k8s.V1Pod(
+        #     metadata=k8s.V1ObjectMeta(
+        #         name="dummy-name",
+        #         namespace="test-namespace"
+        # )
+        # )
+        # }
     )
 
     start_task >> second_task >> third_task
