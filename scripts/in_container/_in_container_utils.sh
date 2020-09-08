@@ -294,6 +294,17 @@ function install_released_airflow_version() {
     pip install --upgrade "${INSTALLS[@]}"
 }
 
+function filenames_to_python_module() {
+  for file in "$@";
+  do
+    # Turn the file name into a python package name
+    no_leading_dotslash="${file#./}"
+    no_py="${no_leading_dotslash/.py/}"
+    no_init="${no_py/\/__init__/}"
+    echo "${no_init//\//.}"
+  done
+}
+
 
 export CI=${CI:="false"}
 export GITHUB_ACTIONS=${GITHUB_ACTIONS:="false"}

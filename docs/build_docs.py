@@ -754,12 +754,17 @@ Channel link: https://apache-airflow.slack.com/archives/CJ1LVREHX
 Invitation link: https://apache-airflow-slack.herokuapp.com/\
 """
 
-print_build_errors_and_exit("The documentation has errors. Fix them to build documentation.")
+try:
+    # Our autodoc generator doesn't cope with implicit packages, so fake it
+    # back to a real package for this. step
+    open(f"{ROOT_PACKAGE_DIR}/providers/__init__.py", "w").close()
 
-if not args.docs_only:
-    check_spelling()
-    print_build_errors_and_exit("The documentation has spelling errors. Fix them to build documentation.")
+    if not args.docs_only:
+        check_spelling()
+        print_build_errors_and_exit("The documentation has spelling errors. Fix them to build documentation.")
 
-if not args.spellcheck_only:
-    build_sphinx_docs()
-    print_build_errors_and_exit("The documentation has errors.")
+    if not args.spellcheck_only:
+        build_sphinx_docs()
+        print_build_errors_and_exit("The documentation has errors.")
+finally:
+    os.remove(f"{ROOT_PACKAGE_DIR}/providers/__init__.py")
