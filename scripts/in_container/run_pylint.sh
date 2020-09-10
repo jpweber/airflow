@@ -33,19 +33,17 @@ if [[ ${#@} == "0" ]]; then
     # Files mounted and node_modules is a huge directory which takes many seconds to even scan
     # -prune works better than -not path because it skips traversing the whole directory. -not path traverses
     # the directory and only excludes it after all of it is scanned
-    readarray -d '' files < <(find . \
-      -path "./airflow/www/node_modules" -prune -o \
-      -path "./airflow/www_rbac/node_modules" -prune -o \
-      -path "./airflow/migrations/versions" -prune -o \
-      -path "./.eggs" -prune -o \
-      -path "./docs/_build" -prune -o \
-      -path "./build" -prune -o \
-      -name "*.py" \
-      -not -name 'webserver_config.py' \
-      -print0 \
-    )
-
-    filenames_to_python_module "${files[@]}" | grep -vFf scripts/ci/pylint_todo.txt | xargs pylint --output-format=colorized
+    find . \
+    -path "./airflow/www/node_modules" -prune -o \
+    -path "./airflow/www_rbac/node_modules" -prune -o \
+    -path "./airflow/migrations/versions" -prune -o \
+    -path "./.eggs" -prune -o \
+    -path "./docs/_build" -prune -o \
+    -path "./build" -prune -o \
+    -name "*.py" \
+    -not -name 'webserver_config.py' | \
+        grep  ".*.py$" | \
+        grep -vFf scripts/ci/pylint_todo.txt | xargs pylint --output-format=colorized
 else
-    /usr/local/bin/pylint --output-format=colorized "$( filenames_to_python_module "$@")"
+    /usr/local/bin/pylint --output-format=colorized "$@"
 fi
