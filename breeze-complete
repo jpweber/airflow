@@ -59,6 +59,7 @@ _BREEZE_ALLOWED_INSTALL_AIRFLOW_VERSIONS=$(cat <<-EOF
 1.10.2
 master
 v1-10-test
+v2-0-test
 EOF
 )
 
