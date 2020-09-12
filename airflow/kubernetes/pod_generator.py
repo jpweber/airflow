@@ -524,12 +524,12 @@ class PodGenerator:
             namespace=namespace,
             image=kube_image,
             labels={
-                'airflow-worker': worker_uuid,
                 'dag_id': make_safe_label_value(dag_id),
                 'task_id': make_safe_label_value(task_id),
                 'execution_date': datetime_to_label_safe_datestring(date),
                 'try_number': str(try_number),
                 'airflow_version': airflow_version.replace('+', '-'),
+                'airflow-worker': str(worker_uuid),
                 'kubernetes_executor': 'True',
             },
             annotations={
