@@ -61,4 +61,7 @@ echo
 echo  Importing all classes in Airflow 1.10
 echo
 
+# We need to make sure we are not in the airflow checkout, otherwise it will automatically be added to the
+# import path
+cd /
 python3 /import_all_provider_classes.py
