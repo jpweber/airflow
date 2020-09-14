@@ -835,8 +835,8 @@ class KubernetesExecutor(BaseExecutor, LoggingMixin):
             _create_pod_id(dag_id=ti.dag_id, task_id=ti.task_id): ti
             for ti in tis if ti.external_executor_id
         }
+        kube_client: client.CoreV1Api = self.kube_client
         for worker_uuid in worker_uuids:
-            kube_client: client.CoreV1Api = self.kube_client
             kwargs = {'label_selector': 'airflow-worker={}'.format(worker_uuid)}
             pod_list = kube_client.list_namespaced_pod(
                 namespace=self.kube_config.kube_namespace, **kwargs)
@@ -856,7 +856,28 @@ class KubernetesExecutor(BaseExecutor, LoggingMixin):
                 except ApiException as e:
                     self.log.info("failed to adopt pod %s. reason: %s", pod.metadata.name, e)
         tis_to_flush.extend(pod_ids.values())
+        if self.kube_config.delete_worker_pods:
+            self._adopt_completed_pods(kube_client)
         return tis_to_flush
+
+    def _adopt_completed_pods(self, kube_client):
+        from airflow.version import version as airflow_version
+        kwargs = {
+            'field_selector': "status.phase=Succeeded",
+            'label_selector': f"airflow_version={airflow_version.replace('+', '-')}",
+        }
+        pod_list = kube_client.list_namespaced_pod(namespace=self.kube_config.kube_namespace, **kwargs)
+        for pod in pod_list.items:
+            self.log.info("attempting to adopt pod %s", pod.metadata.name)
+            pod.metadata.labels['airflow-worker'] = str(self.worker_uuid)
+            try:
+                kube_client.patch_namespaced_pod(
+                    name=pod.metadata.name,
+                    namespace=pod.metadata.namespace,
+                    body=PodGenerator.serialize_pod(pod),
+                )
+            except ApiException as e:
+                self.log.info("failed to adopt pod %s. reason: %s", pod.metadata.name, e)
 
     def _flush_task_queue(self) -> None:
         if not self.task_queue:
