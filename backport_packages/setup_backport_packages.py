@@ -1110,7 +1110,7 @@ def update_release_notes_for_packages(provider_ids: List[str], release_version: 
     :return:
     """
     imported_classes = import_all_provider_classes(
-        source_path=SOURCE_DIR_PATH, provider_ids=provider_ids, print_imports=False)
+        source_paths=[SOURCE_DIR_PATH], provider_ids=provider_ids, print_imports=False)
     make_sure_remote_apache_exists_and_fetch()
     if len(provider_ids) == 0:
         provider_ids = get_all_backportable_providers()

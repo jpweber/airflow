@@ -31,7 +31,7 @@ if [[ ! ${INSTALL_AIRFLOW_VERSION:=""} =~ 1.10* ]]; then
     echo "Set INSTALL_AIRFLOW_VERSION variable to the version you want to install before running!"
     exit 1
 else
-    pushd /airflow_sources || exit
+    pushd /airflow_sources > /dev/null || exit
     echo
     echo "Installing remaining packages from 'all' extras"
     echo
@@ -40,7 +40,7 @@ else
     echo "Uninstalling airflow after that"
     echo
     pip uninstall -y apache-airflow >>"${OUT_FILE_PRINTED_ON_ERROR}"  2>&1
-    popd || exit
+    popd >/dev/null || exit
     echo
     echo "Install airflow from PyPI - ${INSTALL_AIRFLOW_VERSION}"
     echo
