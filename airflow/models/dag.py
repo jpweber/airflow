@@ -606,6 +606,9 @@ class DAG(BaseDag, LoggingMixin):
         """
         Returns a boolean indicating whether the concurrency limit for this DAG
         has been reached
+
+        :param session: Sqlalchemy ORM Session
+        :type session: Session
         """
         TI = TaskInstance
         qry = session.query(func.count(TI.task_id)).filter(
