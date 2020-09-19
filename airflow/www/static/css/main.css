@@ -52,6 +52,11 @@ div.container {
   padding: 7px 15px;
 }
 
+.brand-logo {
+  width: 94px;
+  height: 36px;
+}
+
 .modal-backdrop {
   z-index: 2;
   position: fixed;
