@@ -33,7 +33,7 @@ try:
     from kubernetes.client.rest import ApiException
 
     from airflow.executors.kubernetes_executor import (
-        AirflowKubernetesScheduler, KubernetesExecutor, KubernetesJobWatcher, create_pod_id,
+        AirflowKubernetesScheduler, KubernetesExecutor, create_pod_id,
     )
     from airflow.kubernetes import pod_generator
     from airflow.kubernetes.pod_generator import PodGenerator
