@@ -125,6 +125,11 @@ class TestKubernetesExecutor(unittest.TestCase):
     Tests if an ApiException from the Kube Client will cause the task to
     be rescheduled.
     """
+
+    def setUp(self) -> None:
+        self.kubernetes_executor = KubernetesExecutor()
+        self.kubernetes_executor.job_id = "5"
+
     @unittest.skipIf(AirflowKubernetesScheduler is None,
                      'kubernetes python package is not installed')
     @mock.patch('airflow.executors.kubernetes_executor.KubernetesJobWatcher')
@@ -155,7 +160,7 @@ class TestKubernetesExecutor(unittest.TestCase):
         }
         with conf_vars(config):
 
-            kubernetes_executor = KubernetesExecutor()
+            kubernetes_executor = self.kubernetes_executor
             kubernetes_executor.start()
             # Execute a task while the Api Throws errors
             try_number = 1
@@ -182,7 +187,7 @@ class TestKubernetesExecutor(unittest.TestCase):
     @mock.patch('airflow.executors.base_executor.BaseExecutor.trigger_tasks')
     @mock.patch('airflow.executors.base_executor.Stats.gauge')
     def test_gauge_executor_metrics(self, mock_stats_gauge, mock_trigger_tasks, mock_sync, mock_kube_config):
-        executor = KubernetesExecutor()
+        executor = self.kubernetes_executor
         executor.heartbeat()
         calls = [mock.call('executor.open_slots', mock.ANY),
                  mock.call('executor.queued_tasks', mock.ANY),
@@ -192,7 +197,7 @@ class TestKubernetesExecutor(unittest.TestCase):
     @mock.patch('airflow.executors.kubernetes_executor.KubernetesJobWatcher')
     @mock.patch('airflow.executors.kubernetes_executor.get_kube_client')
     def test_change_state_running(self, mock_get_kube_client, mock_kubernetes_job_watcher):
-        executor = KubernetesExecutor()
+        executor = self.kubernetes_executor
         executor.start()
         key = ('dag_id', 'task_id', 'ex_time', 'try_number1')
         executor._change_state(key, State.RUNNING, 'pod_id', 'default')
@@ -202,7 +207,7 @@ class TestKubernetesExecutor(unittest.TestCase):
     @mock.patch('airflow.executors.kubernetes_executor.get_kube_client')
     @mock.patch('airflow.executors.kubernetes_executor.AirflowKubernetesScheduler.delete_pod')
     def test_change_state_success(self, mock_delete_pod, mock_get_kube_client, mock_kubernetes_job_watcher):
-        executor = KubernetesExecutor()
+        executor = self.kubernetes_executor
         executor.start()
         test_time = timezone.utcnow()
         key = ('dag_id', 'task_id', test_time, 'try_number2')
@@ -219,7 +224,7 @@ class TestKubernetesExecutor(unittest.TestCase):
         mock_get_kube_client,
         mock_kubernetes_job_watcher
     ):
-        executor = KubernetesExecutor()
+        executor = self.kubernetes_executor
         executor.kube_config.delete_worker_pods = False
         executor.kube_config.delete_worker_pods_on_failure = False
         executor.start()
@@ -236,7 +241,7 @@ class TestKubernetesExecutor(unittest.TestCase):
     def test_change_state_skip_pod_deletion(self, mock_delete_pod, mock_get_kube_client,
                                             mock_kubernetes_job_watcher):
         test_time = timezone.utcnow()
-        executor = KubernetesExecutor()
+        executor = self.kubernetes_executor
         executor.kube_config.delete_worker_pods = False
         executor.kube_config.delete_worker_pods_on_failure = False
 
@@ -251,7 +256,7 @@ class TestKubernetesExecutor(unittest.TestCase):
     @mock.patch('airflow.executors.kubernetes_executor.AirflowKubernetesScheduler.delete_pod')
     def test_change_state_failed_pod_deletion(self, mock_delete_pod, mock_get_kube_client,
                                               mock_kubernetes_job_watcher):
-        executor = KubernetesExecutor()
+        executor = self.kubernetes_executor
         executor.kube_config.delete_worker_pods_on_failure = True
 
         executor.start()
@@ -262,7 +267,7 @@ class TestKubernetesExecutor(unittest.TestCase):
 
     @mock.patch('airflow.executors.kubernetes_executor.get_kube_client')
     def test_adopt_launched_task(self, mock_kube_client):
-        executor = KubernetesExecutor()
+        executor = self.kubernetes_executor
         executor.worker_uuid = "modified"
         pod_ids = {"dagtask": {}}
         pod = k8s.V1Pod(
@@ -297,7 +302,7 @@ class TestKubernetesExecutor(unittest.TestCase):
         @return:
         """
 
-        executor = KubernetesExecutor()
+        executor = self.kubernetes_executor
         executor.worker_uuid = "modified"
         pod_ids = {}
         pod = k8s.V1Pod(

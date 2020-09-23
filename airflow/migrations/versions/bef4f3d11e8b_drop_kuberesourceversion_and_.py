@@ -16,21 +16,22 @@
 # specific language governing permissions and limitations
 # under the License.
 
-"""Drop KubeResourceVersion and KubeWorkerIdentifier tables
+"""Drop KubeResourceVersion and KubeWorkerId
 
-Revision ID: 6ff377c9c757
+Revision ID: bef4f3d11e8b
 Revises: e1a11ece99cc
-Create Date: 2020-09-21 07:34:43.025649
+Create Date: 2020-09-22 18:45:28.011654
 
 """
 
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = '6ff377c9c757'
+revision = 'bef4f3d11e8b'
 down_revision = 'e1a11ece99cc'
 branch_labels = None
 depends_on = None
+
 
 WORKER_UUID_TABLE = "kube_worker_uuid"
 WORKER_RESOURCEVERSION_TABLE = "kube_resource_version"
